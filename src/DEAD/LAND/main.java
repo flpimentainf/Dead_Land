@@ -6,8 +6,9 @@ package DEAD.LAND;
  * DATA:   29/04/2026
  */
 
+import DEAD.LAND.ui.moldura;
 
-public class principal {
+public class main {
 
 	public static void main(String[] args) {
 		System.out.println("DEAD LAND");
