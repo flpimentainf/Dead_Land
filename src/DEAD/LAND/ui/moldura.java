@@ -1,4 +1,4 @@
-package DEAD.LAND;
+package DEAD.LAND.ui;
 
 import java.awt.BorderLayout;
 

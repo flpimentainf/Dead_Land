@@ -1,4 +1,4 @@
-package DEAD.LAND;
+package DEAD.LAND.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,13 +8,19 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+import DEAD.LAND.core.gameLoop;
+import DEAD.LAND.core.spriteLoop;
+import DEAD.LAND.entity.player;
+import DEAD.LAND.input.escutadorTeclado;
+import DEAD.LAND.world.tileMap;
+
 
 public class panel extends JPanel{
 	private String posicao;
 	gameLoop GL;
 	escutadorTeclado ET;
 	spriteLoop SL;
-    player jogador;
+    private player jogador;
     tileMap cenario;
 
 
@@ -27,7 +33,7 @@ public class panel extends JPanel{
             	this.setPreferredSize(new Dimension(768, 480));
                 this.setBackground(Color.BLACK);
                 
-                jogador = new player();
+                setJogador(new player());
 
                 
                 ET = new escutadorTeclado();
@@ -68,7 +74,7 @@ public class panel extends JPanel{
             	g2.fillRect(0, 0, getWidth(), getHeight());
             	
             	this.cenario.desenhar(g2);
-            	jogador.desenharPlayer(g2);
+            	getJogador().desenharPlayer(g2);
 
                 break;
                 
@@ -80,4 +86,14 @@ public class panel extends JPanel{
                 
         }
     }
+
+
+	public player getJogador() {
+		return jogador;
+	}
+
+
+	public void setJogador(player jogador) {
+		this.jogador = jogador;
+	}
 }

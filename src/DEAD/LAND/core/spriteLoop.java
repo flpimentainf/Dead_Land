@@ -1,9 +1,12 @@
-package DEAD.LAND;
+package DEAD.LAND.core;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
+
+import DEAD.LAND.input.escutadorTeclado;
+import DEAD.LAND.ui.panel;
 
 public class spriteLoop extends Thread implements Runnable, ActionListener{
 	private int FPS = 15;
@@ -36,7 +39,7 @@ public class spriteLoop extends Thread implements Runnable, ActionListener{
         	tempoUltimaMedidaDoLoop = tempoAtualDoLoop;
         	
         	if (tempoDecorrido >=1) {
-        		CenaDoJogo.jogador.atualizarSprite(ET.movePraEsq, ET.movePraCima, 
+        		CenaDoJogo.getJogador().atualizarSprite(ET.movePraEsq, ET.movePraCima, 
 						ET.movePraDir, ET.movePraBaixo);
         		CenaDoJogo.repaint();
         		this.contadorDeFPS++;

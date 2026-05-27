@@ -1,4 +1,4 @@
-package DEAD.LAND;
+package DEAD.LAND.input;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
