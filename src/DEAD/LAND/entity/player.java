@@ -9,6 +9,8 @@ import javax.swing.ImageIcon;
 
 public class player extends Rectangle{
     private Color CorFundo = Color.WHITE;
+    public Rectangle AreaColisao;
+    public int passo = 3;
     
     Image[]imgPlayerDown = new Image[3];
     Image[]imgPlayerRight = new Image[3];
@@ -22,6 +24,8 @@ public class player extends Rectangle{
         this.y = 100;
         this.width = 48;
         this.height = 48;
+        this.AreaColisao = new Rectangle();
+        atualizarAreaColisao();
         //ImageIcon icon;
         //icon = new ImageIcon("res/PLAYERS/down1.png");
         //this.imagemPlayer = icon.getImage();
@@ -37,14 +41,25 @@ public class player extends Rectangle{
     public void desenharPlayer(Graphics2D g) {
         g.setColor(this.CorFundo);
         // g.fillRect(this.x, this.y, this.width, this.height);
+        // Para visualizar a area de colisao, descomente a linha abaixo.
+        // g.fillRect(this.AreaColisao.x, this.AreaColisao.y, this.AreaColisao.width, this.AreaColisao.height);
         g.drawImage(imagemPlayer, x, y, width, height, null);
     }
     
     public void atualizarPosicaoJogador (boolean ME, boolean MC, boolean MD, boolean MB) {
-    	if (ME)	this.x -= 3;
-    	if (MD)	this.x += 3;
-    	if (MC)	this.y -= 3;
-    	if (MB)	this.y += 3;
+    	if (ME)	this.x -= this.passo;
+    	if (MD)	this.x += this.passo;
+    	if (MC)	this.y -= this.passo;
+    	if (MB)	this.y += this.passo;
+
+        atualizarAreaColisao();
+    }
+
+    public void atualizarAreaColisao() {
+        this.AreaColisao.x = this.x + 3;
+        this.AreaColisao.y = this.y + this.height / 2;
+        this.AreaColisao.width = this.width - 20;
+        this.AreaColisao.height = this.height / 2;
     }
     
     public void atualizarSprite(boolean moveEsq, boolean moveCima,
