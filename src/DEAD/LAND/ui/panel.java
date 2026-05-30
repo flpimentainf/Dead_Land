@@ -72,7 +72,9 @@ public class panel extends JPanel{
             case "centro":
             	g2.setColor(Color.BLACK);
             	g2.fillRect(0, 0, getWidth(), getHeight());
-            	
+
+            	g2.scale((double) getWidth() / 768, (double) getHeight() / 480);
+
             	this.cenario.desenhar(g2);
             	getJogador().desenharPlayer(g2);
 
