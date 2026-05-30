@@ -16,6 +16,7 @@ public class tiles {
 
     private Image[] imagensTiles = new Image[TOTAL_TILES + 1];
     private Image imgAtual;
+    private int valorAtual;
 
     private static final int AJUSTE_ID_ARQUIVO = 1;
 
@@ -23,6 +24,15 @@ public class tiles {
 
     public tiles() {
         carregarTodasImagens();
+        configurarTilesSolidos();
+    }
+
+    private void configurarTilesSolidos() {
+        // Valores da matriz que devem bloquear o jogador.
+        // Para adicionar/remover blocos solidos, edite esta lista.
+        this.tilesSolidos.add(7);
+        this.tilesSolidos.add(16);
+        this.tilesSolidos.add(18);
     }
 
     public void desenhar(Graphics2D g, int linha, int coluna) {
@@ -45,6 +55,7 @@ public class tiles {
     }
 
     public void carregaPecaDaMatriz(int valorDaPeca) {
+        this.valorAtual = valorDaPeca;
         int idArquivo = valorDaPeca + AJUSTE_ID_ARQUIVO;
 
         if (idArquivo >= 1 && idArquivo <= TOTAL_TILES && this.imagensTiles[idArquivo] != null) {
@@ -54,6 +65,14 @@ public class tiles {
         }
     }
 
+
+    public boolean isColisao() {
+        return this.tilesSolidos.contains(this.valorAtual);
+    }
+
+    public boolean isTileSolido(int valorDaPeca) {
+        return this.tilesSolidos.contains(valorDaPeca);
+    }
 
     public int getLargura() {
         return LARGURA;

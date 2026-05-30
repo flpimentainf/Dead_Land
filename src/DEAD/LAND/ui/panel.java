@@ -21,7 +21,7 @@ public class panel extends JPanel{
 	escutadorTeclado ET;
 	spriteLoop SL;
     private player jogador;
-    tileMap cenario;
+    private tileMap cenario;
 
 
 	
@@ -96,4 +96,9 @@ public class panel extends JPanel{
 	public void setJogador(player jogador) {
 		this.jogador = jogador;
 	}
+
+
+    public tileMap getCenario() {
+        return cenario;
+    }
 }

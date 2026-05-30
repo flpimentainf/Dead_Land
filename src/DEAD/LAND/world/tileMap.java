@@ -3,8 +3,8 @@ package DEAD.LAND.world;
 import java.awt.Graphics2D;
 
 public class tileMap {
-	tiles pecaDoCenario;
-	int [][] cenarioValido;
+	private tiles pecaDoCenario;
+	private int [][] cenarioValido;
 	int [][] cenarioDoJogo = {  {1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
 								{2,2,0,0,2,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
 							    {2,0,18,7,0,2,2,0,0,2,2,0,7,18,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
@@ -95,4 +95,16 @@ public class tileMap {
 			}
 		}
 	}
+
+    public boolean tileTemColisao(int linha, int coluna) {
+        if (linha < 0 || coluna < 0 || linha >= this.cenarioValido.length || coluna >= this.cenarioValido[0].length) {
+            return true;
+        }
+        return this.pecaDoCenario.isTileSolido(this.cenarioValido[linha][coluna]);
+    }
+
+    public int getTamanhoTile() {
+        return tiles.LARGURA;
+    }
+
 }
