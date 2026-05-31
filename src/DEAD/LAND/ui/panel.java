@@ -70,22 +70,23 @@ public class panel extends JPanel{
 
         switch (posicao) {
             case "centro":
-            	g2.setColor(Color.BLACK);
-            	g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.setColor(Color.BLACK);
+                g2.fillRect(0, 0, getWidth(), getHeight());
 
-            	g2.scale((double) getWidth() / 768, (double) getHeight() / 480);
+                if (this.cenario == null) break;
 
-            	this.cenario.desenhar(g2);
-            	getJogador().desenharPlayer(g2);
+                double escalaX = (double) getWidth()  / this.cenario.getLarguraTotal();
+                double escalaY = (double) getHeight() / this.cenario.getAlturaTotal();
+                g2.scale(escalaX, escalaY);
 
+                this.cenario.desenhar(g2);
+                getJogador().desenharPlayer(g2);
                 break;
-                
+
             case "sul":
-            	g2.setColor(Color.YELLOW);
-            	g2.fillRect(0, 0, getWidth(), getHeight());
-
+                g2.setColor(Color.YELLOW);
+                g2.fillRect(0, 0, getWidth(), getHeight());
                 break;
-                
         }
     }
 
@@ -102,5 +103,17 @@ public class panel extends JPanel{
 
     public tileMap getCenario() {
         return cenario;
+    }
+
+    public void irParaProximoCenario() {
+        cenario.irParaProximoCenario();
+        getJogador().x = 10;
+        getJogador().atualizarAreaColisao();
+    }
+
+    public void irParaCenarioAnterior() {
+        cenario.irParaCenarioAnterior();
+        getJogador().x = cenario.getLarguraTotal() - getJogador().width - 10;
+        getJogador().atualizarAreaColisao();
     }
 }

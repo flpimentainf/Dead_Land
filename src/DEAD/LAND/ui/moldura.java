@@ -9,7 +9,7 @@ public class moldura extends JFrame{
     public moldura() {
         this.setTitle("DEAD LAND");
         this.setAlwaysOnTop(true);
-        this.setResizable(false);
+        this.setResizable(true);
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         

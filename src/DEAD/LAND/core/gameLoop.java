@@ -40,22 +40,37 @@ public class gameLoop extends Thread implements Runnable, ActionListener{
         	tempoUltimaMedidaDoLoop = tempoAtualDoLoop;
         	
         	if (tempoDecorrido >=1) {
-                String direcao = "";
-                if (ET.movePraCima) direcao = "cima";
-                if (ET.movePraBaixo) direcao = "baixo";
-                if (ET.movePraDir) direcao = "direita";
-                if (ET.movePraEsq) direcao = "esquerda";
 
-                verificadorDeColisao verificadorDeColisao = new verificadorDeColisao();
-                boolean bateu = verificadorDeColisao.ocorreuColisao(
-                        CenaDoJogo.getJogador(),
-                        CenaDoJogo.getCenario(),
-                        direcao
-                );
+                if (CenaDoJogo.getCenario() != null) {
 
-                if (!bateu) {
-                    CenaDoJogo.getJogador().atualizarPosicaoJogador(ET.movePraEsq, ET.movePraCima,
-                            ET.movePraDir, ET.movePraBaixo);
+                    String direcao = "";
+                    if (ET.movePraCima) direcao = "cima";
+                    if (ET.movePraBaixo) direcao = "baixo";
+                    if (ET.movePraDir) direcao = "direita";
+                    if (ET.movePraEsq) direcao = "esquerda";
+
+                    verificadorDeColisao verificadorDeColisao = new verificadorDeColisao();
+                    boolean bateu = verificadorDeColisao.ocorreuColisao(
+                            CenaDoJogo.getJogador(),
+                            CenaDoJogo.getCenario(),
+                            direcao
+                    );
+
+                    if (!bateu) {
+                        CenaDoJogo.getJogador().atualizarPosicaoJogador(ET.movePraEsq, ET.movePraCima,
+                                ET.movePraDir, ET.movePraBaixo);
+                    }
+
+                    int larguraMapa = CenaDoJogo.getCenario().getLarguraTotal();
+                    int jogadorX   = CenaDoJogo.getJogador().x;
+                    int jogadorW   = CenaDoJogo.getJogador().width;
+
+                    if (jogadorX + jogadorW < 0) {
+                        CenaDoJogo.irParaCenarioAnterior();
+                    } else if (jogadorX > larguraMapa) {
+                        CenaDoJogo.irParaProximoCenario();
+                    }
+
                 }
 
         		CenaDoJogo.repaint();

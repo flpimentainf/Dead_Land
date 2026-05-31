@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 public class tiles {
     public static final int LARGURA = 48;
     public static final int ALTURA = 48;
-    public static final int TOTAL_TILES = 132;
+    public static final int TOTAL_TILES = 141;
 
     private static final String PASTA_TILES = "repos/tiles/";
 
@@ -33,6 +33,14 @@ public class tiles {
         this.tilesSolidos.add(7);
         this.tilesSolidos.add(16);
         this.tilesSolidos.add(18);
+        this.tilesSolidos.add(133);
+        this.tilesSolidos.add(134);
+        this.tilesSolidos.add(135);
+        this.tilesSolidos.add(136);
+        this.tilesSolidos.add(137);
+        this.tilesSolidos.add(138);
+        this.tilesSolidos.add(139);
+        this.tilesSolidos.add(140);
     }
 
     public void desenhar(Graphics2D g, int linha, int coluna) {
