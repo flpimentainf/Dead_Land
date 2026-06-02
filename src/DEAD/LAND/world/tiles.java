@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 public class tiles {
     public static final int LARGURA = 48;
     public static final int ALTURA = 48;
-    public static final int TOTAL_TILES = 141;
+    public static final int TOTAL_TILES = 142;
 
     private static final String PASTA_TILES = "repos/tiles/";
 
