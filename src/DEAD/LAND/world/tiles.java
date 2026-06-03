@@ -37,7 +37,6 @@ public class tiles {
         this.tilesSolidos.add(31);
         this.tilesSolidos.add(32);
         this.tilesSolidos.add(26);
-        this.tilesSolidos.add(38);
         this.tilesSolidos.add(56);
         this.tilesSolidos.add(11);
         this.tilesSolidos.add(12);

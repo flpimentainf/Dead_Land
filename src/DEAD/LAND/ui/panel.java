@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
@@ -22,6 +21,7 @@ public class panel extends JPanel{
 	spriteLoop SL;
     private player jogador;
     private tileMap cenario;
+    private IconeInteracao iconeInteracao;
 
 
 	
@@ -31,9 +31,11 @@ public class panel extends JPanel{
         switch (this.posicao) {
             case "centro":
             	this.setPreferredSize(new Dimension(768, 480));
-                this.setBackground(Color.BLACK);
+            	this.setBackground(Color.BLACK);
                 
                 setJogador(new player());
+                this.cenario = new tileMap();
+                this.iconeInteracao = new IconeInteracao();
 
                 
                 ET = new escutadorTeclado();
@@ -45,8 +47,6 @@ public class panel extends JPanel{
                 
                 GL.start();
                 SL.start();
-                
-                this.cenario = new tileMap();
 
                 break;
 
@@ -81,6 +81,7 @@ public class panel extends JPanel{
 
                 this.cenario.desenhar(g2);
                 getJogador().desenharPlayer(g2);
+                this.iconeInteracao.desenharCama(g2, this.cenario, getJogador());
                 break;
 
             case "sul":
@@ -105,15 +106,33 @@ public class panel extends JPanel{
         return cenario;
     }
 
+    public boolean jogadorPertoDaCama() {
+        if (this.cenario == null || getJogador() == null) {
+            return false;
+        }
+
+        getJogador().atualizarAreaColisao();
+        return this.cenario.getAreaCamaPerto(getJogador().AreaColisao) != null;
+    }
+
+    public void irParaCenario(int indexCenario, int jogadorX, int jogadorY) {
+        cenario.irParaCenario(indexCenario);
+        posicionarJogador(jogadorX, jogadorY);
+    }
+
     public void irParaProximoCenario() {
         cenario.irParaProximoCenario();
-        getJogador().x = 10;
-        getJogador().atualizarAreaColisao();
+        posicionarJogador(10, getJogador().y);
     }
 
     public void irParaCenarioAnterior() {
         cenario.irParaCenarioAnterior();
-        getJogador().x = cenario.getLarguraTotal() - getJogador().width - 10;
+        posicionarJogador(cenario.getLarguraTotal() - getJogador().width - 10, getJogador().y);
+    }
+
+    private void posicionarJogador(int x, int y) {
+        getJogador().x = x;
+        getJogador().y = y;
         getJogador().atualizarAreaColisao();
     }
 }

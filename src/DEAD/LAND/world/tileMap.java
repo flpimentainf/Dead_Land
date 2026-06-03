@@ -1,24 +1,31 @@
 package DEAD.LAND.world;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 
 public class tileMap {
+	private static final int VAZIO = -1;
+	private static final int TILE_CAMA = 0;
+	private static final int ALCANCE_INTERACAO = 16;
+
 	private tiles pecaDoCenario;
 	private int [][] cenarioValido;
+	private int [][] camadaObjetosValida;
 	private int cenarioAtualIndex = 0;
 	private int [][][] todosOsCenarios;
+	private int [][][] todosOsObjetos;
 
 	int [][] cenario1DoJogo = {
 		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37},
 		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37},
 		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 53, 39, 39, 39, 39, 39, 39, 39, 39, 53, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37},
-		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 53, 39, 39, 39, 39, 39, 39, 39,  0, 53, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37},
+		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 53, 39, 39, 39, 39, 39, 39, 39, 39, 53, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37},
 		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 53, 39, 39, 39, 39, 39, 39, 39, 39, 53, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37},
 		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 53, 39, 39, 39, 39, 39, 39, 39, 39, 53, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37},
 		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 53, 39, 39, 39, 39, 39, 39, 39, 39, 53, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37},
 		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 53, 39, 39, 39, 39, 39, 39, 39, 39, 53, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37},
 		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 53, 53, 23, 24, 31, 32, 24, 26, 53, 53, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37},
-		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37}
+		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37},
 	};
 
 	int [][] cenario2DoJogo = {
@@ -112,6 +119,19 @@ public class tileMap {
 		{ 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38},
 	};
 
+	int[][] cenario1Objetos = {
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, 0, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+	};
+
 	public tileMap() {
 		this.pecaDoCenario = new tiles();
 		this.todosOsCenarios = new int[][][] {
@@ -124,22 +144,41 @@ public class tileMap {
 			this.cenario7DoJogo,
 			this.cenario8DoJogo
 		};
-		this.cenarioAtualIndex = 7;
-		this.cenarioValido = this.todosOsCenarios[this.cenarioAtualIndex];
+		this.todosOsObjetos = new int[][][] {
+			this.cenario1Objetos,
+			criarCamadaVazia(this.cenario2DoJogo),
+			criarCamadaVazia(this.cenario3DoJogo),
+			criarCamadaVazia(this.cenario4DoJogo),
+			criarCamadaVazia(this.cenario5DoJogo),
+			criarCamadaVazia(this.cenario6DoJogo),
+			criarCamadaVazia(this.cenario7DoJogo),
+			criarCamadaVazia(this.cenario8DoJogo)
+		};
+		this.cenarioAtualIndex = 0;
+		atualizarCenarioValido();
 	}
 
 	public void irParaProximoCenario() {
 		if (this.cenarioAtualIndex < this.todosOsCenarios.length - 1) {
 			this.cenarioAtualIndex++;
-			this.cenarioValido = this.todosOsCenarios[this.cenarioAtualIndex];
+			atualizarCenarioValido();
 		}
 	}
 
 	public void irParaCenarioAnterior() {
 		if (this.cenarioAtualIndex > 0) {
 			this.cenarioAtualIndex--;
-			this.cenarioValido = this.todosOsCenarios[this.cenarioAtualIndex];
+			atualizarCenarioValido();
 		}
+	}
+
+	public void irParaCenario(int indexCenario) {
+		if (indexCenario < 0 || indexCenario >= this.todosOsCenarios.length) {
+			return;
+		}
+
+		this.cenarioAtualIndex = indexCenario;
+		atualizarCenarioValido();
 	}
 
 	public boolean ehPrimeiroCenario() {
@@ -150,15 +189,45 @@ public class tileMap {
 		return this.cenarioAtualIndex >= this.todosOsCenarios.length - 1;
 	}
 
-	public void desenhar(Graphics2D g) {
-		int pecaDaMatriz;
-		for (int col = 0; col < this.cenarioValido[0].length; col++) {
-			for (int lin = 0; lin < this.cenarioValido.length; lin++) {
-				pecaDaMatriz = this.cenarioValido[lin][col];
+	public int getCenarioAtualIndex() {
+		return this.cenarioAtualIndex;
+	}
+
+	private int[][] criarCamadaVazia(int[][] cenarioBase) {
+		int[][] camada = new int[cenarioBase.length][cenarioBase[0].length];
+
+		for (int lin = 0; lin < camada.length; lin++) {
+			for (int col = 0; col < camada[lin].length; col++) {
+				camada[lin][col] = VAZIO;
+			}
+		}
+
+		return camada;
+	}
+
+	private void atualizarCenarioValido() {
+		this.cenarioValido = this.todosOsCenarios[this.cenarioAtualIndex];
+		this.camadaObjetosValida = this.todosOsObjetos[this.cenarioAtualIndex];
+	}
+
+	private void desenharCamada(Graphics2D g, int[][] camada, boolean ignorarVazio) {
+		for (int col = 0; col < camada[0].length; col++) {
+			for (int lin = 0; lin < camada.length; lin++) {
+				int pecaDaMatriz = camada[lin][col];
+
+				if (ignorarVazio && pecaDaMatriz == VAZIO) {
+					continue;
+				}
+
 				this.pecaDoCenario.carregaPecaDaMatriz(pecaDaMatriz);
 				this.pecaDoCenario.desenhar(g, lin, col);
 			}
 		}
+	}
+
+	public void desenhar(Graphics2D g) {
+		desenharCamada(g, this.cenarioValido, false);
+		desenharCamada(g, this.camadaObjetosValida, true);
 	}
 
 	public boolean tileTemColisao(int linha, int coluna) {
@@ -171,7 +240,36 @@ public class tileMap {
 		if (coluna >= this.cenarioValido[0].length) {
 			return this.ehUltimoCenario();
 		}
-		return this.pecaDoCenario.isTileSolido(this.cenarioValido[linha][coluna]);
+		int tileBase = this.cenarioValido[linha][coluna];
+		int tileObjeto = this.camadaObjetosValida[linha][coluna];
+
+		return this.pecaDoCenario.isTileSolido(tileBase)
+				|| (tileObjeto != VAZIO && this.pecaDoCenario.isTileSolido(tileObjeto));
+	}
+
+	public Rectangle getAreaCamaPerto(Rectangle areaJogador) {
+		Rectangle areaInteracao = new Rectangle(areaJogador);
+		areaInteracao.grow(ALCANCE_INTERACAO, ALCANCE_INTERACAO);
+
+		for (int lin = 0; lin < this.camadaObjetosValida.length; lin++) {
+			for (int col = 0; col < this.camadaObjetosValida[lin].length; col++) {
+				if (this.camadaObjetosValida[lin][col] != TILE_CAMA) {
+					continue;
+				}
+
+				Rectangle areaCama = new Rectangle(
+						col * tiles.LARGURA,
+						lin * tiles.ALTURA,
+						tiles.LARGURA,
+						tiles.ALTURA);
+
+				if (areaInteracao.intersects(areaCama)) {
+					return areaCama;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	public int getTamanhoTile() {

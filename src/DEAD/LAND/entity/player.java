@@ -8,9 +8,17 @@ import java.awt.Rectangle;
 import javax.swing.ImageIcon;
 
 public class player extends Rectangle{
+    private static final int VELOCIDADE_QUEDA_INICIAL = 4;
+    private static final int VELOCIDADE_QUEDA_MAXIMA = 14;
+    private static final int GRAVIDADE_QUEDA = 1;
+    private static final int FRAMES_PARA_TROCAR_SPRITE_QUEDA = 8;
+
     private Color CorFundo = Color.WHITE;
     public Rectangle AreaColisao;
     public int passo = 3;
+    private boolean caindo;
+    private int velocidadeQueda;
+    private int contadorFramesQueda;
     
     Image[]imgPlayerDown = new Image[3];
     Image[]imgPlayerRight = new Image[3];
@@ -20,8 +28,8 @@ public class player extends Rectangle{
     private int frameJogador = 0;
 
     public player() {
-        this.x = 100;
-        this.y = 200;
+        this.x = 745;
+        this.y = 335;
         this.width = 48;
         this.height = 48;
         this.AreaColisao = new Rectangle();
@@ -61,9 +69,60 @@ public class player extends Rectangle{
         this.AreaColisao.width = this.width - 20;
         this.AreaColisao.height = this.height / 2;
     }
+
+    public void iniciarQueda() {
+        this.caindo = true;
+        this.velocidadeQueda = VELOCIDADE_QUEDA_INICIAL;
+        this.contadorFramesQueda = 0;
+        this.frameJogador = 0;
+        this.imagemPlayer = this.imgPlayerDown[this.frameJogador];
+        atualizarAreaColisao();
+    }
+
+    public void pararQueda() {
+        this.caindo = false;
+        this.velocidadeQueda = 0;
+        atualizarAreaColisao();
+    }
+
+    public boolean estaCaindo() {
+        return this.caindo;
+    }
+
+    public void atualizarQueda() {
+        this.y += this.velocidadeQueda;
+
+        if (this.velocidadeQueda < VELOCIDADE_QUEDA_MAXIMA) {
+            this.velocidadeQueda += GRAVIDADE_QUEDA;
+        }
+
+        atualizarSpriteQueda();
+        atualizarAreaColisao();
+    }
+
+    private void atualizarSpriteQueda() {
+        this.contadorFramesQueda++;
+
+        if (this.contadorFramesQueda < FRAMES_PARA_TROCAR_SPRITE_QUEDA) {
+            return;
+        }
+
+        this.contadorFramesQueda = 0;
+        this.frameJogador++;
+
+        if (this.frameJogador >= this.imgPlayerDown.length) {
+            this.frameJogador = 0;
+        }
+
+        this.imagemPlayer = this.imgPlayerDown[this.frameJogador];
+    }
     
     public void atualizarSprite(boolean moveEsq, boolean moveCima,
             boolean moveDir, boolean moveBaixo) {
+        if (this.caindo) {
+            return;
+        }
+
         this.frameJogador++;
         if (moveEsq) {
             if (frameJogador >= this.imgPlayerLeft.length)
