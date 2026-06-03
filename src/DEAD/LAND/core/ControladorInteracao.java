@@ -12,7 +12,7 @@ public class ControladorInteracao {
     private int framesSegurandoInteracao;
 
     public void atualizar(panel cenaDoJogo, escutadorTeclado teclado) {
-        if (cenaDoJogo.jogadorPertoDaCama() && teclado.interagir) {
+        if (cenaDoJogo.jogadorPerto() && teclado.interagir) {
             this.framesSegurandoInteracao++;
 
             if (this.framesSegurandoInteracao >= FRAMES_PARA_ACAO) {

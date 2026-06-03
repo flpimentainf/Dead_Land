@@ -106,13 +106,13 @@ public class panel extends JPanel{
         return cenario;
     }
 
-    public boolean jogadorPertoDaCama() {
+    public boolean jogadorPerto() {
         if (this.cenario == null || getJogador() == null) {
             return false;
         }
 
         getJogador().atualizarAreaColisao();
-        return this.cenario.getAreaCamaPerto(getJogador().AreaColisao) != null;
+        return this.cenario.getAreaInteracaoPerto(getJogador().AreaColisao) != null;
     }
 
     public void irParaCenario(int indexCenario, int jogadorX, int jogadorY) {

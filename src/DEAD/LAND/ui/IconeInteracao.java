@@ -14,17 +14,17 @@ public class IconeInteracao {
 
     public void desenharCama(Graphics2D g2, tileMap cenario, player jogador) {
         jogador.atualizarAreaColisao();
-        Rectangle areaCama = cenario.getAreaCamaPerto(jogador.AreaColisao);
+        Rectangle area = cenario.getAreaInteracaoPerto(jogador.AreaColisao);
 
-        if (areaCama == null) {
+        if (area == null) {
             return;
         }
 
-        int x = areaCama.x + areaCama.width / 2 - TAMANHO / 2;
-        int y = areaCama.y - TAMANHO - 4;
+        int x = area.x + area.width / 2 - TAMANHO / 2;
+        int y = area.y - TAMANHO - 4;
 
         if (y < 4) {
-            y = areaCama.y + 4;
+            y = area.y + 4;
         }
 
         desenharBotao(g2, x, y);
