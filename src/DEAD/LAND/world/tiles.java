@@ -32,20 +32,25 @@ public class tiles {
         // Para adicionar/remover blocos solidos, edite esta lista.
         this.tilesSolidos.add(1);
         this.tilesSolidos.add(53);
-        this.tilesSolidos.add(104);
-        this.tilesSolidos.add(117);
-        this.tilesSolidos.add(118);
-        this.tilesSolidos.add(106);
+        this.tilesSolidos.add(23);
+        this.tilesSolidos.add(24);
+        this.tilesSolidos.add(31);
         this.tilesSolidos.add(32);
-        this.tilesSolidos.add(75);
-        this.tilesSolidos.add(76);
-        this.tilesSolidos.add(77);
-        this.tilesSolidos.add(78);
-        this.tilesSolidos.add(75);
-        this.tilesSolidos.add(75);
-        this.tilesSolidos.add(75);
-        this.tilesSolidos.add(75);
-        this.tilesSolidos.add(75);
+        this.tilesSolidos.add(26);
+        this.tilesSolidos.add(38);
+        this.tilesSolidos.add(56);
+        this.tilesSolidos.add(11);
+        this.tilesSolidos.add(12);
+        this.tilesSolidos.add(14);
+        this.tilesSolidos.add(13);
+        this.tilesSolidos.add(15);
+        this.tilesSolidos.add(16);
+        this.tilesSolidos.add(18);
+        this.tilesSolidos.add(17);
+        this.tilesSolidos.add(19);
+        this.tilesSolidos.add(20);
+        this.tilesSolidos.add(27);
+        this.tilesSolidos.add(22);
     }
 
     public void desenhar(Graphics2D g, int linha, int coluna) {
