@@ -20,8 +20,8 @@ public class player extends Rectangle{
     private int frameJogador = 0;
 
     public player() {
-        this.x = 200;
-        this.y = 100;
+        this.x = 100;
+        this.y = 200;
         this.width = 48;
         this.height = 48;
         this.AreaColisao = new Rectangle();

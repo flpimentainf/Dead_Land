@@ -30,7 +30,7 @@ public class tiles {
     private void configurarTilesSolidos() {
         // Valores da matriz que devem bloquear o jogador.
         // Para adicionar/remover blocos solidos, edite esta lista.
-        this.tilesSolidos.add(1);
+        this.tilesSolidos.add(0);
         this.tilesSolidos.add(53);
         this.tilesSolidos.add(23);
         this.tilesSolidos.add(24);
@@ -51,6 +51,11 @@ public class tiles {
         this.tilesSolidos.add(20);
         this.tilesSolidos.add(27);
         this.tilesSolidos.add(22);
+        this.tilesSolidos.add(51);
+        this.tilesSolidos.add(52);
+        this.tilesSolidos.add(43);
+        this.tilesSolidos.add(44);
+        this.tilesSolidos.add(36);
     }
 
     public void desenhar(Graphics2D g, int linha, int coluna) {
