@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 public class tiles {
     public static final int LARGURA = 48;
     public static final int ALTURA = 48;
-    public static final int TOTAL_TILES = 142;
+    public static final int TOTAL_TILES = 60;
 
     private static final String PASTA_TILES = "repos/tiles/";
 
@@ -30,21 +30,31 @@ public class tiles {
     private void configurarTilesSolidos() {
         // Valores da matriz que devem bloquear o jogador.
         // Para adicionar/remover blocos solidos, edite esta lista.
-        this.tilesSolidos.add(7);
+        this.tilesSolidos.add(0);
+        this.tilesSolidos.add(53);
+        this.tilesSolidos.add(23);
+        this.tilesSolidos.add(24);
+        this.tilesSolidos.add(31);
+        this.tilesSolidos.add(32);
+        this.tilesSolidos.add(26);
+        this.tilesSolidos.add(56);
+        this.tilesSolidos.add(11);
+        this.tilesSolidos.add(12);
+        this.tilesSolidos.add(14);
+        this.tilesSolidos.add(13);
+        this.tilesSolidos.add(15);
         this.tilesSolidos.add(16);
         this.tilesSolidos.add(18);
-        this.tilesSolidos.add(133);
-        this.tilesSolidos.add(134);
-        this.tilesSolidos.add(135);
-        this.tilesSolidos.add(136);
-        this.tilesSolidos.add(137);
-        this.tilesSolidos.add(138);
-        this.tilesSolidos.add(139);
-        this.tilesSolidos.add(140);
-        this.tilesSolidos.add(104);
-        this.tilesSolidos.add(21);
-        this.tilesSolidos.add(118);
-        this.tilesSolidos.add(117);
+        this.tilesSolidos.add(17);
+        this.tilesSolidos.add(19);
+        this.tilesSolidos.add(20);
+        this.tilesSolidos.add(27);
+        this.tilesSolidos.add(22);
+        this.tilesSolidos.add(51);
+        this.tilesSolidos.add(52);
+        this.tilesSolidos.add(43);
+        this.tilesSolidos.add(44);
+        this.tilesSolidos.add(36);
     }
 
     public void desenhar(Graphics2D g, int linha, int coluna) {
