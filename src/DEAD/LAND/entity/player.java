@@ -8,8 +8,8 @@ import java.awt.Rectangle;
 import javax.swing.ImageIcon;
 
 public class player extends Rectangle{
-    private static final int VELOCIDADE_QUEDA_INICIAL = 4;
-    private static final int VELOCIDADE_QUEDA_MAXIMA = 14;
+    private static final int VELOCIDADE_QUEDA_INICIAL = 1;
+    private static final int VELOCIDADE_QUEDA_MAXIMA = 6;
     private static final int GRAVIDADE_QUEDA = 1;
     private static final int FRAMES_PARA_TROCAR_SPRITE_QUEDA = 8;
 

@@ -81,7 +81,7 @@ public class panel extends JPanel{
 
                 this.cenario.desenhar(g2);
                 getJogador().desenharPlayer(g2);
-                this.iconeInteracao.desenharCama(g2, this.cenario, getJogador());
+                this.iconeInteracao.desenharArea(g2, this.cenario, getJogador());
                 break;
 
             case "sul":
@@ -112,7 +112,7 @@ public class panel extends JPanel{
         }
 
         getJogador().atualizarAreaColisao();
-        return this.cenario.getAreaInteracaoPerto(getJogador().AreaColisao) != null;
+        return this.cenario.getInteracaoPerto(getJogador().AreaColisao) != null;
     }
 
     public void irParaCenario(int indexCenario, int jogadorX, int jogadorY) {
