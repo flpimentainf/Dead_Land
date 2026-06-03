@@ -15,7 +15,7 @@ public class gameLoop extends Thread implements Runnable, ActionListener{
 	private long contadorDeFPS;
 	private ControladorMovimento controladorMovimento;
 	private ControladorQueda controladorQueda;
-	private ControladorInteracaoCama controladorInteracaoCama;
+	private ControladorInteracao controladorInteracao;
     panel CenaDoJogo;
     escutadorTeclado ET;
 	
@@ -25,7 +25,7 @@ public class gameLoop extends Thread implements Runnable, ActionListener{
         this.ET = ET;
 		this.controladorMovimento = new ControladorMovimento();
 		this.controladorQueda = new ControladorQueda();
-		this.controladorInteracaoCama = new ControladorInteracaoCama();
+		this.controladorInteracao = new ControladorInteracao();
     }
 	
 	@Override
@@ -50,10 +50,10 @@ public class gameLoop extends Thread implements Runnable, ActionListener{
                 if (CenaDoJogo.getCenario() != null) {
 
                     if (this.controladorQueda.atualizar(CenaDoJogo)) {
-                        this.controladorInteracaoCama.resetar();
+                        this.controladorInteracao.resetar();
                     } else {
                         this.controladorMovimento.atualizar(CenaDoJogo, ET);
-                        this.controladorInteracaoCama.atualizar(CenaDoJogo, ET);
+                        this.controladorInteracao.atualizar(CenaDoJogo, ET);
                     }
                 }
 
