@@ -106,13 +106,17 @@ public class panel extends JPanel{
         return cenario;
     }
 
-    public boolean jogadorPerto() {
+    public tileMap.InteracaoPerto getInteracaoPerto() {
         if (this.cenario == null || getJogador() == null) {
-            return false;
+            return null;
         }
 
         getJogador().atualizarAreaColisao();
-        return this.cenario.getInteracaoPerto(getJogador().AreaColisao) != null;
+        return this.cenario.getInteracaoPerto(getJogador().AreaColisao);
+    }
+
+    public boolean jogadorPerto() {
+        return getInteracaoPerto() != null;
     }
 
     public void irParaCenario(int indexCenario, int jogadorX, int jogadorY) {

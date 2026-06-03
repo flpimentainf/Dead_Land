@@ -2,25 +2,27 @@ package DEAD.LAND.core;
 
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.ui.panel;
+import DEAD.LAND.world.tileMap;
 
 public class ControladorInteracao {
     private static final int FRAMES_PARA_ACAO = 60;
-    private static final int CENARIO_APOS_ACAO = 1;
-    private static final int JOGADOR_X_APOS_ACAO = 320;
-    private static final int JOGADOR_Y_APOS_ACAO = 200;
+    private static final int CENARIO_APOS_CAMA = 1;
+    private static final int JOGADOR_X_APOS_CAMA = 320;
+    private static final int JOGADOR_Y_APOS_CAMA = 200;
+    private static final int CENARIO_APOS_PORTA = 5;
+    private static final int JOGADOR_X_APOS_PORTA = 100;
+    private static final int JOGADOR_Y_APOS_PORTA = 200;
 
     private int framesSegurandoInteracao;
 
     public void atualizar(panel cenaDoJogo, escutadorTeclado teclado) {
-        if (cenaDoJogo.jogadorPerto() && teclado.interagir) {
+        tileMap.InteracaoPerto interacao = cenaDoJogo.getInteracaoPerto();
+
+        if (interacao != null && teclado.interagir) {
             this.framesSegurandoInteracao++;
 
             if (this.framesSegurandoInteracao >= FRAMES_PARA_ACAO) {
-                cenaDoJogo.irParaCenario(
-                        CENARIO_APOS_ACAO,
-                        JOGADOR_X_APOS_ACAO,
-                        JOGADOR_Y_APOS_ACAO
-                );
+                executarAcao(cenaDoJogo, interacao);
                 this.framesSegurandoInteracao = 0;
             }
 
@@ -28,6 +30,25 @@ public class ControladorInteracao {
         }
 
         resetar();
+    }
+
+    private void executarAcao(panel cenaDoJogo, tileMap.InteracaoPerto interacao) {
+        if (interacao.tipo == tileMap.TIPO_CAMA) {
+            cenaDoJogo.irParaCenario(
+                    CENARIO_APOS_CAMA,
+                    JOGADOR_X_APOS_CAMA,
+                    JOGADOR_Y_APOS_CAMA
+            );
+            return;
+        }
+
+        if (interacao.tipo == tileMap.TIPO_PORTA) {
+            cenaDoJogo.irParaCenario(
+                    CENARIO_APOS_PORTA,
+                    JOGADOR_X_APOS_PORTA,
+                    JOGADOR_Y_APOS_PORTA
+            );
+        }
     }
 
     public void resetar() {

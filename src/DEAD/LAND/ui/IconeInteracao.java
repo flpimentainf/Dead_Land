@@ -29,9 +29,9 @@ public class IconeInteracao {
         }
 
         if (interacao.tipo == tileMap.TIPO_CAMA) {
-            desenharBotao(g2, x, y, "Z", new Color(30, 80, 180, 180));
+            desenharBotao(g2, x - 20, y + 15, "E", new Color(30, 80, 180, 180));
         } else if (interacao.tipo == tileMap.TIPO_PORTA) {
-            desenharBotao(g2, x, y, "P", new Color(120, 70, 20, 180));
+            desenharBotao(g2, x, y, "E", new Color(120, 70, 20, 180));
         }
     }
 

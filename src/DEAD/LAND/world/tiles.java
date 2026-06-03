@@ -55,6 +55,7 @@ public class tiles {
         this.tilesSolidos.add(43);
         this.tilesSolidos.add(44);
         this.tilesSolidos.add(36);
+        this.tilesSolidos.add(60);
     }
 
     public void desenhar(Graphics2D g, int linha, int coluna) {
