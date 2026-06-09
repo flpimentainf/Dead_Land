@@ -24,6 +24,7 @@ public class player extends Rectangle{
     Image[]imgPlayerRight = new Image[3];
     Image[]imgPlayerLeft = new Image[3];
     Image[]imgPlayerUp = new Image[3];
+    Image[]imgPlayerFall = new Image[3];
     Image imagemPlayer;
     private int frameJogador = 0;
 
@@ -42,7 +43,8 @@ public class player extends Rectangle{
             this.imgPlayerRight[i] = new ImageIcon("repos/PLAYERS/right" + (i+1) + ".png").getImage();
             this.imgPlayerLeft[i] = new ImageIcon("repos/PLAYERS/left" + (i+1) + ".png").getImage();
             this.imgPlayerUp[i] = new ImageIcon("repos/PLAYERS/up" + (i+1) + ".png").getImage();
-        }
+            this.imgPlayerFall[i] = new ImageIcon("repos/PLAYERS/fall" + (i+1) + ".png").getImage();
+        } 
         this.imagemPlayer = this.imgPlayerDown[frameJogador];
 
     }
@@ -75,7 +77,7 @@ public class player extends Rectangle{
         this.velocidadeQueda = VELOCIDADE_QUEDA_INICIAL;
         this.contadorFramesQueda = 0;
         this.frameJogador = 0;
-        this.imagemPlayer = this.imgPlayerDown[this.frameJogador];
+        this.imagemPlayer = this.imgPlayerFall[this.frameJogador];
         atualizarAreaColisao();
     }
 
@@ -110,11 +112,11 @@ public class player extends Rectangle{
         this.contadorFramesQueda = 0;
         this.frameJogador++;
 
-        if (this.frameJogador >= this.imgPlayerDown.length) {
+        if (this.frameJogador >= this.imgPlayerFall.length) {
             this.frameJogador = 0;
         }
 
-        this.imagemPlayer = this.imgPlayerDown[this.frameJogador];
+        this.imagemPlayer = this.imgPlayerFall[this.frameJogador];
     }
     
     public void atualizarSprite(boolean moveEsq, boolean moveCima,
