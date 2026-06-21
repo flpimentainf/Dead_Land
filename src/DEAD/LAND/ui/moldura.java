@@ -1,8 +1,8 @@
 package DEAD.LAND.ui;
 
 import java.awt.BorderLayout;
-
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 
 public class moldura extends JFrame{
@@ -25,5 +25,6 @@ public class moldura extends JFrame{
         this.setLocationRelativeTo(null);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
+        SwingUtilities.invokeLater(painelCentro::requestFocusInWindow);
     }
 }

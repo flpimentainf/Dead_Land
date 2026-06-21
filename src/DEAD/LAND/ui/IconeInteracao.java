@@ -1,13 +1,12 @@
 package DEAD.LAND.ui;
 
+import DEAD.LAND.entity.player;
+import DEAD.LAND.world.tileMap;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-
-import DEAD.LAND.entity.player;
-import DEAD.LAND.world.tileMap;
 
 public class IconeInteracao {
     private static final int TAMANHO = 24;

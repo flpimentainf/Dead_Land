@@ -3,7 +3,6 @@ package DEAD.LAND.entity;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
-
 import javax.swing.ImageIcon;
 
 public class Flecha extends Rectangle {

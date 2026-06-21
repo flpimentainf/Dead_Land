@@ -1,25 +1,21 @@
 package DEAD.LAND.ui;
 
+import DEAD.LAND.core.ControladorFlechas;
+import DEAD.LAND.core.gameLoop;
+import DEAD.LAND.entity.player;
+import DEAD.LAND.input.escutadorTeclado;
+import DEAD.LAND.world.tileMap;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-
 import javax.swing.JPanel;
-
-import DEAD.LAND.core.ControladorFlechas;
-import DEAD.LAND.core.gameLoop;
-import DEAD.LAND.core.spriteLoop;
-import DEAD.LAND.entity.player;
-import DEAD.LAND.input.escutadorTeclado;
-import DEAD.LAND.world.tileMap;
 
 
 public class panel extends JPanel{
 	private String posicao;
 	gameLoop GL;
 	escutadorTeclado ET;
-	spriteLoop SL;
     private player jogador;
     private tileMap cenario;
     private IconeInteracao iconeInteracao;
@@ -45,13 +41,11 @@ public class panel extends JPanel{
                 
                 ET = new escutadorTeclado();
                 GL = new gameLoop(this, ET);
-                SL = new spriteLoop(this, ET);
                 
                 this.addKeyListener(ET);
                 this.setFocusable(true); 
                 
-                GL.start();
-                SL.start();
+                GL.iniciar();
 
                 break;
 
@@ -71,6 +65,7 @@ public class panel extends JPanel{
     
     
     public void paintComponent(Graphics g) {
+        super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
         switch (posicao) {
@@ -111,9 +106,9 @@ public class panel extends JPanel{
 	}
 
 
-public ControladorFlechas getControladorFlechas() { return controladorFlechas; }
+    public ControladorFlechas getControladorFlechas() { return controladorFlechas; }
 
-public tileMap getCenario() {
+    public tileMap getCenario() {
         return cenario;
     }
 

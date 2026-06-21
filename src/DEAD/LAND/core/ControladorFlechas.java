@@ -1,14 +1,13 @@
 package DEAD.LAND.core;
 
-import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.List;
-
 import DEAD.LAND.entity.Flecha;
 import DEAD.LAND.entity.player;
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.ui.panel;
 import DEAD.LAND.world.tileMap;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ControladorFlechas {
     private List<Flecha> flechas = new ArrayList<>();

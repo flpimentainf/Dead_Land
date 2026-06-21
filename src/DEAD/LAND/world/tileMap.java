@@ -197,7 +197,7 @@ public class tileMap {
 			criarCamadaVazia(this.cenario7DoJogo),
 			criarCamadaVazia(this.cenario8DoJogo)
 		};
-		this.cenarioAtualIndex = 6;
+		this.cenarioAtualIndex = 0;
 		atualizarCenarioValido();
 	}
 
@@ -390,4 +390,5 @@ public class tileMap {
 	public int getAlturaTotal() {
 		return this.cenarioValido.length * tiles.ALTURA;
 	}
+	
 }

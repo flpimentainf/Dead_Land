@@ -42,6 +42,12 @@ public class ControladorInteracao {
             return;
         }
 
+        if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 0) {
+            if (interacao.tipo == tileMap.TIPO_PORTA) {
+                System.out.println("Não dá");
+            }
+        }
+
         if (interacao.tipo == tileMap.TIPO_PORTA) {
             cenaDoJogo.irParaCenario(
                     CENARIO_APOS_PORTA,

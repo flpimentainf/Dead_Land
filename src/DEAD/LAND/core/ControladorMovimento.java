@@ -1,50 +1,61 @@
 package DEAD.LAND.core;
 
+import DEAD.LAND.entity.player;
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.ui.panel;
 
 public class ControladorMovimento {
-    private verificadorDeColisao verificadorDeColisao;
+    private final verificadorDeColisao verificadorDeColisao;
 
     public ControladorMovimento() {
         this.verificadorDeColisao = new verificadorDeColisao();
     }
 
     public void atualizar(panel cenaDoJogo, escutadorTeclado teclado) {
-        String direcao = obterDirecao(teclado);
-        boolean bateu = this.verificadorDeColisao.ocorreuColisao(
-                cenaDoJogo.getJogador(),
-                cenaDoJogo.getCenario(),
-                direcao
-        );
+        player jogador = cenaDoJogo.getJogador();
+        int movimentoX = obterMovimentoEixo(teclado.movePraEsq, teclado.movePraDir, jogador.passo);
+        int movimentoY = obterMovimentoEixo(teclado.movePraCima, teclado.movePraBaixo, jogador.passo);
 
-        if (!bateu) {
-            cenaDoJogo.getJogador().atualizarPosicaoJogador(
-                    teclado.movePraEsq,
-                    teclado.movePraCima,
-                    teclado.movePraDir,
-                    teclado.movePraBaixo
-            );
+        if (movimentoX != 0 && movimentoY != 0) {
+            int passoDiagonal = Math.max(1, (int) Math.round(jogador.passo / Math.sqrt(2)));
+            movimentoX = Integer.signum(movimentoX) * passoDiagonal;
+            movimentoY = Integer.signum(movimentoY) * passoDiagonal;
         }
+
+        moverEixoSePossivel(cenaDoJogo, movimentoX, 0);
+        moverEixoSePossivel(cenaDoJogo, 0, movimentoY);
 
         trocarCenarioAoSairPelasLaterais(cenaDoJogo);
     }
 
-    private String obterDirecao(escutadorTeclado teclado) {
-        if (teclado.movePraCima) {
-            return "cima";
+    private int obterMovimentoEixo(boolean negativo, boolean positivo, int passo) {
+        int movimento = 0;
+
+        if (negativo) {
+            movimento -= passo;
         }
-        if (teclado.movePraBaixo) {
-            return "baixo";
-        }
-        if (teclado.movePraDir) {
-            return "direita";
-        }
-        if (teclado.movePraEsq) {
-            return "esquerda";
+        if (positivo) {
+            movimento += passo;
         }
 
-        return "";
+        return movimento;
+    }
+
+    private void moverEixoSePossivel(panel cenaDoJogo, int movimentoX, int movimentoY) {
+        if (movimentoX == 0 && movimentoY == 0) {
+            return;
+        }
+
+        boolean bateu = this.verificadorDeColisao.ocorreuColisao(
+                cenaDoJogo.getJogador(),
+                cenaDoJogo.getCenario(),
+                movimentoX,
+                movimentoY
+        );
+
+        if (!bateu) {
+            cenaDoJogo.getJogador().mover(movimentoX, movimentoY);
+        }
     }
 
     private void trocarCenarioAoSairPelasLaterais(panel cenaDoJogo) {

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
-
 import javax.swing.ImageIcon;
 
 public class player extends Rectangle{
@@ -15,7 +14,7 @@ public class player extends Rectangle{
 
     private Color CorFundo = Color.WHITE;
     public Rectangle AreaColisao;
-    public int passo = 3;
+    public int passo = 4;
     private boolean caindo;
     private int velocidadeQueda;
     private int contadorFramesQueda;
@@ -57,12 +56,9 @@ public class player extends Rectangle{
         g.drawImage(imagemPlayer, x, y, width, height, null);
     }
     
-    public void atualizarPosicaoJogador (boolean ME, boolean MC, boolean MD, boolean MB) {
-    	if (ME)	this.x -= this.passo;
-    	if (MD)	this.x += this.passo;
-    	if (MC)	this.y -= this.passo;
-    	if (MB)	this.y += this.passo;
-
+    public void mover(int movimentoX, int movimentoY) {
+        this.x += movimentoX;
+        this.y += movimentoY;
         atualizarAreaColisao();
     }
 
