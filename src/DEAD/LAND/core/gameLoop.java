@@ -18,6 +18,7 @@ public class gameLoop implements ActionListener {
 	private final ControladorInteracao controladorInteracao;
 	private final ControladorItens controladorItens;
 	private final ControladorFlechas controladorFlechas;
+	private final ControladorInimigos controladorInimigos;
 	private final panel cenaDoJogo;
 	private final escutadorTeclado teclado;
 
@@ -31,9 +32,13 @@ public class gameLoop implements ActionListener {
 		this.controladorInteracao = new ControladorInteracao();
 		this.controladorItens = new ControladorItens();
 		this.controladorFlechas = P.getControladorFlechas();
+		this.controladorInimigos = new ControladorInimigos();
 		this.temporizador = new Timer(INTERVALO_LOOP_MS, this);
 		this.temporizador.setCoalesce(true);
     }
+
+	public ControladorItens getControladorItens() { return controladorItens; }
+	public ControladorInimigos getControladorInimigos() { return controladorInimigos; }
 
 	public void iniciar() {
 		if (!this.temporizador.isRunning()) {
@@ -78,6 +83,7 @@ public class gameLoop implements ActionListener {
 		if (this.controladorFlechas != null) {
 			this.controladorFlechas.atualizar(this.cenaDoJogo, this.teclado);
 		}
+		this.controladorInimigos.atualizar(this.cenaDoJogo, this.controladorFlechas);
 	}
 
 	private void atualizarSpriteQuandoNecessario() {

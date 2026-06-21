@@ -1,0 +1,59 @@
+package DEAD.LAND.core;
+
+import DEAD.LAND.entity.Flecha;
+import DEAD.LAND.entity.Inimigo;
+import DEAD.LAND.entity.player;
+import DEAD.LAND.ui.panel;
+import DEAD.LAND.world.tiles;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ControladorInimigos {
+    private static final int DANO_FLECHA = 30;
+
+    private List<Inimigo> inimigos = new ArrayList<>();
+
+    public ControladorInimigos() {
+        // Esqueletos no cenário da floresta (index 7 = cenario do arco/floresta exterior)
+        adicionarInimigo(5 * tiles.LARGURA, 3 * tiles.ALTURA, 7);
+        adicionarInimigo(12 * tiles.LARGURA, 4 * tiles.ALTURA, 7);
+        adicionarInimigo(18 * tiles.LARGURA, 2 * tiles.ALTURA, 7);
+    }
+
+    private void adicionarInimigo(int x, int y, int cenarioIndex) {
+        Inimigo ini = new Inimigo(x, y);
+        ini.setCenarioIndex(cenarioIndex);
+        inimigos.add(ini);
+    }
+
+    public void atualizar(panel cenaDoJogo, ControladorFlechas controladorFlechas) {
+        int cenarioAtual = cenaDoJogo.getCenario().getCenarioAtualIndex();
+        player jogador = cenaDoJogo.getJogador();
+
+        jogador.atualizarInvencibilidade();
+
+        for (Inimigo ini : inimigos) {
+            if (!ini.estaVivo() || ini.getCenarioIndex() != cenarioAtual) continue;
+            ini.atualizar(jogador);
+
+            // Verificar colisão de flechas com o inimigo
+            if (controladorFlechas != null) {
+                for (Flecha f : controladorFlechas.getFlechas()) {
+                    if (f.isAtiva() && f.intersects(ini.areaColisao)) {
+                        ini.levarDano(DANO_FLECHA);
+                        f.desativar();
+                    }
+                }
+            }
+        }
+    }
+
+    public void desenhar(Graphics2D g2, int cenarioAtual) {
+        for (Inimigo ini : inimigos) {
+            if (ini.getCenarioIndex() == cenarioAtual) {
+                ini.desenhar(g2);
+            }
+        }
+    }
+}

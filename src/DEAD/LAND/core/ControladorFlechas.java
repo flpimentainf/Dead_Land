@@ -47,6 +47,8 @@ public class ControladorFlechas {
         flechas.add(new Flecha(cx, cy, jogador.getDirecao()));
     }
 
+    public List<Flecha> getFlechas() { return flechas; }
+
     public void desenhar(Graphics2D g) {
         for (Flecha f : flechas) {
             f.desenhar(g);
