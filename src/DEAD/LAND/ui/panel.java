@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
 
+import DEAD.LAND.core.ControladorFlechas;
 import DEAD.LAND.core.gameLoop;
 import DEAD.LAND.core.spriteLoop;
 import DEAD.LAND.entity.player;
@@ -24,6 +25,7 @@ public class panel extends JPanel{
     private IconeInteracao iconeInteracao;
     private Inventario inventario;
     private panel painelInventario;
+    private ControladorFlechas controladorFlechas;
 
 
     public panel(String posicao, Inventario inventario) {
@@ -38,6 +40,7 @@ public class panel extends JPanel{
                 setJogador(new player());
                 this.cenario = new tileMap();
                 this.iconeInteracao = new IconeInteracao();
+                this.controladorFlechas = new ControladorFlechas();
 
                 
                 ET = new escutadorTeclado();
@@ -83,6 +86,7 @@ public class panel extends JPanel{
 
                 this.cenario.desenhar(g2);
                 getJogador().desenharPlayer(g2);
+                if (this.controladorFlechas != null) this.controladorFlechas.desenhar(g2);
                 this.iconeInteracao.desenharArea(g2, this.cenario, getJogador());
                 break;
 
@@ -106,6 +110,8 @@ public class panel extends JPanel{
 		this.jogador = jogador;
 	}
 
+
+public ControladorFlechas getControladorFlechas() { return controladorFlechas; }
 
 public tileMap getCenario() {
         return cenario;
@@ -145,7 +151,7 @@ public tileMap getCenario() {
 
     public void irParaProximoCenario() {
         cenario.irParaProximoCenario();
-        posicionarJogador(10, getJogador().y);
+        posicionarJogador(50, getJogador().y);
     }
 
     public void irParaCenarioAnterior() {

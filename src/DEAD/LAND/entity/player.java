@@ -19,6 +19,7 @@ public class player extends Rectangle{
     private boolean caindo;
     private int velocidadeQueda;
     private int contadorFramesQueda;
+    private String direcao = "baixo";
     
     Image[]imgPlayerDown = new Image[3];
     Image[]imgPlayerRight = new Image[3];
@@ -64,6 +65,8 @@ public class player extends Rectangle{
 
         atualizarAreaColisao();
     }
+
+    public String getDirecao() { return direcao; }
 
     public void atualizarAreaColisao() {
         this.AreaColisao.x = this.x + 3;
@@ -129,25 +132,25 @@ public class player extends Rectangle{
         if (moveEsq) {
             if (frameJogador >= this.imgPlayerLeft.length)
                 frameJogador = 0;
-            
+            this.direcao = "esquerda";
             this.imagemPlayer = this.imgPlayerLeft[frameJogador];
         }
         if (moveCima) {
             if (frameJogador >= this.imgPlayerUp.length)
                 frameJogador = 0;
-            
+            this.direcao = "cima";
             this.imagemPlayer = this.imgPlayerUp[frameJogador];
         }
         if (moveDir) {
             if (frameJogador >= this.imgPlayerRight.length)
                 frameJogador = 0;
-            
+            this.direcao = "direita";
             this.imagemPlayer = this.imgPlayerRight[frameJogador];
         }
         if (moveBaixo) {
             if (frameJogador >= this.imgPlayerDown.length)
                 frameJogador = 0;
-            
+            this.direcao = "baixo";
             this.imagemPlayer = this.imgPlayerDown[frameJogador];
         }
     }

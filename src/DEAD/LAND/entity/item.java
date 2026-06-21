@@ -15,8 +15,15 @@ public class item extends Rectangle {
     private int tileSubstituto;
     private boolean coletado;
 
+    private String nome;
+
     public item(String caminhoSprite, int cenarioIndex, int linha, int coluna, int tileSubstituto) {
+        this(caminhoSprite, cenarioIndex, linha, coluna, tileSubstituto, "");
+    }
+
+    public item(String caminhoSprite, int cenarioIndex, int linha, int coluna, int tileSubstituto, String nome) {
         this.sprite = new ImageIcon(caminhoSprite).getImage();
+        this.nome = nome;
         this.cenarioIndex = cenarioIndex;
         this.linha = linha;
         this.coluna = coluna;
@@ -55,4 +62,6 @@ public class item extends Rectangle {
     public void coletar() {
         this.coletado = true;
     }
+
+    public String getNome() { return nome; }
 }

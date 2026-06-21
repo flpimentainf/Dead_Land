@@ -6,7 +6,7 @@ import java.awt.Rectangle;
 public class tileMap {
 	private static final int VAZIO = -1;
 	private static final int TILE_CAMA = 0;
-	private static final int[] TILE_PORTA = {51, 52};
+	private static final int[] TILE_PORTA = {51, 52, 31, 32};
 	public static final int TIPO_CAMA = 1;
 	public static final int TIPO_PORTA = 2;
 	private static final int ALCANCE_INTERACAO = 16;
@@ -343,7 +343,11 @@ public class tileMap {
 		for (int lin = 0; lin < this.camadaObjetosValida.length; lin++) {
 			for (int col = 0; col < this.camadaObjetosValida[lin].length; col++) {
 				int tileObjeto = this.camadaObjetosValida[lin][col];
+				int tileBase = this.cenarioValido[lin][col];
 				int tipo = getTipoInteracao(tileObjeto);
+				if (tipo == SEM_INTERACAO) {
+					tipo = getTipoInteracao(tileBase);
+				}
 
 				if (tipo == SEM_INTERACAO) {
 					continue;

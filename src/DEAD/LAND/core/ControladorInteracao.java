@@ -5,7 +5,7 @@ import DEAD.LAND.ui.panel;
 import DEAD.LAND.world.tileMap;
 
 public class ControladorInteracao {
-    private static final int FRAMES_PARA_ACAO = 60;
+    private static final int FRAMES_PARA_ACAO = 20;
     private static final int CENARIO_APOS_CAMA = 1;
     private static final int JOGADOR_X_APOS_CAMA = 320;
     private static final int JOGADOR_Y_APOS_CAMA = 200;

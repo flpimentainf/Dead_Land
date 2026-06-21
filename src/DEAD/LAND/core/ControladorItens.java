@@ -13,9 +13,9 @@ public class ControladorItens {
 
     public ControladorItens() {
         this.itens = new item[] {
-            new item("repos/tiles/tile (46).png", CENARIO_DOS_ITENS, 2, 2, TILE_CHAO),
-            new item("repos/tiles/tile (47).png", CENARIO_DOS_ITENS, 1, 22, TILE_CHAO),
-            new item("repos/tiles/tile (48).png", CENARIO_DOS_ITENS, 1, 23, TILE_CHAO)
+            new item("repos/tiles/tile (46).png", CENARIO_DOS_ITENS, 2, 2, TILE_CHAO, "chave"),
+            new item("repos/tiles/tile (47).png", CENARIO_DOS_ITENS, 1, 22, TILE_CHAO, "arco"),
+            new item("repos/tiles/tile (48).png", CENARIO_DOS_ITENS, 1, 23, TILE_CHAO, "flecha")
         };
     }
 

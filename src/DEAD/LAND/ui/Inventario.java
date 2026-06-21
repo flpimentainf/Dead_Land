@@ -29,6 +29,13 @@ public class Inventario {
         }
     }
 
+    public boolean temArco() {
+        for (item i : itens) {
+            if ("arco".equals(i.getNome())) return true;
+        }
+        return false;
+    }
+
     private void desenharSlot(Graphics2D g2, item itemColetado, int x, int y) {
         g2.setColor(new Color(0, 0, 0, 70));
         g2.fillRoundRect(x, y, TAMANHO_SLOT, TAMANHO_SLOT, 10, 10);
