@@ -65,8 +65,10 @@ public class ControladorMovimento {
 
         if (jogadorX + jogadorW < 0) {
             cenaDoJogo.irParaCenarioAnterior();
+            if (cenaDoJogo.getHistoria() != null) cenaDoJogo.getHistoria().eventoEntrouCenario(cenaDoJogo.getCenario().getCenarioAtualIndex(), cenaDoJogo);
         } else if (jogadorX > larguraMapa) {
             cenaDoJogo.irParaProximoCenario();
+            if (cenaDoJogo.getHistoria() != null) cenaDoJogo.getHistoria().eventoEntrouCenario(cenaDoJogo.getCenario().getCenarioAtualIndex(), cenaDoJogo);
         }
     }
 }

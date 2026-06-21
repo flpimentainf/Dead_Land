@@ -38,6 +38,9 @@ public class ControladorItens {
                 );
                 cenaDoJogo.getInventario().adicionar(itemDoJogo);
                 cenaDoJogo.atualizarInventario();
+                if (cenaDoJogo.getHistoria() != null) {
+                    cenaDoJogo.getHistoria().eventoItemColetado(itemDoJogo.getNome());
+                }
             }
         }
     }

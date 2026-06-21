@@ -5,10 +5,12 @@ import DEAD.LAND.core.gameLoop;
 import DEAD.LAND.entity.player;
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.world.tileMap;
+import DEAD.LAND.story.SistemaHistoria;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import javax.swing.JPanel;
 
 
@@ -22,6 +24,7 @@ public class panel extends JPanel{
     private Inventario inventario;
     private panel painelInventario;
     private ControladorFlechas controladorFlechas;
+    private SistemaHistoria historia;
 
 
     public panel(String posicao, Inventario inventario) {
@@ -37,6 +40,7 @@ public class panel extends JPanel{
                 this.cenario = new tileMap();
                 this.iconeInteracao = new IconeInteracao();
                 this.controladorFlechas = new ControladorFlechas();
+                this.historia = new SistemaHistoria();
 
                 
                 ET = new escutadorTeclado();
@@ -75,6 +79,7 @@ public class panel extends JPanel{
 
                 if (this.cenario == null) break;
 
+                AffineTransform transformacaoOriginal = g2.getTransform();
                 double escalaX = (double) getWidth()  / this.cenario.getLarguraTotal();
                 double escalaY = (double) getHeight() / this.cenario.getAlturaTotal();
                 g2.scale(escalaX, escalaY);
@@ -83,6 +88,8 @@ public class panel extends JPanel{
                 getJogador().desenharPlayer(g2);
                 if (this.controladorFlechas != null) this.controladorFlechas.desenhar(g2);
                 this.iconeInteracao.desenharArea(g2, this.cenario, getJogador());
+                g2.setTransform(transformacaoOriginal);
+                if (this.historia != null) this.historia.desenhar(g2, getWidth(), getHeight());
                 break;
 
             case "sul":
@@ -107,6 +114,8 @@ public class panel extends JPanel{
 
 
     public ControladorFlechas getControladorFlechas() { return controladorFlechas; }
+
+    public SistemaHistoria getHistoria() { return historia; }
 
     public tileMap getCenario() {
         return cenario;

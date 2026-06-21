@@ -34,6 +34,7 @@ public class ControladorInteracao {
 
     private void executarAcao(panel cenaDoJogo, tileMap.InteracaoPerto interacao) {
         if (interacao.tipo == tileMap.TIPO_CAMA) {
+            if (cenaDoJogo.getHistoria() != null) cenaDoJogo.getHistoria().eventoDormir();
             cenaDoJogo.irParaCenario(
                     CENARIO_APOS_CAMA,
                     JOGADOR_X_APOS_CAMA,
@@ -42,13 +43,12 @@ public class ControladorInteracao {
             return;
         }
 
-        if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 0) {
-            if (interacao.tipo == tileMap.TIPO_PORTA) {
-                System.out.println("Não dá");
-            }
-        }
-
         if (interacao.tipo == tileMap.TIPO_PORTA) {
+            if (cenaDoJogo.getHistoria() != null
+                    && cenaDoJogo.getHistoria().eventoPorta(cenaDoJogo.getCenario().getCenarioAtualIndex(), cenaDoJogo)) {
+                return;
+            }
+
             cenaDoJogo.irParaCenario(
                     CENARIO_APOS_PORTA,
                     JOGADOR_X_APOS_PORTA,

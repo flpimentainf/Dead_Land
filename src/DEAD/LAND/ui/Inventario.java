@@ -30,8 +30,12 @@ public class Inventario {
     }
 
     public boolean temArco() {
+        return temItem("arco");
+    }
+
+    public boolean temItem(String nome) {
         for (item i : itens) {
-            if ("arco".equals(i.getNome())) return true;
+            if (nome.equals(i.getNome())) return true;
         }
         return false;
     }

@@ -48,6 +48,7 @@ public class ControladorQueda {
 
         jogador.pararQueda();
         cenaDoJogo.irParaProximoCenario();
+        if (cenaDoJogo.getHistoria() != null) cenaDoJogo.getHistoria().eventoQuedaConcluida();
         jogador.x = JOGADOR_X_APOS_QUEDA;
         jogador.y = JOGADOR_Y_APOS_QUEDA;
         jogador.atualizarAreaColisao();
