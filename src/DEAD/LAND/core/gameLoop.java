@@ -57,6 +57,15 @@ public class gameLoop implements ActionListener {
 			return;
 		}
 
+		if (this.cenaDoJogo.getHistoria() != null) {
+			this.cenaDoJogo.getHistoria().atualizar(this.cenaDoJogo, this.teclado);
+
+			if (this.cenaDoJogo.getHistoria().bloqueiaControleDoJogador()) {
+				this.controladorInteracao.resetar();
+				return;
+			}
+		}
+
 		if (this.controladorQueda.atualizar(this.cenaDoJogo)) {
 			this.controladorInteracao.resetar();
 			return;
@@ -72,6 +81,11 @@ public class gameLoop implements ActionListener {
 	}
 
 	private void atualizarSpriteQuandoNecessario() {
+		if (this.cenaDoJogo.getHistoria() != null
+				&& this.cenaDoJogo.getHistoria().bloqueiaControleDoJogador()) {
+			return;
+		}
+
 		this.atualizacoesDesdeUltimoSprite++;
 
 		if (this.atualizacoesDesdeUltimoSprite < ATUALIZACOES_POR_SPRITE) {
@@ -79,6 +93,7 @@ public class gameLoop implements ActionListener {
 		}
 
 		this.atualizacoesDesdeUltimoSprite = 0;
+
 		this.cenaDoJogo.getJogador().atualizarSprite(
 				this.teclado.movePraEsq,
 				this.teclado.movePraCima,

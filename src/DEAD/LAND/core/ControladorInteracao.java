@@ -6,9 +6,11 @@ import DEAD.LAND.world.tileMap;
 
 public class ControladorInteracao {
     private static final int FRAMES_PARA_ACAO = 20;
+
     private static final int CENARIO_APOS_CAMA = 1;
     private static final int JOGADOR_X_APOS_CAMA = 320;
     private static final int JOGADOR_Y_APOS_CAMA = 200;
+
     private static final int CENARIO_APOS_PORTA = 5;
     private static final int JOGADOR_X_APOS_PORTA = 100;
     private static final int JOGADOR_Y_APOS_PORTA = 200;
@@ -34,18 +36,26 @@ public class ControladorInteracao {
 
     private void executarAcao(panel cenaDoJogo, tileMap.InteracaoPerto interacao) {
         if (interacao.tipo == tileMap.TIPO_CAMA) {
-            if (cenaDoJogo.getHistoria() != null) cenaDoJogo.getHistoria().eventoDormir();
+
+            if (cenaDoJogo.getHistoria() != null) {
+                cenaDoJogo.getHistoria().eventoDormir();
+            }
+
             cenaDoJogo.irParaCenario(
                     CENARIO_APOS_CAMA,
                     JOGADOR_X_APOS_CAMA,
                     JOGADOR_Y_APOS_CAMA
             );
+
             return;
         }
 
         if (interacao.tipo == tileMap.TIPO_PORTA) {
             if (cenaDoJogo.getHistoria() != null
-                    && cenaDoJogo.getHistoria().eventoPorta(cenaDoJogo.getCenario().getCenarioAtualIndex(), cenaDoJogo)) {
+                    && cenaDoJogo.getHistoria().eventoPorta(
+                            cenaDoJogo.getCenario().getCenarioAtualIndex(),
+                            cenaDoJogo
+                    )) {
                 return;
             }
 

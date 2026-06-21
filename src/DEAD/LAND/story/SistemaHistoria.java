@@ -10,6 +10,7 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.awt.Toolkit;
 
 public class SistemaHistoria {
     public enum Estado {
@@ -25,7 +26,7 @@ public class SistemaHistoria {
     }
 
     private Estado estado = Estado.QUARTO;
-    private String objetivoAtual = "Deite na cama para dormir.";
+    private String objetivoAtual = "Deite-se na cama.";
     private List<String> mensagem = new ArrayList<String>();
     private boolean exibindoMensagem = true;
     private boolean exibindoEscolha;
@@ -35,13 +36,14 @@ public class SistemaHistoria {
     private boolean teclaMenuPressionada;
     private boolean teclaCimaPressionada;
     private boolean teclaBaixoPressionada;
+    private boolean telaEscura;
 
     public SistemaHistoria() {
         mostrarMensagem(
-                "DEAD LAND",
                 "Você está no seu quarto.",
-                "Algo parece cansado demais para ser só sono.",
-                "Objetivo: deite na cama."
+                "O silêncio parece mais pesado do que deveria.",
+                "Seu corpo está cansado... mas sua mente continua inquieta.",
+                "Talvez dormir seja a única coisa que ainda faça sentido."
         );
     }
 
@@ -112,23 +114,29 @@ public class SistemaHistoria {
     public void eventoDormir() {
         estado = Estado.QUEDA;
         objetivoAtual = "Sobreviva à queda.";
+        telaEscura = true;
+        tocarSomEstranhoBasico();
+
         mostrarMensagem(
-                "...",
-                "A cama desaparece.",
-                "O quarto vira céu.",
-                "Você está caindo."
+                "Você fecha os olhos.",
+                "Por um instante, tudo fica escuro.",
+                "Mas então... você começa a cair."
         );
     }
 
     public void eventoQuedaConcluida() {
         if (estado != Estado.QUEDA) return;
+
         estado = Estado.FLORESTA;
         objetivoAtual = "Explore a floresta e procure uma saída.";
+        telaEscura = false;
+
         mostrarMensagem(
-                "Sistema",
-                "Barra de vida carregada.",
-                "Mapa carregado.",
-                "Missão principal: encontre a cidade."
+                "Você acorda antes de tocar o chão.",
+                "O céu está errado.",
+                "A floresta respira como se estivesse viva.",
+                "Uma mensagem aparece diante dos seus olhos:",
+                "Complete as missões principais para retornar."
         );
     }
 
@@ -285,6 +293,10 @@ public class SistemaHistoria {
     }
 
     public void desenhar(Graphics2D g2, int largura, int altura) {
+        if (telaEscura) {
+            desenharEscurecimento(g2, largura, altura);
+        }
+
         desenharObjetivo(g2, largura);
 
         if (exibindoEscolha) {
@@ -295,6 +307,11 @@ public class SistemaHistoria {
         if (exibindoMensagem) {
             desenharCaixaTexto(g2, largura, altura, mensagem, "ENTER/E para continuar");
         }
+    }
+
+    private void desenharEscurecimento(Graphics2D g2, int largura, int altura) {
+        g2.setColor(new Color(0, 0, 0, 210));
+        g2.fillRect(0, 0, largura, altura);
     }
 
     private void desenharObjetivo(Graphics2D g2, int largura) {
@@ -337,5 +354,11 @@ public class SistemaHistoria {
         g2.setFont(new Font("Arial", Font.ITALIC, 13));
         g2.setColor(new Color(200, 200, 200));
         g2.drawString(rodape, caixaX + 24, caixaY + caixaAltura - 16);
+    }
+
+    private void tocarSomEstranhoBasico() {
+    // Som simples para não depender de arquivo de áudio.
+    // Depois você pode trocar por um efeito .wav.
+    Toolkit.getDefaultToolkit().beep();
     }
 }

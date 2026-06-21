@@ -6,7 +6,7 @@ import java.awt.Rectangle;
 public class tileMap {
 	private static final int VAZIO = -1;
 	private static final int TILE_CAMA = 0;
-	private static final int[] TILE_PORTA = {51, 52, 31, 32};
+	private static final int[] TILE_PORTA = {51, 31};
 	public static final int TIPO_CAMA = 1;
 	public static final int TIPO_PORTA = 2;
 	private static final int ALCANCE_INTERACAO = 16;
