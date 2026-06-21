@@ -1,20 +1,22 @@
 package DEAD.LAND.ui;
 
 import java.awt.BorderLayout;
-
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 
 public class moldura extends JFrame{
     public moldura() {
         this.setTitle("DEAD LAND");
         this.setAlwaysOnTop(true);
-        this.setResizable(false);
+        this.setResizable(true);
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         
-        panel painelCentro = new panel("centro");
-        panel painelSul = new panel("sul");
+        Inventario inventario = new Inventario();
+        panel painelCentro = new panel("centro", inventario);
+        panel painelSul = new panel("sul", inventario);
+        painelCentro.setPainelInventario(painelSul);
 
         add(painelCentro, BorderLayout.CENTER);
         add(painelSul, BorderLayout.SOUTH);
@@ -23,5 +25,6 @@ public class moldura extends JFrame{
         this.setLocationRelativeTo(null);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
+        SwingUtilities.invokeLater(painelCentro::requestFocusInWindow);
     }
 }

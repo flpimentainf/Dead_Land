@@ -2,49 +2,32 @@ package DEAD.LAND.core;
 
 import DEAD.LAND.entity.player;
 import DEAD.LAND.world.tileMap;
+import java.awt.Rectangle;
 
 public class verificadorDeColisao {
-    private boolean colidiu;
-
-    public boolean ocorreuColisao(player jogador, tileMap cenario, String direcao) {
-        this.colidiu = false;
-
-        if (direcao == null || direcao.isEmpty()) {
+    public boolean ocorreuColisao(
+            player jogador,
+            tileMap cenario,
+            int movimentoX,
+            int movimentoY
+    ) {
+        if (movimentoX == 0 && movimentoY == 0) {
             return false;
         }
 
         jogador.atualizarAreaColisao();
+        Rectangle areaFutura = new Rectangle(jogador.AreaColisao);
+        areaFutura.translate(movimentoX, movimentoY);
 
         int tamanhoTile = cenario.getTamanhoTile();
+        int colunaEsquerda = Math.floorDiv(areaFutura.x, tamanhoTile);
+        int colunaDireita = Math.floorDiv(areaFutura.x + areaFutura.width - 1, tamanhoTile);
+        int linhaSuperior = Math.floorDiv(areaFutura.y, tamanhoTile);
+        int linhaInferior = Math.floorDiv(areaFutura.y + areaFutura.height - 1, tamanhoTile);
 
-        int bordaEsqX = jogador.AreaColisao.x;
-        int bordaDirX = jogador.AreaColisao.x + jogador.AreaColisao.width;
-        int bordaTopoY = jogador.AreaColisao.y;
-        int bordaBaseY = jogador.AreaColisao.y + jogador.AreaColisao.height;
-
-        int colEsqX = bordaEsqX / tamanhoTile;
-        int colDirX = bordaDirX / tamanhoTile;
-        int rowTopoY = bordaTopoY / tamanhoTile;
-        int rowBaseY = bordaBaseY / tamanhoTile;
-
-        if (direcao.equals("cima")) {
-            int proxRowTopoY = (bordaTopoY - jogador.passo) / tamanhoTile;
-            colidiu = cenario.tileTemColisao(proxRowTopoY, colEsqX)
-                    || cenario.tileTemColisao(proxRowTopoY, colDirX);
-        } else if (direcao.equals("baixo")) {
-            int proxRowBaseY = (bordaBaseY + jogador.passo) / tamanhoTile;
-            colidiu = cenario.tileTemColisao(proxRowBaseY, colEsqX)
-                    || cenario.tileTemColisao(proxRowBaseY, colDirX);
-        } else if (direcao.equals("direita")) {
-            int proxColDirX = (bordaDirX + jogador.passo) / tamanhoTile;
-            colidiu = cenario.tileTemColisao(rowTopoY, proxColDirX)
-                    || cenario.tileTemColisao(rowBaseY, proxColDirX);
-        } else if (direcao.equals("esquerda")) {
-            int proxColEsqX = (bordaEsqX - jogador.passo) / tamanhoTile;
-            colidiu = cenario.tileTemColisao(rowTopoY, proxColEsqX)
-                    || cenario.tileTemColisao(rowBaseY, proxColEsqX);
-        }
-
-        return colidiu;
+        return cenario.tileTemColisao(linhaSuperior, colunaEsquerda)
+                || cenario.tileTemColisao(linhaSuperior, colunaDireita)
+                || cenario.tileTemColisao(linhaInferior, colunaEsquerda)
+                || cenario.tileTemColisao(linhaInferior, colunaDireita);
     }
 }

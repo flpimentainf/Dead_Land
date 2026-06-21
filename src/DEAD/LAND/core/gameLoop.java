@@ -1,75 +1,89 @@
 package DEAD.LAND.core;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Timer;
-
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.ui.panel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
 
+public class gameLoop implements ActionListener {
+	private static final int FPS = 60;
+	private static final int FPS_SPRITES = 15;
+	private static final int INTERVALO_LOOP_MS = 1000 / FPS;
+	private static final int ATUALIZACOES_POR_SPRITE = FPS / FPS_SPRITES;
 
-public class gameLoop extends Thread implements Runnable, ActionListener{
-	private int FPS = 60;
-	private Timer controleDoTempoDoJogo;
-	private long contadorDeFPS;
-    panel CenaDoJogo;
-    escutadorTeclado ET;
-	
+	private final Timer temporizador;
+	private final ControladorMovimento controladorMovimento;
+	private final ControladorQueda controladorQueda;
+	private final ControladorInteracao controladorInteracao;
+	private final ControladorItens controladorItens;
+	private final ControladorFlechas controladorFlechas;
+	private final panel cenaDoJogo;
+	private final escutadorTeclado teclado;
+
+	private int atualizacoesDesdeUltimoSprite;
+
     public gameLoop(panel P, escutadorTeclado ET) {
-        System.out.println("GameLoop Instanciado");
-        this.CenaDoJogo = P;
-        this.ET = ET;
+		this.cenaDoJogo = P;
+		this.teclado = ET;
+		this.controladorMovimento = new ControladorMovimento();
+		this.controladorQueda = new ControladorQueda();
+		this.controladorInteracao = new ControladorInteracao();
+		this.controladorItens = new ControladorItens();
+		this.controladorFlechas = P.getControladorFlechas();
+		this.temporizador = new Timer(INTERVALO_LOOP_MS, this);
+		this.temporizador.setCoalesce(true);
     }
-	
-	@Override
-	public void run() {
-		this.contadorDeFPS = 0;
-        this.controleDoTempoDoJogo = new Timer(1000, this);
-        this.controleDoTempoDoJogo.start();
-        //------------------------------------------------
-        double frameRate = 1000000000/this.FPS;
-        double tempoDecorrido = 0;
-        long tempoUltimaMedidaDoLoop = System.nanoTime();
-        long tempoAtualDoLoop;
-        //------------------------------------------------
-        while (this.isAlive()) {
-        	tempoAtualDoLoop = System.nanoTime();
-        	tempoDecorrido = tempoDecorrido +
-        			(tempoAtualDoLoop - tempoUltimaMedidaDoLoop)/frameRate;
-        	tempoUltimaMedidaDoLoop = tempoAtualDoLoop;
-        	
-        	if (tempoDecorrido >=1) {
-                String direcao = "";
-                if (ET.movePraCima) direcao = "cima";
-                if (ET.movePraBaixo) direcao = "baixo";
-                if (ET.movePraDir) direcao = "direita";
-                if (ET.movePraEsq) direcao = "esquerda";
 
-                verificadorDeColisao verificadorDeColisao = new verificadorDeColisao();
-                boolean bateu = verificadorDeColisao.ocorreuColisao(
-                        CenaDoJogo.getJogador(),
-                        CenaDoJogo.getCenario(),
-                        direcao
-                );
+	public void iniciar() {
+		if (!this.temporizador.isRunning()) {
+			this.temporizador.start();
+		}
+	}
 
-                if (!bateu) {
-                    CenaDoJogo.getJogador().atualizarPosicaoJogador(ET.movePraEsq, ET.movePraCima,
-                            ET.movePraDir, ET.movePraBaixo);
-                }
-
-        		CenaDoJogo.repaint();
-        		this.contadorDeFPS++;
-        		tempoDecorrido = 0;
-        	}
-        }
+	public void parar() {
+		this.temporizador.stop();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		System.out.println("FPS GameLoop: " + this.contadorDeFPS);
-		this.contadorDeFPS = 0;
-		
+		atualizarJogo();
+		atualizarSpriteQuandoNecessario();
+		this.cenaDoJogo.repaint();
 	}
 
+	private void atualizarJogo() {
+		if (this.cenaDoJogo.getCenario() == null) {
+			return;
+		}
+
+		if (this.controladorQueda.atualizar(this.cenaDoJogo)) {
+			this.controladorInteracao.resetar();
+			return;
+		}
+
+		this.controladorMovimento.atualizar(this.cenaDoJogo, this.teclado);
+		this.controladorInteracao.atualizar(this.cenaDoJogo, this.teclado);
+		this.controladorItens.atualizar(this.cenaDoJogo);
+
+		if (this.controladorFlechas != null) {
+			this.controladorFlechas.atualizar(this.cenaDoJogo, this.teclado);
+		}
+	}
+
+	private void atualizarSpriteQuandoNecessario() {
+		this.atualizacoesDesdeUltimoSprite++;
+
+		if (this.atualizacoesDesdeUltimoSprite < ATUALIZACOES_POR_SPRITE) {
+			return;
+		}
+
+		this.atualizacoesDesdeUltimoSprite = 0;
+		this.cenaDoJogo.getJogador().atualizarSprite(
+				this.teclado.movePraEsq,
+				this.teclado.movePraCima,
+				this.teclado.movePraDir,
+				this.teclado.movePraBaixo
+		);
+	}
 }

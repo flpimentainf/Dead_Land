@@ -4,24 +4,33 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
-
 import javax.swing.ImageIcon;
 
 public class player extends Rectangle{
+    private static final int VELOCIDADE_QUEDA_INICIAL = 1;
+    private static final int VELOCIDADE_QUEDA_MAXIMA = 6;
+    private static final int GRAVIDADE_QUEDA = 1;
+    private static final int FRAMES_PARA_TROCAR_SPRITE_QUEDA = 8;
+
     private Color CorFundo = Color.WHITE;
     public Rectangle AreaColisao;
-    public int passo = 3;
+    public int passo = 4;
+    private boolean caindo;
+    private int velocidadeQueda;
+    private int contadorFramesQueda;
+    private String direcao = "baixo";
     
     Image[]imgPlayerDown = new Image[3];
     Image[]imgPlayerRight = new Image[3];
     Image[]imgPlayerLeft = new Image[3];
     Image[]imgPlayerUp = new Image[3];
+    Image[]imgPlayerFall = new Image[3];
     Image imagemPlayer;
     private int frameJogador = 0;
 
     public player() {
-        this.x = 200;
-        this.y = 100;
+        this.x = 745;
+        this.y = 335;
         this.width = 48;
         this.height = 48;
         this.AreaColisao = new Rectangle();
@@ -34,7 +43,8 @@ public class player extends Rectangle{
             this.imgPlayerRight[i] = new ImageIcon("repos/PLAYERS/right" + (i+1) + ".png").getImage();
             this.imgPlayerLeft[i] = new ImageIcon("repos/PLAYERS/left" + (i+1) + ".png").getImage();
             this.imgPlayerUp[i] = new ImageIcon("repos/PLAYERS/up" + (i+1) + ".png").getImage();
-        }
+            this.imgPlayerFall[i] = new ImageIcon("repos/PLAYERS/fall" + (i+1) + ".png").getImage();
+        } 
         this.imagemPlayer = this.imgPlayerDown[frameJogador];
 
     }
@@ -46,14 +56,13 @@ public class player extends Rectangle{
         g.drawImage(imagemPlayer, x, y, width, height, null);
     }
     
-    public void atualizarPosicaoJogador (boolean ME, boolean MC, boolean MD, boolean MB) {
-    	if (ME)	this.x -= this.passo;
-    	if (MD)	this.x += this.passo;
-    	if (MC)	this.y -= this.passo;
-    	if (MB)	this.y += this.passo;
-
+    public void mover(int movimentoX, int movimentoY) {
+        this.x += movimentoX;
+        this.y += movimentoY;
         atualizarAreaColisao();
     }
+
+    public String getDirecao() { return direcao; }
 
     public void atualizarAreaColisao() {
         this.AreaColisao.x = this.x + 3;
@@ -61,32 +70,83 @@ public class player extends Rectangle{
         this.AreaColisao.width = this.width - 20;
         this.AreaColisao.height = this.height / 2;
     }
+
+    public void iniciarQueda() {
+        this.caindo = true;
+        this.velocidadeQueda = VELOCIDADE_QUEDA_INICIAL;
+        this.contadorFramesQueda = 0;
+        this.frameJogador = 0;
+        this.imagemPlayer = this.imgPlayerFall[this.frameJogador];
+        atualizarAreaColisao();
+    }
+
+    public void pararQueda() {
+        this.caindo = false;
+        this.velocidadeQueda = 0;
+        atualizarAreaColisao();
+    }
+
+    public boolean estaCaindo() {
+        return this.caindo;
+    }
+
+    public void atualizarQueda() {
+        this.y += this.velocidadeQueda;
+
+        if (this.velocidadeQueda < VELOCIDADE_QUEDA_MAXIMA) {
+            this.velocidadeQueda += GRAVIDADE_QUEDA;
+        }
+
+        atualizarSpriteQueda();
+        atualizarAreaColisao();
+    }
+
+    private void atualizarSpriteQueda() {
+        this.contadorFramesQueda++;
+
+        if (this.contadorFramesQueda < FRAMES_PARA_TROCAR_SPRITE_QUEDA) {
+            return;
+        }
+
+        this.contadorFramesQueda = 0;
+        this.frameJogador++;
+
+        if (this.frameJogador >= this.imgPlayerFall.length) {
+            this.frameJogador = 0;
+        }
+
+        this.imagemPlayer = this.imgPlayerFall[this.frameJogador];
+    }
     
     public void atualizarSprite(boolean moveEsq, boolean moveCima,
             boolean moveDir, boolean moveBaixo) {
+        if (this.caindo) {
+            return;
+        }
+
         this.frameJogador++;
         if (moveEsq) {
             if (frameJogador >= this.imgPlayerLeft.length)
                 frameJogador = 0;
-            
+            this.direcao = "esquerda";
             this.imagemPlayer = this.imgPlayerLeft[frameJogador];
         }
         if (moveCima) {
             if (frameJogador >= this.imgPlayerUp.length)
                 frameJogador = 0;
-            
+            this.direcao = "cima";
             this.imagemPlayer = this.imgPlayerUp[frameJogador];
         }
         if (moveDir) {
             if (frameJogador >= this.imgPlayerRight.length)
                 frameJogador = 0;
-            
+            this.direcao = "direita";
             this.imagemPlayer = this.imgPlayerRight[frameJogador];
         }
         if (moveBaixo) {
             if (frameJogador >= this.imgPlayerDown.length)
                 frameJogador = 0;
-            
+            this.direcao = "baixo";
             this.imagemPlayer = this.imgPlayerDown[frameJogador];
         }
     }
