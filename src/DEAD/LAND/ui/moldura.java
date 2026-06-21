@@ -13,8 +13,10 @@ public class moldura extends JFrame{
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         
-        panel painelCentro = new panel("centro");
-        panel painelSul = new panel("sul");
+        Inventario inventario = new Inventario();
+        panel painelCentro = new panel("centro", inventario);
+        panel painelSul = new panel("sul", inventario);
+        painelCentro.setPainelInventario(painelSul);
 
         add(painelCentro, BorderLayout.CENTER);
         add(painelSul, BorderLayout.SOUTH);

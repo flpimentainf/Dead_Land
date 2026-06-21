@@ -22,11 +22,13 @@ public class panel extends JPanel{
     private player jogador;
     private tileMap cenario;
     private IconeInteracao iconeInteracao;
+    private Inventario inventario;
+    private panel painelInventario;
 
 
-	
-    public panel(String posicao) {
+    public panel(String posicao, Inventario inventario) {
         this.posicao = posicao.toLowerCase();
+        this.inventario = inventario;
         
         switch (this.posicao) {
             case "centro":
@@ -52,7 +54,7 @@ public class panel extends JPanel{
 
             case "sul":
             	this.setPreferredSize(new Dimension(768, 100));
-            	this.setBackground(Color.YELLOW);
+            	this.setBackground(new Color(38, 44, 58));
             	
                 break;
 
@@ -85,8 +87,11 @@ public class panel extends JPanel{
                 break;
 
             case "sul":
-                g2.setColor(Color.YELLOW);
+                g2.setColor(new Color(38, 44, 58));
                 g2.fillRect(0, 0, getWidth(), getHeight());
+                if (this.inventario != null) {
+                    this.inventario.desenhar(g2, getWidth(), getHeight());
+                }
                 break;
         }
     }
@@ -102,8 +107,22 @@ public class panel extends JPanel{
 	}
 
 
-    public tileMap getCenario() {
+public tileMap getCenario() {
         return cenario;
+    }
+
+    public Inventario getInventario() {
+        return this.inventario;
+    }
+
+    public void setPainelInventario(panel painelInventario) {
+        this.painelInventario = painelInventario;
+    }
+
+    public void atualizarInventario() {
+        if (this.painelInventario != null) {
+            this.painelInventario.repaint();
+        }
     }
 
     public tileMap.InteracaoPerto getInteracaoPerto() {

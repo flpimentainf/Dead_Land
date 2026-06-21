@@ -197,7 +197,7 @@ public class tileMap {
 			criarCamadaVazia(this.cenario7DoJogo),
 			criarCamadaVazia(this.cenario8DoJogo)
 		};
-		this.cenarioAtualIndex = 0;
+		this.cenarioAtualIndex = 6;
 		atualizarCenarioValido();
 	}
 
@@ -251,6 +251,16 @@ public class tileMap {
 	private void atualizarCenarioValido() {
 		this.cenarioValido = this.todosOsCenarios[this.cenarioAtualIndex];
 		this.camadaObjetosValida = this.todosOsObjetos[this.cenarioAtualIndex];
+	}
+
+	public void definirTile(int linha, int coluna, int valor) {
+		if (linha < 0 || linha >= this.cenarioValido.length) {
+			return;
+		}
+		if (coluna < 0 || coluna >= this.cenarioValido[0].length) {
+			return;
+		}
+		this.cenarioValido[linha][coluna] = valor;
 	}
 
 	private void desenharCamada(Graphics2D g, int[][] camada, boolean ignorarVazio) {

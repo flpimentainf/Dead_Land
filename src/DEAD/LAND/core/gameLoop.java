@@ -16,6 +16,7 @@ public class gameLoop extends Thread implements Runnable, ActionListener{
 	private ControladorMovimento controladorMovimento;
 	private ControladorQueda controladorQueda;
 	private ControladorInteracao controladorInteracao;
+	private ControladorItens controladorItens;
     panel CenaDoJogo;
     escutadorTeclado ET;
 	
@@ -26,6 +27,7 @@ public class gameLoop extends Thread implements Runnable, ActionListener{
 		this.controladorMovimento = new ControladorMovimento();
 		this.controladorQueda = new ControladorQueda();
 		this.controladorInteracao = new ControladorInteracao();
+		this.controladorItens = new ControladorItens();
     }
 	
 	@Override
@@ -54,6 +56,7 @@ public class gameLoop extends Thread implements Runnable, ActionListener{
                     } else {
                         this.controladorMovimento.atualizar(CenaDoJogo, ET);
                         this.controladorInteracao.atualizar(CenaDoJogo, ET);
+                        this.controladorItens.atualizar(CenaDoJogo);
                     }
                 }
 
