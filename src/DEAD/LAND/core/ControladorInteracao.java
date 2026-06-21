@@ -12,8 +12,8 @@ public class ControladorInteracao {
     private static final int JOGADOR_Y_APOS_CAMA = 200;
 
     private static final int CENARIO_APOS_PORTA = 5;
-    private static final int JOGADOR_X_APOS_PORTA = 100;
-    private static final int JOGADOR_Y_APOS_PORTA = 200;
+    private static final int JOGADOR_X_APOS_PORTA = 695;
+    private static final int JOGADOR_Y_APOS_PORTA = 400;
 
     private int framesSegurandoInteracao;
 
@@ -58,12 +58,26 @@ public class ControladorInteracao {
                     )) {
                 return;
             }
-
+        	
+        	if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 4) {
+       
             cenaDoJogo.irParaCenario(
-                    CENARIO_APOS_PORTA,
-                    JOGADOR_X_APOS_PORTA,
+            		5,
+                    JOGADOR_X_APOS_PORTA, 
                     JOGADOR_Y_APOS_PORTA
             );
+            return;
+        }
+        	 
+        
+        	if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 5) {
+        	   cenaDoJogo.irParaCenario(
+        	          7,
+        	          742,
+        	          312
+        	    );
+        	   return;
+        	}
         }
     }
 
