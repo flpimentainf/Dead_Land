@@ -90,7 +90,17 @@ public class ControladorInteracao {
                 return;
             }
 
-            if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 5) {
+           if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 5) {
+                if (interacao.area.y == 0) {
+                    if (!cenaDoJogo.getInventario().temChave()) {
+                        return;
+                    }
+                } else {
+                    if (!cenaDoJogo.getInventario().temChaveVermelha()) {
+                        return;
+                    }
+                }
+
                 cenaDoJogo.irParaCenario(
                         7,
                         752,

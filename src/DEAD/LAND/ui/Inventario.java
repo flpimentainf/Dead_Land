@@ -32,8 +32,16 @@ public class Inventario {
         }
     }
 
-    public boolean temArco() {
+   public boolean temArco() {
         return temItem("arco");
+    }
+
+    public boolean temChave() {
+        return temItem("chave");
+    }
+
+    public boolean temChaveVermelha() {
+        return temItem("chave_vermelha");
     }
 
     public boolean temItem(String nome) {

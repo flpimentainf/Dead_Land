@@ -71,6 +71,12 @@ public class ControladorMovimento {
                         1475,
                         cenaDoJogo.getJogador().y
                 );
+             } else if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 8) {
+                cenaDoJogo.irParaCenario(
+                        5,
+                        1440,
+                        cenaDoJogo.getJogador().y
+                );
             } else {
                 cenaDoJogo.irParaCenarioAnterior();
             }
@@ -90,6 +96,11 @@ public class ControladorMovimento {
                         larguraMapa - jogadorW - 1500,
                         cenaDoJogo.getJogador().y);
         	
+        	} else if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 5) {
+                cenaDoJogo.irParaCenario(8,
+                        60,
+                        cenaDoJogo.getJogador().y);
+
         	} else {
             cenaDoJogo.irParaProximoCenario();
             if (cenaDoJogo.getHistoria() != null) cenaDoJogo.getHistoria().eventoEntrouCenario(cenaDoJogo.getCenario().getCenarioAtualIndex(), cenaDoJogo);

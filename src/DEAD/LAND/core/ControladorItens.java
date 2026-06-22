@@ -12,6 +12,8 @@ import java.awt.Graphics2D;
 public class ControladorItens {
     private static final int CENARIO_DOS_ITENS = 6;
     private static final int TILE_CHAO = 41;
+    private static final int CENARIO_CHAVE_VERMELHA = 2;
+    private static final int TILE_TERRA = 2;
 
     private item[] itens;
 
@@ -19,7 +21,9 @@ public class ControladorItens {
         this.itens = new item[] {
             new item("repos/tiles/tile (46).png", CENARIO_DOS_ITENS, 2, 2, TILE_CHAO, "chave"),
             new item("repos/tiles/tile (47).png", CENARIO_DOS_ITENS, 1, 22, TILE_CHAO, "arco"),
-            new item("repos/tiles/tile (48).png", CENARIO_DOS_ITENS, 1, 23, TILE_CHAO, "flecha")
+            new item("repos/tiles/tile (48).png", CENARIO_DOS_ITENS, 1, 23, TILE_CHAO, "flecha"),
+            new item("repos/tiles/tile (64).png", CENARIO_CHAVE_VERMELHA, 4, 15, TILE_TERRA, "chave_vermelha")
+            
         };
     }
 
