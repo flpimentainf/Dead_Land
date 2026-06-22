@@ -74,9 +74,9 @@ public class tileMap {
 	int [][] cenario5DoJogo = {
 		{55, 55, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 43, 44, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 55, 55, 55, 55},
 		{55, 55, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 51, 52, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 55, 55, 55, 55},
-		{55, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,  1,  3, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 55, 55, 55, 55},
+		{55, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 55,  1,  3, 55, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 55, 55, 55, 55},
 		{55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55,  1,  3, 55, 55, 36, 36, 36, 36, 36, 36, 36, 36, 36, 55, 55, 55, 55},
-		{58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58,  1,  3, 55, 55, 36, 36, 36, 36, 36, 36, 36, 36, 36, 55, 55, 55, 55},
+		{58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58,  7,  3, 55, 55, 36, 36, 36, 36, 36, 36, 36, 36, 36, 55, 55, 55, 55},
 		{ 5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  6, 55, 55, 36, 36, 36, 36, 36, 36, 36, 36, 36, 55, 55, 55, 55},
 		{55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 36, 36, 36, 36, 36, 36, 36, 36, 36, 55, 55, 55, 55},
 		{55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 36, 36, 36, 36, 36, 36, 36, 36, 36, 55, 55, 55, 55},
@@ -99,8 +99,8 @@ public class tileMap {
 
 		int [][] cenario7DoJogo = {
 		{60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60},
-		{60, 41, 41, 41, 41, 60, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 60, 46, 47, 41, 41, 41, 41, 41, 41, 41, 60},
-		{60, 41, 45, 41, 41, 60, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 60, 41, 41, 41, 41, 41, 41, 41, 41, 41, 60},
+		{60, 41, 41, 41, 41, 60, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 60, 41, 41, 41, 41, 41, 41, 41, 41, 41, 60},
+		{60, 41, 41, 41, 41, 60, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 60, 41, 41, 41, 41, 41, 41, 41, 41, 41, 60},
 		{60, 41, 41, 41, 41, 60, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 60, 41, 41, 41, 41, 41, 41, 41, 41, 41, 60},
 		{60, 60, 60, 41, 41, 60, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 60, 60, 60, 60, 60, 60, 60, 41, 41, 60, 60},
 		{60, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 60, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41},
@@ -188,6 +188,19 @@ public class tileMap {
 			{56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56},
 	};
 
+	int[][] cenario7Objetos = {
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO,    46,    47, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO,    45, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
+	};
+
 	public tileMap() {
 		this.pecaDoCenario = new tiles();
 		this.todosOsCenarios = new int[][][] {
@@ -198,7 +211,8 @@ public class tileMap {
 			this.cenario5DoJogo,
 			this.cenario6DoJogo,
 			this.cenario7DoJogo,
-			this.cenario8DoJogo
+			this.cenario8DoJogo,
+			this.cenario9DoJogo
 		};
 		this.todosOsObjetos = new int[][][] {
 			this.cenario1Objetos,
@@ -207,8 +221,9 @@ public class tileMap {
 			this.cenario4Objetos,
 			this.cenario5Objetos,
 			criarCamadaVazia(this.cenario6DoJogo),
-			criarCamadaVazia(this.cenario7DoJogo),
-			criarCamadaVazia(this.cenario8DoJogo)
+			this.cenario7Objetos,
+			criarCamadaVazia(this.cenario8DoJogo),
+			criarCamadaVazia(this.cenario9DoJogo)
 		};
 		this.cenarioAtualIndex = 0;
 		atualizarCenarioValido();
