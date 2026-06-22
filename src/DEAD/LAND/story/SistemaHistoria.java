@@ -144,6 +144,50 @@ public class SistemaHistoria {
         }
     }
 
+
+    public void eventoFalarComNpc(String npcId, panel cenaDoJogo) {
+        if (historiaFinalizada() || npcId == null) return;
+
+        if ("ari".equals(npcId)) {
+            if (estado == Estado.FLORESTA) {
+                estado = Estado.FALHA;
+            }
+            objetivoAtual = "Procure a chave da memória.";
+            mostrarMensagem(RoteiroHistoria.npcAri());
+            return;
+        }
+
+        if ("mara".equals(npcId)) {
+            if (estado != Estado.MEMORIAS) {
+                estado = Estado.BUSCA_MEMORIA;
+                objetivoAtual = "Encontre a chave e recupere suas memórias.";
+            }
+            mostrarMensagem(RoteiroHistoria.npcMara());
+            return;
+        }
+
+        if ("guardiao_memoria".equals(npcId)) {
+            if (estado != Estado.MEMORIAS) {
+                estado = Estado.BUSCA_MEMORIA;
+                objetivoAtual = "Encontre a chave da memória nesta área.";
+            }
+            mostrarMensagem(RoteiroHistoria.npcGuardiaoMemoria());
+            return;
+        }
+
+        if ("porteiro_morto".equals(npcId)) {
+            if (cenaDoJogo != null && cenaDoJogo.getInventario().temItem("chave")) {
+                iniciarEscolhaFinal(RoteiroHistoria.npcPorteiroComChave());
+            } else {
+                objetivoAtual = "A saída está trancada. Procure a chave.";
+                mostrarMensagem(RoteiroHistoria.npcPorteiroSemChave());
+            }
+            return;
+        }
+
+        mostrarMensagem(RoteiroHistoria.npcDesconhecido());
+    }
+
     public void eventoItemColetado(String nome) {
         if (nome == null || nome.isBlank()) return;
 
@@ -183,12 +227,16 @@ public class SistemaHistoria {
     }
 
     private void iniciarEscolhaFinal() {
+        iniciarEscolhaFinal(RoteiroHistoria.escolhaFinal());
+    }
+
+    private void iniciarEscolhaFinal(String[] linhas) {
         estado = Estado.ESCOLHA_FINAL;
         objetivoAtual = "Escolha o final.";
         exibindoEscolha = true;
         exibindoMensagem = false;
         opcaoEscolhida = 0;
-        mostrarMensagemSemAbrirCaixa(RoteiroHistoria.escolhaFinal());
+        mostrarMensagemSemAbrirCaixa(linhas);
     }
 
     private void iniciarFinalAcordar() {

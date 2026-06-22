@@ -1,5 +1,6 @@
 package DEAD.LAND.core;
 
+import DEAD.LAND.entity.NPC;
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.ui.panel;
 import DEAD.LAND.world.tileMap;
@@ -16,8 +17,27 @@ public class ControladorInteracao {
     private static final int JOGADOR_Y_APOS_PORTA = 400;
 
     private int framesSegurandoInteracao;
+    private boolean interacaoNpcPressionada;
 
     public void atualizar(panel cenaDoJogo, escutadorTeclado teclado) {
+        if (!teclado.interagir) {
+            this.interacaoNpcPressionada = false;
+        }
+
+        NPC npcPerto = cenaDoJogo.getControladorNPCs() != null
+                ? cenaDoJogo.getControladorNPCs().getNpcPerto(cenaDoJogo)
+                : null;
+
+        if (npcPerto != null && teclado.interagir && !this.interacaoNpcPressionada) {
+            this.interacaoNpcPressionada = true;
+            this.framesSegurandoInteracao = 0;
+
+            if (cenaDoJogo.getHistoria() != null) {
+                cenaDoJogo.getHistoria().eventoFalarComNpc(npcPerto.getId(), cenaDoJogo);
+            }
+            return;
+        }
+
         tileMap.InteracaoPerto interacao = cenaDoJogo.getInteracaoPerto();
 
         if (interacao != null && teclado.interagir) {

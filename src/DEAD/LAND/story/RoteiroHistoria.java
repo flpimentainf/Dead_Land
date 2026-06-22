@@ -151,4 +151,59 @@ public final class RoteiroHistoria {
                 "DEAD LAND"
         };
     }
+
+    public static String[] npcAri() {
+        return new String[] {
+                "Ari, o que lembra",
+                "Você não morreu... ainda não do jeito que importa.",
+                "Dead Land é o lugar entre acordar e desistir.",
+                "O portão tomou uma memória sua. Sem ela, você só anda em círculo."
+        };
+    }
+
+    public static String[] npcMara() {
+        return new String[] {
+                "Mara, a escutadora",
+                "Nem todo vulto aqui quer te ferir.",
+                "Alguns de nós somos sobras de pessoas que quase acordaram.",
+                "Se encontrar uma chave, não pense nela como metal.",
+                "Pense nela como uma lembrança que ainda dói."
+        };
+    }
+
+    public static String[] npcGuardiaoMemoria() {
+        return new String[] {
+                "Guardião da memória",
+                "A chave está perto porque você também está perto da verdade.",
+                "Quando pegá-la, a floresta vai devolver cenas que você tentou apagar.",
+                "Depois disso, vá ao portão. Ele só abre para quem lembra."
+        };
+    }
+
+    public static String[] npcPorteiroSemChave() {
+        return new String[] {
+                "Porteiro morto",
+                "Você chegou até a saída sem trazer a parte que perdeu.",
+                "Volte. Procure a CHAVE DA MEMÓRIA.",
+                "O portão não quer força. Ele quer verdade."
+        };
+    }
+
+    public static String[] npcPorteiroComChave() {
+        return new String[] {
+                "Porteiro morto",
+                "Agora você lembra do impacto, da chuva e da sirene.",
+                "Posso abrir o caminho, mas não posso escolher por você.",
+                "Acordar dói. Ficar aqui também cobra um preço."
+        };
+    }
+
+    public static String[] npcDesconhecido() {
+        return new String[] {
+                "NPC",
+                "A figura observa você em silêncio.",
+                "Por algum motivo, parece estar esperando outra versão sua."
+        };
+    }
+
 }

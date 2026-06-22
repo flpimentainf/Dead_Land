@@ -3,6 +3,7 @@ package DEAD.LAND.ui;
 import DEAD.LAND.core.ControladorFlechas;
 import DEAD.LAND.core.ControladorInimigos;
 import DEAD.LAND.core.ControladorItens;
+import DEAD.LAND.core.ControladorNPCs;
 import DEAD.LAND.core.gameLoop;
 import DEAD.LAND.entity.player;
 import DEAD.LAND.input.escutadorTeclado;
@@ -28,6 +29,7 @@ public class panel extends JPanel{
     private ControladorFlechas controladorFlechas;
     private ControladorItens controladorItens;
     private ControladorInimigos controladorInimigos;
+    private ControladorNPCs controladorNPCs;
     private BarraDeVida barradeVida;
     private SistemaHistoria historia;
     private InterfaceHistoria interfaceHistoria;
@@ -58,6 +60,7 @@ public class panel extends JPanel{
                 
                 this.controladorItens = GL.getControladorItens();
                 this.controladorInimigos = GL.getControladorInimigos();
+                this.controladorNPCs = GL.getControladorNPCs();
                 this.barradeVida = new BarraDeVida();
                 GL.iniciar();
 
@@ -95,11 +98,13 @@ public class panel extends JPanel{
                 g2.scale(escalaX, escalaY);
 
                 this.cenario.desenhar(g2);
+                if (this.controladorNPCs != null) this.controladorNPCs.desenhar(g2, this.cenario.getCenarioAtualIndex());
                 if (this.controladorInimigos != null) this.controladorInimigos.desenhar(g2, this.cenario.getCenarioAtualIndex());
                 getJogador().desenharPlayer(g2);
                 if (this.controladorFlechas != null) this.controladorFlechas.desenhar(g2);
                 if (this.controladorItens != null) this.controladorItens.desenhar(g2, this);
                 this.iconeInteracao.desenharArea(g2, this.cenario, getJogador());
+                if (this.controladorNPCs != null) this.controladorNPCs.desenharIndicadorInteracao(g2, this);
                 g2.setTransform(transformacaoOriginal);
                 if (this.barradeVida != null) this.barradeVida.desenhar(g2, getJogador(), getWidth(), getHeight());
                 if (this.interfaceHistoria != null) this.interfaceHistoria.desenhar(g2, getWidth(), getHeight(), this.historia);
@@ -127,6 +132,8 @@ public class panel extends JPanel{
 
 
     public ControladorFlechas getControladorFlechas() { return controladorFlechas; }
+
+    public ControladorNPCs getControladorNPCs() { return controladorNPCs; }
 
     public SistemaHistoria getHistoria() { return historia; }
 

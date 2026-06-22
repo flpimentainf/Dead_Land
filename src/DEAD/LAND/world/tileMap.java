@@ -210,7 +210,7 @@ public class tileMap {
 			criarCamadaVazia(this.cenario7DoJogo),
 			criarCamadaVazia(this.cenario8DoJogo)
 		};
-		this.cenarioAtualIndex = 5;
+		this.cenarioAtualIndex = 0;
 		atualizarCenarioValido();
 	}
 
