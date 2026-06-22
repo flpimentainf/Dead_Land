@@ -2,15 +2,11 @@ package DEAD.LAND.story;
 
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.ui.panel;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
+import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.awt.Toolkit;
 
 public class SistemaHistoria {
     public enum Estado {
@@ -18,6 +14,7 @@ public class SistemaHistoria {
         QUEDA,
         FLORESTA,
         FALHA,
+        BUSCA_MEMORIA,
         MEMORIAS,
         ESCOLHA_FINAL,
         FINAL_ACORDAR,
@@ -39,12 +36,7 @@ public class SistemaHistoria {
     private boolean telaEscura;
 
     public SistemaHistoria() {
-        mostrarMensagem(
-                "Você está no seu quarto.",
-                "O silêncio parece mais pesado do que deveria.",
-                "Seu corpo está cansado... mas sua mente continua inquieta.",
-                "Talvez dormir seja a única coisa que ainda faça sentido."
-        );
+        mostrarMensagem(RoteiroHistoria.abertura());
     }
 
     public void atualizar(panel cenaDoJogo, escutadorTeclado teclado) {
@@ -56,8 +48,7 @@ public class SistemaHistoria {
         }
 
         if (exibindoMensagem && teclado.confirmar && !teclaConfirmarPressionada) {
-            exibindoMensagem = false;
-            mensagem.clear();
+            fecharMensagem();
         }
 
         teclaConfirmarPressionada = teclado.confirmar;
@@ -71,13 +62,8 @@ public class SistemaHistoria {
 
             if (estado == Estado.ESCOLHA_FINAL && tentativasMenu >= 3) {
                 iniciarFinalSecreto();
-            } else if (estado != Estado.FINAL_ACORDAR && estado != Estado.FINAL_FICAR && estado != Estado.FINAL_SECRETO) {
-                mostrarMensagem(
-                        "Sistema",
-                        "Menu indisponível.",
-                        "Botão de logout não encontrado.",
-                        "Complete as missões principais para retornar."
-                );
+            } else if (!historiaFinalizada()) {
+                mostrarMensagem(RoteiroHistoria.menuBloqueado());
             }
         }
         teclaMenuPressionada = teclado.abrirMenu;
@@ -105,8 +91,11 @@ public class SistemaHistoria {
     }
 
     public boolean bloqueiaControleDoJogador() {
-        return exibindoMensagem || exibindoEscolha
-                || estado == Estado.FINAL_ACORDAR
+        return exibindoMensagem || exibindoEscolha || historiaFinalizada();
+    }
+
+    private boolean historiaFinalizada() {
+        return estado == Estado.FINAL_ACORDAR
                 || estado == Estado.FINAL_FICAR
                 || estado == Estado.FINAL_SECRETO;
     }
@@ -116,12 +105,7 @@ public class SistemaHistoria {
         objetivoAtual = "Sobreviva à queda.";
         telaEscura = true;
         tocarSomEstranhoBasico();
-
-        mostrarMensagem(
-                "Você fecha os olhos.",
-                "Por um instante, tudo fica escuro.",
-                "Mas então... você começa a cair."
-        );
+        mostrarMensagem(RoteiroHistoria.dormir());
     }
 
     public void eventoQuedaConcluida() {
@@ -130,37 +114,23 @@ public class SistemaHistoria {
         estado = Estado.FLORESTA;
         objetivoAtual = "Explore a floresta e procure uma saída.";
         telaEscura = false;
-
-        mostrarMensagem(
-                "Você acorda antes de tocar o chão.",
-                "O céu está errado.",
-                "A floresta respira como se estivesse viva.",
-                "Uma mensagem aparece diante dos seus olhos:",
-                "Complete as missões principais para retornar."
-        );
+        mostrarMensagem(RoteiroHistoria.quedaConcluida());
     }
 
     public void eventoEntrouCenario(int indiceCenario, panel cenaDoJogo) {
-        if (estado == Estado.FINAL_SECRETO || estado == Estado.FINAL_ACORDAR || estado == Estado.FINAL_FICAR) return;
+        if (historiaFinalizada()) return;
 
         if (indiceCenario == 3 && estado == Estado.FLORESTA) {
             estado = Estado.FALHA;
             objetivoAtual = "Fale com alguém que ainda lembra.";
-            mostrarMensagem(
-                    "NPC",
-                    "Você não deveria estar andando.",
-                    "Você já tentou acordar?"
-            );
+            mostrarMensagem(RoteiroHistoria.npcLembra());
             return;
         }
 
-        if (indiceCenario == 6 && estado != Estado.MEMORIAS) {
+        if (indiceCenario == 6 && estado != Estado.BUSCA_MEMORIA && estado != Estado.MEMORIAS) {
+            estado = Estado.BUSCA_MEMORIA;
             objetivoAtual = "Encontre a chave e recupere suas memórias.";
-            mostrarMensagem(
-                    "Sistema corrompido",
-                    "Missão atualizada.",
-                    "Recupere a CHAVE DA MEMÓRIA."
-            );
+            mostrarMensagem(RoteiroHistoria.missaoMemoria());
             return;
         }
 
@@ -169,11 +139,7 @@ public class SistemaHistoria {
                 iniciarEscolhaFinal();
             } else {
                 objetivoAtual = "A saída está trancada. Procure a chave.";
-                mostrarMensagem(
-                        "Portão morto",
-                        "A saída reconhece você...",
-                        "mas falta uma memória para abrir."
-                );
+                mostrarMensagem(RoteiroHistoria.portaoSemMemoria());
             }
         }
     }
@@ -184,40 +150,23 @@ public class SistemaHistoria {
         if ("chave".equals(nome)) {
             estado = Estado.MEMORIAS;
             objetivoAtual = "Vá até o fim da floresta.";
-            mostrarMensagem(
-                    "Memória recuperada",
-                    "Vidro quebrado.",
-                    "Sirene distante.",
-                    "Uma voz gritando seu nome."
-            );
+            mostrarMensagem(RoteiroHistoria.chaveColetada());
             return;
         }
 
         if ("arco".equals(nome)) {
-            mostrarMensagem(
-                    "Item obtido",
-                    "Arco encontrado.",
-                    "Às vezes lutar é só uma forma de negar o medo."
-            );
+            mostrarMensagem(RoteiroHistoria.arcoColetado());
             return;
         }
 
         if ("flecha".equals(nome)) {
-            mostrarMensagem(
-                    "Item obtido",
-                    "Flecha encontrada.",
-                    "O caminho final está mais perto."
-            );
+            mostrarMensagem(RoteiroHistoria.flechaColetada());
         }
     }
 
     public boolean eventoPorta(int cenarioAtual, panel cenaDoJogo) {
         if (cenarioAtual == 0) {
-            mostrarMensagem(
-                    "Porta",
-                    "A maçaneta está fria.",
-                    "Você tenta sair, mas a porta não reconhece este mundo."
-            );
+            mostrarMensagem(RoteiroHistoria.portaQuartoTrancada());
             return true;
         }
 
@@ -225,7 +174,7 @@ public class SistemaHistoria {
             if (cenaDoJogo.getInventario().temItem("chave")) {
                 iniciarEscolhaFinal();
             } else {
-                mostrarMensagem("Porta", "A saída está trancada.", "Falta a chave da memória.");
+                mostrarMensagem(RoteiroHistoria.saidaTrancada());
             }
             return true;
         }
@@ -238,26 +187,15 @@ public class SistemaHistoria {
         objetivoAtual = "Escolha o final.";
         exibindoEscolha = true;
         exibindoMensagem = false;
-        mensagem = Arrays.asList(
-                "Memória recuperada.",
-                "Carro quebrado.",
-                "Ambulância.",
-                "Cama de hospital.",
-                "Você está entre acordar e permanecer."
-        );
+        opcaoEscolhida = 0;
+        mostrarMensagemSemAbrirCaixa(RoteiroHistoria.escolhaFinal());
     }
 
     private void iniciarFinalAcordar() {
         exibindoEscolha = false;
         estado = Estado.FINAL_ACORDAR;
         objetivoAtual = "Fim.";
-        mostrarMensagem(
-                "Final: ACORDAR",
-                "A tela fica branca.",
-                "Bip... bip... bip...",
-                "Ele abriu os olhos.",
-                "Alguém ao lado da cama sussurra: você voltou."
-        );
+        mostrarMensagem(RoteiroHistoria.finalAcordar());
     }
 
     private void iniciarFinalFicar(panel cenaDoJogo) {
@@ -265,26 +203,14 @@ public class SistemaHistoria {
         estado = Estado.FINAL_FICAR;
         objetivoAtual = "Fim.";
         cenaDoJogo.irParaCenario(2, 745, 335);
-        mostrarMensagem(
-                "Final: FICAR",
-                "A floresta volta a ficar bonita.",
-                "Os NPCs sorriem como se nada tivesse acontecido.",
-                "No mundo real, ele nunca acordou.",
-                "Ele escolheu viver onde se sentia importante."
-        );
+        mostrarMensagem(RoteiroHistoria.finalFicar());
     }
 
     private void iniciarFinalSecreto() {
         exibindoEscolha = false;
         estado = Estado.FINAL_SECRETO;
         objetivoAtual = "Loop reiniciado.";
-        mostrarMensagem(
-                "Erro...",
-                "Consciência ainda presa.",
-                "Você acorda de novo na floresta.",
-                "Um NPC diz: você já tentou isso antes.",
-                "DEAD LAND"
-        );
+        mostrarMensagem(RoteiroHistoria.finalSecreto());
     }
 
     private void mostrarMensagem(String... linhas) {
@@ -292,73 +218,45 @@ public class SistemaHistoria {
         this.exibindoMensagem = true;
     }
 
-    public void desenhar(Graphics2D g2, int largura, int altura) {
-        if (telaEscura) {
-            desenharEscurecimento(g2, largura, altura);
-        }
-
-        desenharObjetivo(g2, largura);
-
-        if (exibindoEscolha) {
-            desenharEscolha(g2, largura, altura);
-            return;
-        }
-
-        if (exibindoMensagem) {
-            desenharCaixaTexto(g2, largura, altura, mensagem, "ENTER/E para continuar");
-        }
+    private void mostrarMensagemSemAbrirCaixa(String... linhas) {
+        this.mensagem = new ArrayList<String>(Arrays.asList(linhas));
     }
 
-    private void desenharEscurecimento(Graphics2D g2, int largura, int altura) {
-        g2.setColor(new Color(0, 0, 0, 210));
-        g2.fillRect(0, 0, largura, altura);
+    private void fecharMensagem() {
+        this.exibindoMensagem = false;
+        this.mensagem.clear();
     }
 
-    private void desenharObjetivo(Graphics2D g2, int largura) {
-        g2.setFont(new Font("Arial", Font.BOLD, 16));
-        g2.setColor(new Color(0, 0, 0, 150));
-        g2.fillRoundRect(20, 18, Math.min(largura - 40, 560), 34, 12, 12);
-        g2.setColor(Color.WHITE);
-        g2.drawString("Missão: " + objetivoAtual, 34, 41);
+    public Estado getEstado() {
+        return estado;
     }
 
-    private void desenharEscolha(Graphics2D g2, int largura, int altura) {
-        List<String> linhas = new ArrayList<String>(mensagem);
-        linhas.add("");
-        linhas.add((opcaoEscolhida == 0 ? "> " : "  ") + "Acordar");
-        linhas.add((opcaoEscolhida == 1 ? "> " : "  ") + "Ficar no jogo");
-        desenharCaixaTexto(g2, largura, altura, linhas, "↑/↓ escolhe | ENTER/E confirma | ESC 3x: segredo");
+    public String getObjetivoAtual() {
+        return objetivoAtual;
     }
 
-    private void desenharCaixaTexto(Graphics2D g2, int largura, int altura, List<String> linhas, String rodape) {
-        int caixaX = 40;
-        int caixaLargura = largura - 80;
-        int caixaAltura = 190;
-        int caixaY = altura - caixaAltura - 34;
+    public List<String> getMensagem() {
+        return Collections.unmodifiableList(mensagem);
+    }
 
-        g2.setColor(new Color(0, 0, 0, 205));
-        g2.fillRoundRect(caixaX, caixaY, caixaLargura, caixaAltura, 18, 18);
-        g2.setColor(new Color(220, 220, 220));
-        g2.setStroke(new BasicStroke(2));
-        g2.drawRoundRect(caixaX, caixaY, caixaLargura, caixaAltura, 18, 18);
+    public boolean isExibindoMensagem() {
+        return exibindoMensagem;
+    }
 
-        g2.setFont(new Font("Arial", Font.PLAIN, 18));
-        g2.setColor(Color.WHITE);
-        FontMetrics fm = g2.getFontMetrics();
-        int y = caixaY + 32;
-        for (String linha : linhas) {
-            g2.drawString(linha, caixaX + 24, y);
-            y += fm.getHeight() + 2;
-        }
+    public boolean isExibindoEscolha() {
+        return exibindoEscolha;
+    }
 
-        g2.setFont(new Font("Arial", Font.ITALIC, 13));
-        g2.setColor(new Color(200, 200, 200));
-        g2.drawString(rodape, caixaX + 24, caixaY + caixaAltura - 16);
+    public int getOpcaoEscolhida() {
+        return opcaoEscolhida;
+    }
+
+    public boolean isTelaEscura() {
+        return telaEscura;
     }
 
     private void tocarSomEstranhoBasico() {
-    // Som simples para não depender de arquivo de áudio.
-    // Depois você pode trocar por um efeito .wav.
-    Toolkit.getDefaultToolkit().beep();
+        //Adicionar so wav ou waw esqueci qual e o arquivo
+        Toolkit.getDefaultToolkit().beep();
     }
 }

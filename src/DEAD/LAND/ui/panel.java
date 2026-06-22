@@ -6,8 +6,8 @@ import DEAD.LAND.core.ControladorItens;
 import DEAD.LAND.core.gameLoop;
 import DEAD.LAND.entity.player;
 import DEAD.LAND.input.escutadorTeclado;
-import DEAD.LAND.world.tileMap;
 import DEAD.LAND.story.SistemaHistoria;
+import DEAD.LAND.world.tileMap;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -30,6 +30,7 @@ public class panel extends JPanel{
     private ControladorInimigos controladorInimigos;
     private BarraDeVida barradeVida;
     private SistemaHistoria historia;
+    private InterfaceHistoria interfaceHistoria;
 
 
     public panel(String posicao, Inventario inventario) {
@@ -46,6 +47,7 @@ public class panel extends JPanel{
                 this.iconeInteracao = new IconeInteracao();
                 this.controladorFlechas = new ControladorFlechas();
                 this.historia = new SistemaHistoria();
+                this.interfaceHistoria = new InterfaceHistoria();
 
                 
                 ET = new escutadorTeclado();
@@ -62,13 +64,13 @@ public class panel extends JPanel{
                 break;
 
             case "sul":
-            	this.setPreferredSize(new Dimension(768, 100));
+            	this.setPreferredSize(new Dimension(768, 125));
             	this.setBackground(new Color(38, 44, 58));
             	
                 break;
 
             default:
-            	this.setPreferredSize(new Dimension(768, 100));
+            	this.setPreferredSize(new Dimension(768, 125));
             	this.setBackground(Color.GRAY);
             	
                 break;
@@ -100,7 +102,7 @@ public class panel extends JPanel{
                 this.iconeInteracao.desenharArea(g2, this.cenario, getJogador());
                 g2.setTransform(transformacaoOriginal);
                 if (this.barradeVida != null) this.barradeVida.desenhar(g2, getJogador(), getWidth(), getHeight());
-                if (this.historia != null) this.historia.desenhar(g2, getWidth(), getHeight());
+                if (this.interfaceHistoria != null) this.interfaceHistoria.desenhar(g2, getWidth(), getHeight(), this.historia);
                 break;
 
             case "sul":
