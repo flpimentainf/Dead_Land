@@ -70,7 +70,7 @@ public final class RoteiroHistoria {
                 "O portão respira lentamente.",
                 "Ele sabe que você está incompleto.",
                 "A chave prata não é suficiente.",
-                "Encontre a chave vermelha 63",
+                "Encontre a chave vermelha",
                 "e recupere sua memória antes de atravessar."
         };
     }
@@ -106,8 +106,7 @@ public final class RoteiroHistoria {
 
     public static String[] chaveBossColetada() {
         return new String[] {
-                "Memória recuperada: Chave Vermelha 63",
-                "O número 63 está gravado no metal vermelho.",
+                "Memória recuperada: Chave Vermelha",
                 "Chuva. Faróis. Um carro fora da estrada.",
                 "Vidro quebrado. Alguém chamando seu nome.",
                 "Agora você lembra: sofreu um acidente.",
@@ -131,7 +130,7 @@ public final class RoteiroHistoria {
                 "Portão final",
                 "A fechadura não se move.",
                 "O portão sente que algo está faltando.",
-                "Você precisa da CHAVE VERMELHA 63,",
+                "Você precisa da CHAVE VERMELHA.",
                 "a verdadeira Chave da Memória."
         };
     }
@@ -149,8 +148,7 @@ public final class RoteiroHistoria {
         return new String[] {
                 "Porta do confronto",
                 "O selo pulsa em vermelho.",
-                "O número 63 aparece por um segundo.",
-                "Somente a CHAVE VERMELHA 63 pode rompê-lo.",
+                "Somente a CHAVE VERMELHA pode rompê-lo.",
                 "Ela é a Chave da Memória."
         };
     }
@@ -213,7 +211,7 @@ public final class RoteiroHistoria {
                 "Não se assuste. Quase ninguém lembra da primeira vez.",
                 "Este lugar se chama Dead Land.",
                 "Ele aparece para quem está preso entre dois mundos.",
-                "Sua memória está presa na chave vermelha marcada com 63.",
+                "Sua memória está presa na chave vermelha.",
                 "Mas ela foi trancada atrás de uma porta prateada.",
                 "Encontre primeiro a chave prata."
         };
@@ -224,7 +222,7 @@ public final class RoteiroHistoria {
                 "Mara, a escutadora",
                 "Eu ouvi sua queda antes de você chegar.",
                 "A porta inferior deste salão protege uma câmara.",
-                "Lá dentro está a chave vermelha marcada com 63.",
+                "Lá dentro está a chave vermelha.",
                 "Não tente forçar a fechadura.",
                 "Procure a chave prata na área à esquerda."
         };
@@ -235,7 +233,7 @@ public final class RoteiroHistoria {
                 "Mara, a escutadora",
                 "Você encontrou a chave prata.",
                 "Agora volte à porta inferior deste salão.",
-                "Ela abre o caminho até a chave vermelha 63.",
+                "Ela abre o caminho até a chave vermelha.",
                 "Não confunda as duas: somente a vermelha guarda sua memória."
         };
     }
@@ -255,7 +253,7 @@ public final class RoteiroHistoria {
                 "Você encontrou o caminho da chave prata.",
                 "Leve-a de volta ao salão de pedra.",
                 "Ela abre a porta inferior.",
-                "Depois dessa porta está a chave vermelha 63.",
+                "Depois dessa porta está a chave vermelha.",
                 "Essa, sim, guarda sua memória."
         };
     }
@@ -265,7 +263,7 @@ public final class RoteiroHistoria {
                 "Guardião da memória",
                 "A chave prata escolheu sua mão.",
                 "Volte ao salão e abra a porta inferior.",
-                "A chave vermelha 63 espera do outro lado."
+                "A chave vermelha espera do outro lado."
         };
     }
 
@@ -284,7 +282,7 @@ public final class RoteiroHistoria {
                 "Você chegou cedo demais.",
                 "A chave prata abre apenas o caminho.",
                 "Ela não pode abrir o portão final.",
-                "Volte e encontre a CHAVE VERMELHA 63.",
+                "Volte e encontre a CHAVE VERMELHA.",
                 "Traga a verdadeira Chave da Memória."
         };
     }
@@ -321,7 +319,7 @@ public final class RoteiroHistoria {
     public static String[] respostaAriMissao(boolean temMemoria) {
         return temMemoria
                 ? new String[] {"Ari", "Você já recuperou a memória.", "Siga para o confronto final."}
-                : new String[] {"Ari", "Encontre a chave prata primeiro.", "Ela leva até a chave vermelha 63."};
+                : new String[] {"Ari", "Encontre a chave prata primeiro.", "Ela leva até a chave vermelha."};
     }
 
     public static String[] respostaMaraEscuta() {
@@ -337,7 +335,7 @@ public final class RoteiroHistoria {
             return new String[] {"Mara", "A chave vermelha está com você.", "A porta final vai reconhecê-la."};
         }
         if (temPrata) {
-            return new String[] {"Mara", "Use a chave prata na porta inferior.", "A vermelha 63 está além dela."};
+            return new String[] {"Mara", "Use a chave prata na porta inferior.", "A chave vermelha está além dela."};
         }
         return new String[] {"Mara", "A chave prata está na área à esquerda.", "Volte com ela para este salão."};
     }
@@ -355,7 +353,7 @@ public final class RoteiroHistoria {
             return new String[] {"Guardião", "Sua memória voltou.", "Não há mais nada para eu guardar."};
         }
         if (temPrata) {
-            return new String[] {"Guardião", "Leve a prata à porta inferior.", "Encontre a chave vermelha 63."};
+            return new String[] {"Guardião", "Leve a prata à porta inferior.", "Encontre a chave vermelha."};
         }
         return new String[] {"Guardião", "Explore esta área.", "A chave prata está próxima."};
     }
@@ -370,8 +368,8 @@ public final class RoteiroHistoria {
 
     public static String[] respostaPorteiroFalta(boolean temMemoria) {
         return temMemoria
-                ? new String[] {"Porteiro", "Nada mais falta.", "A chave vermelha 63 completou sua memória."}
-                : new String[] {"Porteiro", "Falta a chave vermelha 63.", "A chave prata não abre este caminho."};
+                ? new String[] {"Porteiro", "Nada mais falta.", "A chave vermelha completou sua memória."}
+                : new String[] {"Porteiro", "Falta a chave vermelha.", "A chave prata não abre este caminho."};
     }
 
     // Métodos extras opcionais para usar depois em novos eventos.
@@ -381,7 +379,7 @@ public final class RoteiroHistoria {
         return new String[] {
                 "Ari, o que lembra",
                 "Primeiro encontre a chave prata.",
-                "Ela abre a câmara da chave vermelha 63.",
+                "Ela abre a câmara da chave vermelha.",
                 "A vermelha é a verdadeira Chave da Memória."
         };
     }

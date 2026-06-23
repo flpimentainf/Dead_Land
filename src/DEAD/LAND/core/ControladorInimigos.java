@@ -17,11 +17,15 @@ public class ControladorInimigos {
     private List<Inimigo> inimigos = new ArrayList<>();
 
     public ControladorInimigos() {
-        // Esqueletos no cenário da floresta (index 7 = cenario do arco/floresta exterior)
         adicionarInimigo(22* tiles.LARGURA, 3 * tiles.ALTURA, 5);
         adicionarInimigo(25 * tiles.LARGURA, 4 * tiles.ALTURA, 5);
         adicionarInimigo(29 * tiles.LARGURA, 2 * tiles.ALTURA, 5);
-        adicionarChefe( 15 * tiles.LARGURA, 3 * tiles.ALTURA, 7);
+        adicionarInimigo(6* tiles.LARGURA, 6* tiles.ALTURA, 6);
+        adicionarInimigo(10* tiles.LARGURA, 4* tiles.ALTURA, 6);
+        adicionarInimigo(14* tiles.LARGURA, 5* tiles.ALTURA, 6);
+        adicionarInimigo(17* tiles.LARGURA, 4* tiles.ALTURA, 6);
+        adicionarInimigo(20* tiles.LARGURA, 3* tiles.ALTURA, 6);
+        adicionarChefe( 15 * tiles.LARGURA, 2 * tiles.ALTURA, 7);
     }
 
     private void adicionarInimigo(int x, int y, int cenarioIndex) {
