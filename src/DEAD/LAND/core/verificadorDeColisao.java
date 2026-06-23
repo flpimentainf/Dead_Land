@@ -16,7 +16,20 @@ public class verificadorDeColisao {
         }
 
         jogador.atualizarAreaColisao();
-        Rectangle areaFutura = new Rectangle(jogador.AreaColisao);
+        return ocorreuColisao(jogador.AreaColisao, cenario, movimentoX, movimentoY);
+    }
+
+    public boolean ocorreuColisao(
+            Rectangle areaColisao,
+            tileMap cenario,
+            int movimentoX,
+            int movimentoY
+    ) {
+        if (movimentoX == 0 && movimentoY == 0) {
+            return false;
+        }
+
+        Rectangle areaFutura = new Rectangle(areaColisao);
         areaFutura.translate(movimentoX, movimentoY);
 
         int tamanhoTile = cenario.getTamanhoTile();

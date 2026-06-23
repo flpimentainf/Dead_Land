@@ -7,6 +7,8 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import javax.swing.ImageIcon;
+import DEAD.LAND.core.verificadorDeColisao;
+import DEAD.LAND.world.tileMap;
 
 public class NPC extends Rectangle {
 
@@ -47,6 +49,7 @@ public class NPC extends Rectangle {
     private final Image[][] sprites = new Image[4][TOTAL_FRAMES];
 
     private final Rectangle areaInteracao = new Rectangle();
+    private final Rectangle areaColisao = new Rectangle();
 
     public NPC(String id, String nome, int numeroNpc, int cenarioIndex, int x, int y) {
         this.id = id;
@@ -62,6 +65,7 @@ public class NPC extends Rectangle {
 
         carregarSprites(numeroNpc);
         atualizarAreaInteracao();
+        atualizarAreaColisao();
     }
 
     private void carregarSprites(int numeroNpc) {
@@ -87,15 +91,20 @@ public class NPC extends Rectangle {
         }
     }
 
-    public void atualizar(player jogador) {
+    public void atualizar(
+            player jogador,
+            tileMap cenario,
+            verificadorDeColisao verificadorColisao
+    ) {
         if (estaPerto(jogador)) {
             olharParaJogador(jogador);
         } else {
-            patrulhar();
+            patrulhar(cenario, verificadorColisao);
         }
 
         atualizarAnimacao();
         atualizarAreaInteracao();
+        atualizarAreaColisao();
     }
 
     private void atualizarAnimacao() {
@@ -124,7 +133,7 @@ public class NPC extends Rectangle {
         }
     }
 
-    private void patrulhar() {
+    private void patrulhar(tileMap cenario, verificadorDeColisao verificadorColisao) {
         if (!podeCaminhar) {
             return;
         }
@@ -141,22 +150,48 @@ public class NPC extends Rectangle {
         int limiteEsquerda = xInicial - DISTANCIA_PATRULHA;
 
         if (andandoParaDireita) {
-            x += VELOCIDADE_NPC;
             direcaoAtual = RIGHT;
+            boolean moveu = moverSePossivel(cenario, verificadorColisao, VELOCIDADE_NPC);
 
-            if (x >= limiteDireita) {
+            if (!moveu) {
+                andandoParaDireita = false;
+            } else if (x >= limiteDireita) {
                 x = limiteDireita;
                 andandoParaDireita = false;
             }
         } else {
-            x -= VELOCIDADE_NPC;
             direcaoAtual = LEFT;
+            boolean moveu = moverSePossivel(cenario, verificadorColisao, -VELOCIDADE_NPC);
 
-            if (x <= limiteEsquerda) {
+            if (!moveu) {
+                andandoParaDireita = true;
+            } else if (x <= limiteEsquerda) {
                 x = limiteEsquerda;
                 andandoParaDireita = true;
             }
         }
+    }
+
+    private boolean moverSePossivel(
+            tileMap cenario,
+            verificadorDeColisao verificadorColisao,
+            int movimentoX
+    ) {
+        atualizarAreaColisao();
+        if (verificadorColisao.ocorreuColisao(areaColisao, cenario, movimentoX, 0)) {
+            return false;
+        }
+
+        x += movimentoX;
+        atualizarAreaColisao();
+        return true;
+    }
+
+    private void atualizarAreaColisao() {
+        areaColisao.x = this.x + 6;
+        areaColisao.y = this.y + this.height / 2;
+        areaColisao.width = this.width - 12;
+        areaColisao.height = this.height / 2;
     }
 
     public void desenhar(Graphics2D g2, String simboloEstado, boolean memoriaRecuperada) {

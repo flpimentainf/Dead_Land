@@ -10,6 +10,7 @@ import java.util.List;
 
 public class ControladorNPCs {
     private List<NPC> npcs = new ArrayList<NPC>();
+    private final verificadorDeColisao verificadorColisao = new verificadorDeColisao();
 
     public ControladorNPCs() {
         adicionarNPC("ari", "Ari", 1, 3, 15, 5, true);
@@ -33,7 +34,7 @@ public class ControladorNPCs {
 
         for (NPC npc : npcs) {
             if (npc.getCenarioIndex() == cenarioAtual && npcEstaVisivel(npc, cenaDoJogo)) {
-                npc.atualizar(jogador);
+                npc.atualizar(jogador, cenaDoJogo.getCenario(), verificadorColisao);
             }
         }
     }

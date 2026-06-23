@@ -11,6 +11,7 @@ public class Boss extends Inimigo {
         this.height = 128;
 
         this.vida = 300;
+        atualizarAreaColisao();
         
         String base = "repos/NPCs e Inimigos/Inimigos/Wizard/";
 
@@ -36,12 +37,12 @@ public class Boss extends Inimigo {
 
     @Override
     protected void atualizarAreaColisao() {
-
-        areaColisao.x = this.x;
-        areaColisao.y = this.y;
-
+        // O sprite é grande e pode aparecer por cima das paredes, mas somente
+        // a região dos pés deve bloquear o movimento no mapa.
+        areaColisao.x = this.x + 19;
+        areaColisao.y = this.y + 80;
         areaColisao.width = 90;
-        areaColisao.height = 90;
+        areaColisao.height = 48;
     }
 
 

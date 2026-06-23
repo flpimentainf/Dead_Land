@@ -15,6 +15,7 @@ public class ControladorInimigos {
     private static final int DANO_FLECHA = 30;
 
     private List<Inimigo> inimigos = new ArrayList<>();
+    private final verificadorDeColisao verificadorColisao = new verificadorDeColisao();
 
     public ControladorInimigos() {
         adicionarInimigo(22* tiles.LARGURA, 3 * tiles.ALTURA, 5);
@@ -51,7 +52,7 @@ public class ControladorInimigos {
             if (!ini.estaVivo() || ini.getCenarioIndex() != cenarioAtual) {
                 continue;
             }
-            ini.atualizar(jogador);
+            ini.atualizar(jogador, cenaDoJogo.getCenario(), verificadorColisao);
 
             // Verificar colisão de flechas com o inimigo
             if (controladorFlechas != null) {

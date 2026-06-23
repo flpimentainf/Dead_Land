@@ -5,6 +5,8 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import javax.swing.ImageIcon;
+import DEAD.LAND.core.verificadorDeColisao;
+import DEAD.LAND.world.tileMap;
 
 public class Inimigo extends Rectangle {
     public static final int VIDA_MAXIMA = 60;
@@ -45,7 +47,11 @@ public class Inimigo extends Rectangle {
         }
     }
 
-    public void atualizar(player jogador) {
+    public void atualizar(
+            player jogador,
+            tileMap cenario,
+            verificadorDeColisao verificadorColisao
+    ) {
         if (!vivo) return;
 
         atualizarAreaColisao();
@@ -66,9 +72,10 @@ public class Inimigo extends Rectangle {
             }
 
             if (dist > 30) {
-                this.x += (int)(VELOCIDADE * dx / dist);
-                this.y += (int)(VELOCIDADE * dy / dist);
-                atualizarAreaColisao();
+                int movimentoX = (int)(VELOCIDADE * dx / dist);
+                int movimentoY = (int)(VELOCIDADE * dy / dist);
+                moverEixoSePossivel(cenario, verificadorColisao, movimentoX, 0);
+                moverEixoSePossivel(cenario, verificadorColisao, 0, movimentoY);
             } else {
                 // Está perto — atacar
                 atacando = true;
@@ -84,6 +91,29 @@ public class Inimigo extends Rectangle {
         if (contadorSprite >= FRAMES_SPRITE) {
             contadorSprite = 0;
             frameAtual = (frameAtual + 1) % 3;
+        }
+    }
+
+    private void moverEixoSePossivel(
+            tileMap cenario,
+            verificadorDeColisao verificadorColisao,
+            int movimentoX,
+            int movimentoY
+    ) {
+        if (movimentoX == 0 && movimentoY == 0) {
+            return;
+        }
+
+        atualizarAreaColisao();
+        if (!verificadorColisao.ocorreuColisao(
+                areaColisao,
+                cenario,
+                movimentoX,
+                movimentoY
+        )) {
+            this.x += movimentoX;
+            this.y += movimentoY;
+            atualizarAreaColisao();
         }
     }
 
