@@ -144,6 +144,8 @@ public class panel extends JPanel{
 
     public ControladorNPCs getControladorNPCs() { return controladorNPCs; }
 
+    public ControladorInimigos getControladorInimigos() { return controladorInimigos; }
+
     public SistemaHistoria getHistoria() { return historia; }
 
     public tileMap getCenario() {

@@ -75,6 +75,11 @@ public class ControladorNPCs {
     }
 
     private boolean npcEstaVisivel(NPC npc, panel cenaDoJogo) {
+        if ("porteiro_morto".equals(npc.getId())) {
+            return cenaDoJogo.getControladorInimigos() != null
+                    && cenaDoJogo.getControladorInimigos().bossFoiDerrotado();
+        }
+
         return !"guardiao_memoria".equals(npc.getId())
                 || !cenaDoJogo.getInventario().temChaveBoss63();
     }

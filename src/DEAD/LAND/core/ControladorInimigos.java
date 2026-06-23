@@ -16,6 +16,7 @@ public class ControladorInimigos {
 
     private List<Inimigo> inimigos = new ArrayList<>();
     private final verificadorDeColisao verificadorColisao = new verificadorDeColisao();
+    private Boss chefe;
 
     public ControladorInimigos() {
         adicionarInimigo(22* tiles.LARGURA, 3 * tiles.ALTURA, 5);
@@ -37,7 +38,7 @@ public class ControladorInimigos {
     } 
     
     private void adicionarChefe(int x, int y, int cenarioIndex) {
-        Boss chefe = new Boss(x, y);
+        chefe = new Boss(x, y);
         chefe.setCenarioIndex(cenarioIndex);
         inimigos.add(chefe);
     }
@@ -57,7 +58,7 @@ public class ControladorInimigos {
             // Verificar colisão de flechas com o inimigo
             if (controladorFlechas != null) {
                 for (Flecha f : controladorFlechas.getFlechas()) {
-                    if (f.isAtiva() && f.intersects(ini.areaColisao)) {
+                    if (f.isAtiva() && f.intersects(ini.getAreaDano())) {
                         ini.levarDano(DANO_FLECHA);
                         f.desativar();
                     }
@@ -72,5 +73,9 @@ public class ControladorInimigos {
                 ini.desenhar(g2);
             }
         }
+    }
+
+    public boolean bossFoiDerrotado() {
+        return chefe != null && !chefe.estaVivo();
     }
 }

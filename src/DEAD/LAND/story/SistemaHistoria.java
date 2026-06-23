@@ -51,6 +51,7 @@ public class SistemaHistoria {
     private String opcaoNpc2 = "";
     private final Consumer<Estado> aoFinalizar;
     private boolean finalNotificado;
+    private boolean confrontoBossApresentado;
 
     public SistemaHistoria() {
         this(null);
@@ -162,7 +163,11 @@ public class SistemaHistoria {
 
         if (indiceCenario == 7) {
             if (cenaDoJogo.getInventario().temChaveBoss63()) {
-                iniciarEscolhaFinal();
+                objetivoAtual = "Derrote o chefe.";
+                if (!confrontoBossApresentado) {
+                    confrontoBossApresentado = true;
+                    mostrarMensagem(RoteiroHistoria.antesDoBoss());
+                }
             } else {
                 objetivoAtual = "Encontre a chave vermelha 63.";
                 mostrarMensagem(RoteiroHistoria.portaoSemMemoria());
@@ -349,8 +354,13 @@ public class SistemaHistoria {
         }
 
         if (cenarioAtual >= 7) {
-            if (cenaDoJogo.getInventario().temChaveBoss63()) {
+            boolean bossDerrotado = cenaDoJogo.getControladorInimigos() != null
+                    && cenaDoJogo.getControladorInimigos().bossFoiDerrotado();
+
+            if (cenaDoJogo.getInventario().temChaveBoss63() && bossDerrotado) {
                 iniciarEscolhaFinal();
+            } else if (cenaDoJogo.getInventario().temChaveBoss63()) {
+                mostrarMensagem(RoteiroHistoria.falaBoss());
             } else {
                 mostrarMensagem(RoteiroHistoria.saidaTrancada());
             }

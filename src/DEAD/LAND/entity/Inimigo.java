@@ -17,6 +17,7 @@ public class Inimigo extends Rectangle {
     private static final int ALCANCE_DETECCAO = 120;
 
     protected int vida = VIDA_MAXIMA;
+    protected int vidaMaxima = VIDA_MAXIMA;
     protected boolean vivo = true;
     private String direcao = "direita";
     private int frameAtual = 0;
@@ -63,7 +64,7 @@ public class Inimigo extends Rectangle {
 
         atacando = false;
 
-        if (dist < ALCANCE_DETECCAO) {
+        if (dist < getAlcanceDeteccao()) {
             // Perseguir
             if (Math.abs(dx) > Math.abs(dy)) {
                 direcao = dx > 0 ? "direita" : "esquerda";
@@ -71,17 +72,17 @@ public class Inimigo extends Rectangle {
                 direcao = dy > 0 ? "baixo" : "cima";
             }
 
-            if (dist > 30) {
-                int movimentoX = (int)(VELOCIDADE * dx / dist);
-                int movimentoY = (int)(VELOCIDADE * dy / dist);
+            if (dist > getAlcanceAtaque()) {
+                int movimentoX = (int)(getVelocidade() * dx / dist);
+                int movimentoY = (int)(getVelocidade() * dy / dist);
                 moverEixoSePossivel(cenario, verificadorColisao, movimentoX, 0);
                 moverEixoSePossivel(cenario, verificadorColisao, 0, movimentoY);
             } else {
                 // Está perto — atacar
                 atacando = true;
                 if (contadorAtaque == 0) {
-                    jogador.levarDano(DANO_NO_JOGADOR);
-                    contadorAtaque = FRAMES_ATAQUE;
+                    jogador.levarDano(getDanoNoJogador());
+                    contadorAtaque = getFramesAtaque();
                 }
             }
         }
@@ -135,7 +136,7 @@ public class Inimigo extends Rectangle {
         int by = y - 8;
         g2.setColor(new Color(60, 60, 60, 200));
         g2.fillRect(bx, by, bw, bh);
-        float prop = (float) vida / VIDA_MAXIMA;
+        float prop = (float) vida / vidaMaxima;
         g2.setColor(prop > 0.5f ? new Color(60, 200, 60) : prop > 0.25f ? new Color(230, 180, 0) : new Color(220, 40, 40));
         g2.fillRect(bx, by, (int)(bw * prop), bh);
         g2.setColor(Color.WHITE);
@@ -150,6 +151,13 @@ public class Inimigo extends Rectangle {
 
     public boolean estaVivo() { return vivo; }
     public int getCenarioIndex() { return cenarioIndex; }
+    public Rectangle getAreaDano() { return areaColisao; }
+
+    protected int getVelocidade() { return VELOCIDADE; }
+    protected int getDanoNoJogador() { return DANO_NO_JOGADOR; }
+    protected int getFramesAtaque() { return FRAMES_ATAQUE; }
+    protected int getAlcanceDeteccao() { return ALCANCE_DETECCAO; }
+    protected int getAlcanceAtaque() { return 30; }
 
     private int cenarioIndex;
     public void setCenarioIndex(int i) { this.cenarioIndex = i; }
