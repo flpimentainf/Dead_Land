@@ -169,7 +169,7 @@ public class SistemaHistoria {
                     mostrarMensagem(RoteiroHistoria.antesDoBoss());
                 }
             } else {
-                objetivoAtual = "Encontre a chave vermelha 63.";
+                objetivoAtual = "Encontre a chave vermelha.";
                 mostrarMensagem(RoteiroHistoria.portaoSemMemoria());
             }
         }
@@ -243,7 +243,7 @@ public class SistemaHistoria {
             if (cenaDoJogo != null && cenaDoJogo.getInventario().temChaveBoss63()) {
                 iniciarEscolhaFinal(RoteiroHistoria.npcPorteiroComChave());
             } else {
-                objetivoAtual = "Encontre a chave vermelha 63.";
+                objetivoAtual = "Encontre a chave vermelha.";
                 mostrarMensagem(RoteiroHistoria.npcPorteiroSemChave());
             }
             return;
@@ -317,7 +317,7 @@ public class SistemaHistoria {
 
         if ("chave".equals(nome)) {
             estado = Estado.BUSCA_MEMORIA;
-            objetivoAtual = "Abra a porta inferior e encontre a chave vermelha 63.";
+            objetivoAtual = "Abra a porta inferior e encontre a chave vermelha.";
             mostrarMensagem(RoteiroHistoria.chaveColetada());
             return;
         }
@@ -334,7 +334,7 @@ public class SistemaHistoria {
 
         if ("chave_boss_63".equals(nome)) {
             estado = Estado.MEMORIAS;
-            objetivoAtual = "Abra a porta do confronto com a chave vermelha 63.";
+            objetivoAtual = "Abra a porta do confronto com a chave vermelha.";
             mostrarMensagem(RoteiroHistoria.chaveBossColetada());
         }
     }
