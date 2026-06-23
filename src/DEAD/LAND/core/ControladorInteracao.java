@@ -90,24 +90,40 @@ public class ControladorInteracao {
                 return;
             }
 
-           if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 5) {
+            if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 5) {
                 if (interacao.area.y == 0) {
-                    if (!cenaDoJogo.getInventario().temChave()) {
+                    if (!cenaDoJogo.getInventario().temChaveBoss63()) {
+                        mostrarPortaTrancada(cenaDoJogo, true);
                         return;
                     }
+                    else if (cenaDoJogo.getInventario().temChaveBoss63()) {
+                        cenaDoJogo.irParaCenario(
+                        7,
+                        752,
+                        290
+                );
+                    }
                 } else {
-                    if (!cenaDoJogo.getInventario().temChaveVermelha()) {
+                    if (!cenaDoJogo.getInventario().temChave()) {
+                        mostrarPortaTrancada(cenaDoJogo, false);
+                        return;
+                    }
+                    else if (cenaDoJogo.getInventario().temChave()) {
+                        cenaDoJogo.getCenario().definirTile(6, 22, 61);
+                        cenaDoJogo.getCenario().definirTile(6, 23, 61);
+
+                        cenaDoJogo.repaint();
                         return;
                     }
                 }
-
-                cenaDoJogo.irParaCenario(
-                        7,
-                        752,
-                        312
-                );
                 return;
             }
+        }
+    }
+
+    private void mostrarPortaTrancada(panel cenaDoJogo, boolean portaDoBoss) {
+        if (cenaDoJogo.getHistoria() != null) {
+            cenaDoJogo.getHistoria().eventoPortaSemChave(portaDoBoss);
         }
     }
 

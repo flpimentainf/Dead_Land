@@ -98,7 +98,7 @@ public class panel extends JPanel{
                 g2.scale(escalaX, escalaY);
 
                 this.cenario.desenhar(g2);
-                if (this.controladorNPCs != null) this.controladorNPCs.desenhar(g2, this.cenario.getCenarioAtualIndex());
+                if (this.controladorNPCs != null) this.controladorNPCs.desenhar(g2, this);
                 if (this.controladorInimigos != null) this.controladorInimigos.desenhar(g2, this.cenario.getCenarioAtualIndex());
                 getJogador().desenharPlayer(g2);
                 if (this.controladorFlechas != null) this.controladorFlechas.desenhar(g2);

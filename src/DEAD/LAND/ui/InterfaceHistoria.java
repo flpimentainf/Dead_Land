@@ -6,8 +6,10 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.ImageIcon;
 
 public class InterfaceHistoria {
     public void desenhar(Graphics2D g2, int largura, int altura, SistemaHistoria historia) {
@@ -25,7 +27,14 @@ public class InterfaceHistoria {
         }
 
         if (historia.isExibindoMensagem()) {
-            desenharCaixaTexto(g2, largura, altura, historia.getMensagem(), "ENTER/E para continuar");
+            desenharCaixaTexto(
+                    g2,
+                    largura,
+                    altura,
+                    historia.getMensagem(),
+                    "ENTER/E para continuar",
+                    historia.getNomeNpcFalando()
+            );
         }
     }
 
@@ -45,12 +54,16 @@ public class InterfaceHistoria {
     private void desenharEscolha(Graphics2D g2, int largura, int altura, SistemaHistoria historia) {
         List<String> linhas = new ArrayList<String>(historia.getMensagem());
         linhas.add("");
-        linhas.add((historia.getOpcaoEscolhida() == 0 ? "> " : "  ") + "Acordar");
-        linhas.add((historia.getOpcaoEscolhida() == 1 ? "> " : "  ") + "Ficar em Dead Land");
-        desenharCaixaTexto(g2, largura, altura, linhas, "↑/↓ escolhe | ENTER/E confirma | ESC 3x: segredo");
+        linhas.add((historia.getOpcaoEscolhida() == 0 ? "> " : "  ") + historia.getOpcaoEscolha1());
+        linhas.add((historia.getOpcaoEscolhida() == 1 ? "> " : "  ") + historia.getOpcaoEscolha2());
+        String rodape = historia.isEscolhaNpc()
+                ? "↑/↓ escolhe | ENTER/E confirma"
+                : "↑/↓ escolhe | ENTER/E confirma | ESC 3x: segredo";
+        desenharCaixaTexto(g2, largura, altura, linhas, rodape, historia.getNomeNpcFalando());
     }
 
-    private void desenharCaixaTexto(Graphics2D g2, int largura, int altura, List<String> linhas, String rodape) {
+    private void desenharCaixaTexto(Graphics2D g2, int largura, int altura,
+            List<String> linhas, String rodape, String nomeNpc) {
         int caixaX = 40;
         int caixaLargura = largura - 80;
         int caixaAltura = Math.min(altura - 80, Math.max(190, 70 + linhas.size() * 24));
@@ -62,17 +75,58 @@ public class InterfaceHistoria {
         g2.setStroke(new BasicStroke(2));
         g2.drawRoundRect(caixaX, caixaY, caixaLargura, caixaAltura, 18, 18);
 
+        int textoX = caixaX + 24;
+        if (nomeNpc != null) {
+            desenharRetratoNpc(g2, caixaX + 22, caixaY + 24, nomeNpc);
+            textoX += 72;
+        }
+
         g2.setFont(new Font("Arial", Font.PLAIN, 18));
         g2.setColor(Color.WHITE);
         FontMetrics fm = g2.getFontMetrics();
         int y = caixaY + 32;
         for (String linha : linhas) {
-            g2.drawString(linha, caixaX + 24, y);
+            g2.drawString(linha, textoX, y);
             y += fm.getHeight() + 2;
         }
 
         g2.setFont(new Font("Arial", Font.ITALIC, 13));
         g2.setColor(new Color(200, 200, 200));
         g2.drawString(rodape, caixaX + 24, caixaY + caixaAltura - 16);
+    }
+
+    private void desenharRetratoNpc(Graphics2D g2, int x, int y, String nomeNpc) {
+        String arquivo = getArquivoRetrato(nomeNpc);
+        ImageIcon icone = new ImageIcon(
+                "repos/NPCs e Inimigos/NPC/retratos/" + arquivo
+        );
+
+        if (icone.getIconWidth() > 0) {
+            Image retrato = icone.getImage();
+            g2.drawImage(retrato, x, y, 64, 64, null);
+            return;
+        }
+
+        desenharRetratoPadrao(g2, x, y, nomeNpc);
+    }
+
+    private String getArquivoRetrato(String nomeNpc) {
+        if ("Ari".equals(nomeNpc)) return "ari.png";
+        if ("Mara".equals(nomeNpc)) return "mara.png";
+        if ("Guardião".equals(nomeNpc)) return "guardiao.png";
+        if ("Porteiro".equals(nomeNpc)) return "porteiro.png";
+        return nomeNpc.toLowerCase() + ".png";
+    }
+
+    private void desenharRetratoPadrao(Graphics2D g2, int x, int y, String nomeNpc) {
+        g2.setColor(new Color(80, 105, 135));
+        g2.fillOval(x, y, 64, 64);
+        g2.setColor(Color.WHITE);
+        g2.drawOval(x, y, 64, 64);
+        g2.setFont(new Font("Arial", Font.BOLD, 24));
+
+        String inicial = nomeNpc.substring(0, 1);
+        FontMetrics fm = g2.getFontMetrics();
+        g2.drawString(inicial, x + (64 - fm.stringWidth(inicial)) / 2, y + 41);
     }
 }

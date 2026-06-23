@@ -6,9 +6,10 @@ public final class RoteiroHistoria {
     public static String[] abertura() {
         return new String[] {
                 "Você está no seu quarto.",
-                "O silêncio parece mais pesado do que deveria.",
-                "Seu corpo está cansado... mas sua mente continua inquieta.",
-                "Talvez dormir seja a única coisa que ainda faça sentido."
+                "O silêncio está estranho.",
+                "A chuva bate na janela como se tentasse avisar algo.",
+                "Sua cabeça dói. Suas mãos tremem.",
+                "Talvez dormir seja a única forma de escapar disso."
         };
     }
 
@@ -17,184 +18,287 @@ public final class RoteiroHistoria {
                 "Sistema",
                 "Menu bloqueado.",
                 "O botão de logout pisca, mas não responde.",
-                "A floresta exige uma decisão antes de abrir a saída."
+                "Dead Land não deixa ninguém sair no meio da escolha.",
+                "A floresta exige uma decisão."
         };
     }
 
     public static String[] dormir() {
         return new String[] {
-                "Você fecha os olhos e o quarto perde o contorno.",
-                "O colchão afunda como água escura.",
-                "Quando tenta respirar... o chão desaparece."
+                "Você fecha os olhos.",
+                "Por um segundo, tudo fica calmo.",
+                "Então o chão desaparece.",
+                "Você está caindo.",
+                "Uma voz distante sussurra: você ainda não terminou."
         };
     }
 
     public static String[] quedaConcluida() {
         return new String[] {
                 "Você desperta antes do impacto.",
-                "O céu tem uma cor que não existe no mundo real.",
-                "As árvores se curvam, observando cada passo.",
-                "Uma frase aparece, fria e perfeita:",
-                "Complete as missões principais para retornar."
+                "O céu não tem sol.",
+                "As árvores parecem observar você.",
+                "Uma frase aparece em sua mente:",
+                "Bem-vindo a Dead Land."
         };
     }
 
     public static String[] npcLembra() {
         return new String[] {
-                "NPC",
+                "Ari, o que lembra",
                 "Você caiu aqui de novo?",
-                "Ninguém chega acordado a Dead Land.",
-                "Procure a memória que o portão roubou de você."
+                "Não se assuste. Quase ninguém lembra da primeira vez.",
+                "Dead Land prende quem está entre acordar e desistir.",
+                "Sua memória foi trancada atrás de duas fechaduras.",
+                "Primeiro procure a chave prata."
         };
     }
 
     public static String[] missaoMemoria() {
         return new String[] {
                 "Eco da floresta",
-                "O ar fica pesado. Algo seu está enterrado aqui.",
-                "Encontre a CHAVE DA MEMÓRIA.",
-                "Sem ela, a saída só vai repetir o mesmo pesadelo."
+                "A Chave da Memória está selada em outra parte da ruína.",
+                "Uma chave prata abre o caminho até ela.",
+                "Explore esta área, encontre a CHAVE PRATA",
+                "e volte para a porta inferior do salão."
         };
     }
 
     public static String[] portaoSemMemoria() {
         return new String[] {
                 "Portão morto",
-                "A madeira pulsa como um coração cansado.",
-                "Ele reconhece seu medo...",
-                "mas exige uma memória para abrir."
+                "O portão respira lentamente.",
+                "Ele sabe que você está incompleto.",
+                "A chave prata não é suficiente.",
+                "Encontre a chave vermelha 63",
+                "e recupere sua memória antes de atravessar."
         };
     }
 
     public static String[] chaveColetada() {
         return new String[] {
-                "Memória recuperada",
-                "Vidro quebrando no asfalto.",
-                "Faróis atravessando a chuva.",
-                "Uma sirene engolindo seu nome.",
-                "Agora você lembra: alguém ficou esperando você acordar."
+                "Item obtido: Chave Prata",
+                "O metal está frio e sem marcas.",
+                "Ela não carrega nenhuma lembrança.",
+                "Mas combina com a fechadura da porta inferior do salão.",
+                "Atrás dela está a chave vermelha."
         };
     }
 
     public static String[] arcoColetado() {
         return new String[] {
-                "Item obtido",
-                "Arco encontrado.",
-                "A madeira é fria, mas sua mão parece lembrar como usá-lo.",
-                "Lutar aqui não é coragem; é ganhar tempo."
+                "Item obtido: Arco do Eco",
+                "A madeira é fria.",
+                "Mesmo assim, sua mão sabe como segurá-lo.",
+                "Você já lutou antes.",
+                "Só não lembra contra o quê."
         };
     }
 
     public static String[] flechaColetada() {
         return new String[] {
-                "Item obtido",
-                "Flecha encontrada.",
-                "A ponta vibra como se apontasse para a saída.",
-                "Cada flecha é uma chance a menos de desistir."
+                "Item obtido: Flechas quebradas",
+                "Cada flecha carrega uma pequena luz.",
+                "Use bem.",
+                "A floresta odeia luz."
+        };
+    }
+
+    public static String[] chaveBossColetada() {
+        return new String[] {
+                "Memória recuperada: Chave Vermelha 63",
+                "O número 63 está gravado no metal vermelho.",
+                "Chuva. Faróis. Um carro fora da estrada.",
+                "Vidro quebrado. Alguém chamando seu nome.",
+                "Agora você lembra: sofreu um acidente.",
+                "Esta é a Chave da Memória.",
+                "Leve-a até a porta do confronto final."
         };
     }
 
     public static String[] portaQuartoTrancada() {
         return new String[] {
                 "Porta",
-                "A maçaneta congela sob seus dedos.",
-                "Do outro lado não há corredor... só silêncio.",
-                "Ainda não é por aqui."
+                "A maçaneta está gelada.",
+                "Não há nada atrás desta porta.",
+                "Hoje, a saída não é acordado.",
+                "Volte para a cama."
         };
     }
 
     public static String[] saidaTrancada() {
         return new String[] {
-                "Porta",
-                "A saída respira atrás da fechadura.",
-                "Falta a CHAVE DA MEMÓRIA."
+                "Portão final",
+                "A fechadura não se move.",
+                "O portão sente que algo está faltando.",
+                "Você precisa da CHAVE VERMELHA 63,",
+                "a verdadeira Chave da Memória."
+        };
+    }
+
+    public static String[] portaChaveNormalTrancada() {
+        return new String[] {
+                "Porta da câmara vermelha",
+                "Uma fechadura prateada impede a passagem.",
+                "A Chave da Memória está além desta porta.",
+                "Encontre a CHAVE PRATA."
+        };
+    }
+
+    public static String[] portaBossTrancada() {
+        return new String[] {
+                "Porta do confronto",
+                "O selo pulsa em vermelho.",
+                "O número 63 aparece por um segundo.",
+                "Somente a CHAVE VERMELHA 63 pode rompê-lo.",
+                "Ela é a Chave da Memória."
         };
     }
 
     public static String[] escolhaFinal() {
         return new String[] {
-                "Memória completa.",
-                "O carro retorcido.",
-                "Chuva no vidro.",
-                "Ambulância.",
-                "Dead Land oferece descanso. O mundo real exige dor."
+                "O portão se abre.",
+                "Do outro lado existe uma luz branca.",
+                "Você ouve máquinas apitando.",
+                "Você ouve uma voz chorando.",
+                "Alguém está chamando seu nome.",
+                "Dead Land oferece descanso.",
+                "O mundo real oferece dor.",
+                "Escolha."
         };
     }
 
     public static String[] finalAcordar() {
         return new String[] {
                 "Final: ACORDAR",
-                "A floresta se desfaz em luz branca.",
+                "Você atravessa a luz.",
+                "A floresta se desfaz atrás de você.",
                 "Bip... bip... bip...",
-                "Seu peito dói como se voltasse de muito longe.",
-                "Alguém segura sua mão e sussurra: você voltou."
+                "Seus olhos abrem devagar.",
+                "O teto de um hospital aparece.",
+                "Uma mão segura a sua.",
+                "Alguém sussurra: você voltou."
         };
     }
 
     public static String[] finalFicar() {
         return new String[] {
                 "Final: FICAR",
-                "A floresta fica bonita demais para ser verdade.",
-                "Os NPCs sorriem sem mover os olhos.",
+                "Você se afasta da luz.",
+                "O portão se fecha.",
+                "A floresta fica mais bonita.",
+                "Os NPCs sorriem, mas nenhum deles pisca.",
                 "Lá fora, uma máquina continua apitando sozinha.",
-                "Você escolheu o lugar onde a dor não podia alcançar."
+                "Você escolheu esquecer."
         };
     }
 
     public static String[] finalSecreto() {
         return new String[] {
-                "Erro do sistema",
-                "A escolha foi recusada três vezes.",
-                "A floresta entende: você percebeu o truque.",
-                "O céu reinicia. As árvores voltam ao mesmo lugar.",
-                "Um NPC sussurra: você já tentou isso antes.",
-                "DEAD LAND"
+                "Final secreto: LOOP",
+                "A escolha desaparece.",
+                "O céu começa a rachar.",
+                "As árvores voltam para o mesmo lugar.",
+                "Ari observa você de longe.",
+                "Ele parece triste.",
+                "Você pergunta se já esteve ali antes.",
+                "Ari responde: mais vezes do que consegue lembrar."
         };
     }
 
     public static String[] npcAri() {
         return new String[] {
                 "Ari, o que lembra",
-                "Você não morreu... ainda não do jeito que importa.",
-                "Dead Land é o lugar entre acordar e desistir.",
-                "O portão tomou uma memória sua. Sem ela, você só anda em círculo."
+                "Você caiu aqui de novo?",
+                "Não se assuste. Quase ninguém lembra da primeira vez.",
+                "Este lugar se chama Dead Land.",
+                "Ele aparece para quem está preso entre dois mundos.",
+                "Sua memória está presa na chave vermelha marcada com 63.",
+                "Mas ela foi trancada atrás de uma porta prateada.",
+                "Encontre primeiro a chave prata."
         };
     }
 
     public static String[] npcMara() {
         return new String[] {
                 "Mara, a escutadora",
-                "Nem todo vulto aqui quer te ferir.",
-                "Alguns de nós somos sobras de pessoas que quase acordaram.",
-                "Se encontrar uma chave, não pense nela como metal.",
-                "Pense nela como uma lembrança que ainda dói."
+                "Eu ouvi sua queda antes de você chegar.",
+                "A porta inferior deste salão protege uma câmara.",
+                "Lá dentro está a chave vermelha marcada com 63.",
+                "Não tente forçar a fechadura.",
+                "Procure a chave prata na área à esquerda."
+        };
+    }
+
+    public static String[] npcMaraComChavePrata() {
+        return new String[] {
+                "Mara, a escutadora",
+                "Você encontrou a chave prata.",
+                "Agora volte à porta inferior deste salão.",
+                "Ela abre o caminho até a chave vermelha 63.",
+                "Não confunda as duas: somente a vermelha guarda sua memória."
+        };
+    }
+
+    public static String[] npcMaraComMemoria() {
+        return new String[] {
+                "Mara, a escutadora",
+                "A chave vermelha está com você.",
+                "Eu consigo ouvir a lembrança presa nela.",
+                "O caminho do confronto final agora pode ser aberto."
         };
     }
 
     public static String[] npcGuardiaoMemoria() {
         return new String[] {
                 "Guardião da memória",
-                "A chave está perto porque você também está perto da verdade.",
-                "Quando pegá-la, a floresta vai devolver cenas que você tentou apagar.",
-                "Depois disso, vá ao portão. Ele só abre para quem lembra."
+                "Você encontrou o caminho da chave prata.",
+                "Leve-a de volta ao salão de pedra.",
+                "Ela abre a porta inferior.",
+                "Depois dessa porta está a chave vermelha 63.",
+                "Essa, sim, guarda sua memória."
+        };
+    }
+
+    public static String[] npcGuardiaoComChavePrata() {
+        return new String[] {
+                "Guardião da memória",
+                "A chave prata escolheu sua mão.",
+                "Volte ao salão e abra a porta inferior.",
+                "A chave vermelha 63 espera do outro lado."
+        };
+    }
+
+    public static String[] npcGuardiaoComMemoria() {
+        return new String[] {
+                "Guardião da memória",
+                "Você encontrou a verdadeira chave.",
+                "O vermelho dela carrega aquilo que tentou esquecer.",
+                "Vá até a porta do confronto e termine o caminho."
         };
     }
 
     public static String[] npcPorteiroSemChave() {
         return new String[] {
                 "Porteiro morto",
-                "Você chegou até a saída sem trazer a parte que perdeu.",
-                "Volte. Procure a CHAVE DA MEMÓRIA.",
-                "O portão não quer força. Ele quer verdade."
+                "Você chegou cedo demais.",
+                "A chave prata abre apenas o caminho.",
+                "Ela não pode abrir o portão final.",
+                "Volte e encontre a CHAVE VERMELHA 63.",
+                "Traga a verdadeira Chave da Memória."
         };
     }
 
     public static String[] npcPorteiroComChave() {
         return new String[] {
                 "Porteiro morto",
-                "Agora você lembra do impacto, da chuva e da sirene.",
-                "Posso abrir o caminho, mas não posso escolher por você.",
-                "Acordar dói. Ficar aqui também cobra um preço."
+                "A chave vermelha reconheceu você.",
+                "Agora você lembra.",
+                "O acidente.",
+                "A chuva.",
+                "A sirene.",
+                "A mão de alguém segurando a sua.",
+                "Posso abrir o caminho, mas não posso escolher por você."
         };
     }
 
@@ -206,4 +310,162 @@ public final class RoteiroHistoria {
         };
     }
 
+    public static String[] respostaAriIdentidade() {
+        return new String[] {
+                "Ari",
+                "Eu sou uma lembrança que aprendeu a caminhar.",
+                "Ajudo quem ainda tem vontade de acordar."
+        };
+    }
+
+    public static String[] respostaAriMissao(boolean temMemoria) {
+        return temMemoria
+                ? new String[] {"Ari", "Você já recuperou a memória.", "Siga para o confronto final."}
+                : new String[] {"Ari", "Encontre a chave prata primeiro.", "Ela leva até a chave vermelha 63."};
+    }
+
+    public static String[] respostaMaraEscuta() {
+        return new String[] {
+                "Mara",
+                "Eu ouço as memórias presas nas paredes.",
+                "A sua faz o som de chuva sobre vidro."
+        };
+    }
+
+    public static String[] respostaMaraChaves(boolean temPrata, boolean temMemoria) {
+        if (temMemoria) {
+            return new String[] {"Mara", "A chave vermelha está com você.", "A porta final vai reconhecê-la."};
+        }
+        if (temPrata) {
+            return new String[] {"Mara", "Use a chave prata na porta inferior.", "A vermelha 63 está além dela."};
+        }
+        return new String[] {"Mara", "A chave prata está na área à esquerda.", "Volte com ela para este salão."};
+    }
+
+    public static String[] respostaGuardiaoFuncao() {
+        return new String[] {
+                "Guardião",
+                "Eu protejo o caminho entre a chave prata e a memória.",
+                "Quando a chave vermelha for encontrada, minha tarefa termina."
+        };
+    }
+
+    public static String[] respostaGuardiaoMissao(boolean temPrata, boolean temMemoria) {
+        if (temMemoria) {
+            return new String[] {"Guardião", "Sua memória voltou.", "Não há mais nada para eu guardar."};
+        }
+        if (temPrata) {
+            return new String[] {"Guardião", "Leve a prata à porta inferior.", "Encontre a chave vermelha 63."};
+        }
+        return new String[] {"Guardião", "Explore esta área.", "A chave prata está próxima."};
+    }
+
+    public static String[] respostaPorteiroAlem() {
+        return new String[] {
+                "Porteiro",
+                "Além do portão existe a escolha.",
+                "Acordar e enfrentar a dor, ou permanecer em Dead Land."
+        };
+    }
+
+    public static String[] respostaPorteiroFalta(boolean temMemoria) {
+        return temMemoria
+                ? new String[] {"Porteiro", "Nada mais falta.", "A chave vermelha 63 completou sua memória."}
+                : new String[] {"Porteiro", "Falta a chave vermelha 63.", "A chave prata não abre este caminho."};
+    }
+
+    // Métodos extras opcionais para usar depois em novos eventos.
+    // Eles não quebram o projeto atual, mesmo que ainda não estejam sendo chamados.
+
+    public static String[] dicaAri() {
+        return new String[] {
+                "Ari, o que lembra",
+                "Primeiro encontre a chave prata.",
+                "Ela abre a câmara da chave vermelha 63.",
+                "A vermelha é a verdadeira Chave da Memória."
+        };
+    }
+
+    public static String[] dicaMaraComArco() {
+        return new String[] {
+                "Mara, a escutadora",
+                "Agora você pode lutar.",
+                "Mas cuidado.",
+                "As criaturas daqui não querem matar seu corpo.",
+                "Elas querem cansar sua vontade."
+        };
+    }
+
+    public static String[] inimigoAvistado() {
+        return new String[] {
+                "Algo se move entre as árvores.",
+                "Não é vivo.",
+                "Não é morto.",
+                "É o que sobra quando alguém desiste de acordar."
+        };
+    }
+
+    public static String[] inimigoDerrotado() {
+        return new String[] {
+                "A criatura cai em silêncio.",
+                "Por um instante, você sente pena.",
+                "Talvez ela também tenha procurado uma saída."
+        };
+    }
+
+    public static String[] antesDoBoss() {
+        return new String[] {
+                "O selo se quebra.",
+                "Do outro lado, uma figura aparece.",
+                "Ela tem seus olhos.",
+                "Sua postura.",
+                "Sua sombra.",
+                "O Esquecido sorri: você demorou."
+        };
+    }
+
+    public static String[] falaBoss() {
+        return new String[] {
+                "O Esquecido",
+                "Por que quer voltar?",
+                "Lá fora existe dor.",
+                "Aqui existe silêncio.",
+                "Lá fora, você vai lembrar de tudo.",
+                "Aqui, eu posso apagar para você.",
+                "Fique. Pare de lutar."
+        };
+    }
+
+    public static String[] bossDerrotado() {
+        return new String[] {
+                "O Esquecido cai de joelhos.",
+                "Pela primeira vez, a floresta fica em silêncio de verdade.",
+                "Ele olha para você e sussurra:",
+                "Então você ainda quer acordar..."
+        };
+    }
+
+    public static String[] placaFloresta1() {
+        return new String[] {
+                "Placa antiga",
+                "Nem todo caminho leva para frente.",
+                "A floresta lembra de você."
+        };
+    }
+
+    public static String[] placaFloresta2() {
+        return new String[] {
+                "Placa antiga",
+                "Quem esquece demais vira parte do lugar.",
+                "Não siga as vozes depois da meia-noite."
+        };
+    }
+
+    public static String[] placaPortaoFinal() {
+        return new String[] {
+                "Placa quebrada",
+                "Dead Land não prende corpos.",
+                "Prende vontades."
+        };
+    }
 }

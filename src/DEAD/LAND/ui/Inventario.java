@@ -40,8 +40,8 @@ public class Inventario {
         return temItem("chave");
     }
 
-    public boolean temChaveVermelha() {
-        return temItem("chave_vermelha");
+    public boolean temChaveBoss63() {
+        return temItem("chave_boss_63");
     }
 
     public boolean temItem(String nome) {

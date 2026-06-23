@@ -13,6 +13,8 @@ public class NPC extends Rectangle {
     private static final int ALTURA_NPC = 72;
     private static final int ALCANCE_INTERACAO = 70;
     private static final int FRAMES_SPRITE = 16;
+    private static final int FRAMES_MOVIMENTO = 8;
+    private static final int DISTANCIA_PATRULHA = 48;
 
     private final String id;
     private final String nome;
@@ -21,6 +23,10 @@ public class NPC extends Rectangle {
     private String direcao = "down";
     private int frameAtual = 0;
     private int contadorSprite = 0;
+    private int contadorMovimento = 0;
+    private final int xInicial;
+    private boolean andandoParaDireita = true;
+    private boolean podeCaminhar;
 
     private Image[] spritesDown = new Image[3];
     private Image[] spritesUp = new Image[3];
@@ -35,6 +41,7 @@ public class NPC extends Rectangle {
         this.cenarioIndex = cenarioIndex;
         this.x = x;
         this.y = y;
+        this.xInicial = x;
         this.width = LARGURA_NPC;
         this.height = ALTURA_NPC;
 
@@ -57,7 +64,13 @@ public class NPC extends Rectangle {
     }
 
     public void atualizar(player jogador) {
-        olharParaJogadorQuandoPerto(jogador);
+        boolean jogadorPerto = estaPerto(jogador);
+
+        if (jogadorPerto) {
+            olharParaJogador(jogador);
+        } else {
+            patrulhar();
+        }
 
         contadorSprite++;
         if (contadorSprite >= FRAMES_SPRITE) {
@@ -68,9 +81,7 @@ public class NPC extends Rectangle {
         atualizarAreaInteracao();
     }
 
-    private void olharParaJogadorQuandoPerto(player jogador) {
-        if (!estaPerto(jogador)) return;
-
+    private void olharParaJogador(player jogador) {
         int dx = (jogador.x + jogador.width / 2) - (this.x + this.width / 2);
         int dy = (jogador.y + jogador.height / 2) - (this.y + this.height / 2);
 
@@ -81,15 +92,63 @@ public class NPC extends Rectangle {
         }
     }
 
-    public void desenhar(Graphics2D g2) {
+    private void patrulhar() {
+        if (!podeCaminhar) return;
+
+        contadorMovimento++;
+        if (contadorMovimento < FRAMES_MOVIMENTO) return;
+        contadorMovimento = 0;
+
+        if (andandoParaDireita) {
+            this.x++;
+            direcao = "right";
+            if (this.x >= xInicial + DISTANCIA_PATRULHA) {
+                andandoParaDireita = false;
+            }
+        } else {
+            this.x--;
+            direcao = "left";
+            if (this.x <= xInicial - DISTANCIA_PATRULHA) {
+                andandoParaDireita = true;
+            }
+        }
+    }
+
+    public void desenhar(Graphics2D g2, String simboloEstado, boolean memoriaRecuperada) {
+        if (memoriaRecuperada) {
+            g2.setColor(new Color(180, 220, 255, 70));
+            g2.fillOval(x - 4, y + 8, width + 8, height - 4);
+        }
         g2.drawImage(getSpriteAtual(), x, y, width, height, null);
+        desenharNome(g2, simboloEstado);
+    }
+
+    private void desenharNome(Graphics2D g2, String simboloEstado) {
+        g2.setFont(new Font("Arial", Font.BOLD, 11));
+        FontMetrics fm = g2.getFontMetrics();
+        int largura = fm.stringWidth(nome) + 14;
+        int caixaX = x + width / 2 - largura / 2;
+        int caixaY = y - 19;
+
+        g2.setColor(new Color(0, 0, 0, 150));
+        g2.fillRoundRect(caixaX, caixaY, largura, 16, 6, 6);
+        g2.setColor(Color.WHITE);
+        g2.drawString(nome, caixaX + 7, caixaY + 12);
+
+        if (simboloEstado != null && !simboloEstado.isBlank()) {
+            g2.setFont(new Font("Arial", Font.BOLD, 16));
+            g2.setColor("✓".equals(simboloEstado)
+                    ? new Color(100, 255, 140)
+                    : new Color(255, 220, 70));
+            g2.drawString(simboloEstado, x + width + 3, y - 5);
+        }
     }
 
     public void desenharIndicadorInteracao(Graphics2D g2) {
         int caixaLargura = 86;
         int caixaAltura = 22;
         int caixaX = x + width / 2 - caixaLargura / 2;
-        int caixaY = y - caixaAltura - 4;
+        int caixaY = y - caixaAltura - 24;
 
         if (caixaY < 4) {
             caixaY = y + 4;
@@ -130,4 +189,5 @@ public class NPC extends Rectangle {
     public String getId() { return id; }
     public String getNome() { return nome; }
     public int getCenarioIndex() { return cenarioIndex; }
+    public void setPodeCaminhar(boolean podeCaminhar) { this.podeCaminhar = podeCaminhar; }
 }

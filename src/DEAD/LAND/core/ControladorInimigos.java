@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ControladorInimigos {
+
     private static final int DANO_FLECHA = 30;
 
     private List<Inimigo> inimigos = new ArrayList<>();
@@ -34,7 +35,9 @@ public class ControladorInimigos {
         jogador.atualizarInvencibilidade();
 
         for (Inimigo ini : inimigos) {
-            if (!ini.estaVivo() || ini.getCenarioIndex() != cenarioAtual) continue;
+            if (!ini.estaVivo() || ini.getCenarioIndex() != cenarioAtual) {
+                continue;
+            }
             ini.atualizar(jogador);
 
             // Verificar colisão de flechas com o inimigo

@@ -10,11 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ControladorFlechas {
+
     private List<Flecha> flechas = new ArrayList<>();
     private boolean atirarPressionado = false;
 
     public void atualizar(panel cenaDoJogo, escutadorTeclado teclado) {
-        if (!cenaDoJogo.getInventario().temArco()) return;
+        if (!cenaDoJogo.getInventario().temArco()) {
+            return;
+        }
 
         if (teclado.atirar && !atirarPressionado) {
             atirarPressionado = true;
@@ -28,7 +31,9 @@ public class ControladorFlechas {
         int tileSize = cenario.getTamanhoTile();
 
         for (Flecha f : flechas) {
-            if (!f.isAtiva()) continue;
+            if (!f.isAtiva()) {
+                continue;
+            }
             f.atualizar();
 
             int col = f.x / tileSize;
@@ -47,7 +52,9 @@ public class ControladorFlechas {
         flechas.add(new Flecha(cx, cy, jogador.getDirecao()));
     }
 
-    public List<Flecha> getFlechas() { return flechas; }
+    public List<Flecha> getFlechas() {
+        return flechas;
+    }
 
     public void desenhar(Graphics2D g) {
         for (Flecha f : flechas) {

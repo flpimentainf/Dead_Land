@@ -82,7 +82,7 @@ public class gameLoop implements ActionListener {
 		this.controladorMovimento.atualizar(this.cenaDoJogo, this.teclado);
 		this.controladorNPCs.atualizar(this.cenaDoJogo);
 		this.controladorInteracao.atualizar(this.cenaDoJogo, this.teclado);
-		this.controladorItens.atualizar(this.cenaDoJogo);
+		this.controladorItens.atualizar(this.cenaDoJogo, this.teclado);
 
 		if (this.controladorFlechas != null) {
 			this.controladorFlechas.atualizar(this.cenaDoJogo, this.teclado);

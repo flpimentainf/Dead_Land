@@ -12,18 +12,19 @@ public class ControladorNPCs {
     private List<NPC> npcs = new ArrayList<NPC>();
 
     public ControladorNPCs() {
-        // NPCs pensados para o roteiro atual de Dead Land.
-        // cenarioIndex segue a ordem do tileMap: 0 quarto, 1 queda, 2+, floresta/áreas da memória/final.
-        adicionarNPC("ari", "Ari, o que lembra", 1, 3, 15, 5);
-        adicionarNPC("mara", "Mara, a escutadora", 2, 5, 14, 7);
-        adicionarNPC("guardiao_memoria", "Guardião da memória", 3, 6, 4, 7);
-        adicionarNPC("porteiro_morto", "Porteiro morto", 4, 7, 24, 6);
+        adicionarNPC("ari", "Ari", 1, 3, 15, 5, true);
+        adicionarNPC("mara", "Mara", 2, 5, 14, 7, true);
+        adicionarNPC("guardiao_memoria", "Guardião", 3, 6, 4, 7, false);
+        adicionarNPC("porteiro_morto", "Porteiro", 4, 7, 24, 6, false);
     }
 
-    private void adicionarNPC(String id, String nome, int numeroNpc, int cenarioIndex, int coluna, int linha) {
+    private void adicionarNPC(String id, String nome, int numeroNpc, int cenarioIndex,
+            int coluna, int linha, boolean podeCaminhar) {
         int x = coluna * tiles.LARGURA;
-        int y = linha * tiles.ALTURA - 24; // alinha o pé do NPC com o chão do tile.
-        npcs.add(new NPC(id, nome, numeroNpc, cenarioIndex, x, y));
+        int y = linha * tiles.ALTURA - 24;
+        NPC npc = new NPC(id, nome, numeroNpc, cenarioIndex, x, y);
+        npc.setPodeCaminhar(podeCaminhar);
+        npcs.add(npc);
     }
 
     public void atualizar(panel cenaDoJogo) {
@@ -31,16 +32,21 @@ public class ControladorNPCs {
         player jogador = cenaDoJogo.getJogador();
 
         for (NPC npc : npcs) {
-            if (npc.getCenarioIndex() == cenarioAtual) {
+            if (npc.getCenarioIndex() == cenarioAtual && npcEstaVisivel(npc, cenaDoJogo)) {
                 npc.atualizar(jogador);
             }
         }
     }
 
-    public void desenhar(Graphics2D g2, int cenarioAtual) {
+    public void desenhar(Graphics2D g2, panel cenaDoJogo) {
+        int cenarioAtual = cenaDoJogo.getCenario().getCenarioAtualIndex();
         for (NPC npc : npcs) {
-            if (npc.getCenarioIndex() == cenarioAtual) {
-                npc.desenhar(g2);
+            if (npc.getCenarioIndex() == cenarioAtual && npcEstaVisivel(npc, cenaDoJogo)) {
+                npc.desenhar(
+                        g2,
+                        getSimboloEstado(npc, cenaDoJogo),
+                        cenaDoJogo.getInventario().temChaveBoss63()
+                );
             }
         }
     }
@@ -57,11 +63,31 @@ public class ControladorNPCs {
         player jogador = cenaDoJogo.getJogador();
 
         for (NPC npc : npcs) {
-            if (npc.getCenarioIndex() == cenarioAtual && npc.estaPerto(jogador)) {
+            if (npc.getCenarioIndex() == cenarioAtual
+                    && npcEstaVisivel(npc, cenaDoJogo)
+                    && npc.estaPerto(jogador)) {
                 return npc;
             }
         }
 
         return null;
+    }
+
+    private boolean npcEstaVisivel(NPC npc, panel cenaDoJogo) {
+        return !"guardiao_memoria".equals(npc.getId())
+                || !cenaDoJogo.getInventario().temChaveBoss63();
+    }
+
+    private String getSimboloEstado(NPC npc, panel cenaDoJogo) {
+        boolean falou = cenaDoJogo.getHistoria() != null
+                && cenaDoJogo.getHistoria().jaFalouComNpc(npc.getId());
+
+        if (cenaDoJogo.getInventario().temChaveBoss63()) {
+            return "✓";
+        }
+        if (!falou) {
+            return "!";
+        }
+        return "?";
     }
 }
