@@ -107,7 +107,6 @@ public class InterfaceHistoria {
             return;
         }
 
-        desenharRetratoPadrao(g2, x, y, nomeNpc);
     }
 
     private String getArquivoRetrato(String nomeNpc) {
@@ -116,17 +115,5 @@ public class InterfaceHistoria {
         if ("Guardião".equals(nomeNpc)) return "guardiao.png";
         if ("Porteiro".equals(nomeNpc)) return "porteiro.png";
         return nomeNpc.toLowerCase() + ".png";
-    }
-
-    private void desenharRetratoPadrao(Graphics2D g2, int x, int y, String nomeNpc) {
-        g2.setColor(new Color(80, 105, 135));
-        g2.fillOval(x, y, 64, 64);
-        g2.setColor(Color.WHITE);
-        g2.drawOval(x, y, 64, 64);
-        g2.setFont(new Font("Arial", Font.BOLD, 24));
-
-        String inicial = nomeNpc.substring(0, 1);
-        FontMetrics fm = g2.getFontMetrics();
-        g2.drawString(inicial, x + (64 - fm.stringWidth(inicial)) / 2, y + 41);
     }
 }
