@@ -7,13 +7,14 @@ package DEAD.LAND;
  */
 
 import DEAD.LAND.ui.moldura;
-import javax.swing.SwingUtilities;
 
 public class main {
 
 	public static void main(String[] args) {
 		System.out.println("DEAD LAND");
-		SwingUtilities.invokeLater(moldura::new);
+		new moldura();
 	}
 
 }
+
+

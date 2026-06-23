@@ -1,6 +1,8 @@
 package DEAD.LAND.ui;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +28,49 @@ public class Inventario {
         for (int i = 0; i < this.itens.size(); i++) {
             int x = largura - MARGEM - (i + 1) * TAMANHO_SLOT - i * ESPACO;
             desenharSlot(g2, this.itens.get(i), x, y);
+            desenharDicaTecla(g2, this.itens.get(i), x, y);
         }
     }
 
-    public boolean temArco() {
+   public boolean temArco() {
+        return temItem("arco");
+    }
+
+    public boolean temChave() {
+        return temItem("chave");
+    }
+
+    public boolean temChaveBoss63() {
+        return temItem("chave_boss_63");
+    }
+
+    public boolean temItem(String nome) {
         for (item i : itens) {
-            if ("arco".equals(i.getNome())) return true;
+            if (nome.equals(i.getNome())) return true;
         }
         return false;
+    }
+
+    private void desenharDicaTecla(Graphics2D g2, item itemColetado, int x, int y) {
+        String tecla = null;
+        if ("arco".equals(itemColetado.getNome())) {
+            tecla = "SPACE";
+        }
+        if (tecla == null) return;
+
+        g2.setFont(new Font("Arial", Font.BOLD, 10));
+        FontMetrics fm = g2.getFontMetrics();
+        int tw = fm.stringWidth(tecla) + 8;
+        int th = 14;
+        int tx = x + (TAMANHO_SLOT - tw) / 2;
+        int ty = y - th - 3;
+
+        g2.setColor(new Color(0, 0, 0, 160));
+        g2.fillRoundRect(tx, ty, tw, th, 5, 5);
+        g2.setColor(new Color(255, 200, 50));
+        g2.drawRoundRect(tx, ty, tw, th, 5, 5);
+        g2.setColor(Color.WHITE);
+        g2.drawString(tecla, tx + 4, ty + th - 3);
     }
 
     private void desenharSlot(Graphics2D g2, item itemColetado, int x, int y) {

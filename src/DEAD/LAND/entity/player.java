@@ -12,10 +12,15 @@ public class player extends Rectangle{
     private static final int GRAVIDADE_QUEDA = 1;
     private static final int FRAMES_PARA_TROCAR_SPRITE_QUEDA = 8;
 
+    public static final int VIDA_MAXIMA = 100;
+    private static final int FRAMES_INVENCIVEL = 60;
+
     private Color CorFundo = Color.WHITE;
     public Rectangle AreaColisao;
     public int passo = 4;
     private boolean caindo;
+    private int vida = VIDA_MAXIMA;
+    private int framesInvencivel = 0;
     private int velocidadeQueda;
     private int contadorFramesQueda;
     private String direcao = "baixo";
@@ -63,6 +68,21 @@ public class player extends Rectangle{
     }
 
     public String getDirecao() { return direcao; }
+
+    public int getVida() { return vida; }
+    public boolean estaVivo() { return vida > 0; }
+
+    public void levarDano(int dano) {
+        if (framesInvencivel > 0) return;
+        vida = Math.max(0, vida - dano);
+        framesInvencivel = FRAMES_INVENCIVEL;
+    }
+
+    public void atualizarInvencibilidade() {
+        if (framesInvencivel > 0) framesInvencivel--;
+    }
+
+    public boolean estaInvencivel() { return framesInvencivel > 0; }
 
     public void atualizarAreaColisao() {
         this.AreaColisao.x = this.x + 3;

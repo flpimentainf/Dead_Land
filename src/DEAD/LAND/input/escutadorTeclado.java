@@ -7,6 +7,8 @@ public class escutadorTeclado implements KeyListener{
 	public boolean movePraBaixo, movePraCima, movePraEsq, movePraDir;
 	public boolean interagir;
 	public boolean atirar;
+	public boolean confirmar;
+	public boolean abrirMenu;
 
 
 	@Override
@@ -32,6 +34,13 @@ public class escutadorTeclado implements KeyListener{
 			break;
 		case KeyEvent.VK_E:
 			this.interagir = true;
+			this.confirmar = true;
+			break;
+		case KeyEvent.VK_ENTER:
+			this.confirmar = true;
+			break;
+		case KeyEvent.VK_ESCAPE:
+			this.abrirMenu = true;
 			break;
 		case KeyEvent.VK_SPACE:
 			this.atirar = true;
@@ -60,6 +69,13 @@ public class escutadorTeclado implements KeyListener{
 			break;
 		case KeyEvent.VK_E:
 			this.interagir = false;
+			this.confirmar = false;
+			break;
+		case KeyEvent.VK_ENTER:
+			this.confirmar = false;
+			break;
+		case KeyEvent.VK_ESCAPE:
+			this.abrirMenu = false;
 			break;
 		case KeyEvent.VK_SPACE:
 			this.atirar = false;

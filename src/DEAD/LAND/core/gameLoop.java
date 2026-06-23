@@ -18,6 +18,8 @@ public class gameLoop implements ActionListener {
 	private final ControladorInteracao controladorInteracao;
 	private final ControladorItens controladorItens;
 	private final ControladorFlechas controladorFlechas;
+	private final ControladorInimigos controladorInimigos;
+	private final ControladorNPCs controladorNPCs;
 	private final panel cenaDoJogo;
 	private final escutadorTeclado teclado;
 
@@ -31,9 +33,15 @@ public class gameLoop implements ActionListener {
 		this.controladorInteracao = new ControladorInteracao();
 		this.controladorItens = new ControladorItens();
 		this.controladorFlechas = P.getControladorFlechas();
+		this.controladorInimigos = new ControladorInimigos();
+		this.controladorNPCs = new ControladorNPCs();
 		this.temporizador = new Timer(INTERVALO_LOOP_MS, this);
 		this.temporizador.setCoalesce(true);
     }
+
+	public ControladorItens getControladorItens() { return controladorItens; }
+	public ControladorInimigos getControladorInimigos() { return controladorInimigos; }
+	public ControladorNPCs getControladorNPCs() { return controladorNPCs; }
 
 	public void iniciar() {
 		if (!this.temporizador.isRunning()) {
@@ -57,21 +65,37 @@ public class gameLoop implements ActionListener {
 			return;
 		}
 
+		if (this.cenaDoJogo.getHistoria() != null) {
+			this.cenaDoJogo.getHistoria().atualizar(this.cenaDoJogo, this.teclado);
+
+			if (this.cenaDoJogo.getHistoria().bloqueiaControleDoJogador()) {
+				this.controladorInteracao.resetar();
+				return;
+			}
+		}
+
 		if (this.controladorQueda.atualizar(this.cenaDoJogo)) {
 			this.controladorInteracao.resetar();
 			return;
 		}
 
 		this.controladorMovimento.atualizar(this.cenaDoJogo, this.teclado);
+		this.controladorNPCs.atualizar(this.cenaDoJogo);
 		this.controladorInteracao.atualizar(this.cenaDoJogo, this.teclado);
-		this.controladorItens.atualizar(this.cenaDoJogo);
+		this.controladorItens.atualizar(this.cenaDoJogo, this.teclado);
 
 		if (this.controladorFlechas != null) {
 			this.controladorFlechas.atualizar(this.cenaDoJogo, this.teclado);
 		}
+		this.controladorInimigos.atualizar(this.cenaDoJogo, this.controladorFlechas);
 	}
 
 	private void atualizarSpriteQuandoNecessario() {
+		if (this.cenaDoJogo.getHistoria() != null
+				&& this.cenaDoJogo.getHistoria().bloqueiaControleDoJogador()) {
+			return;
+		}
+
 		this.atualizacoesDesdeUltimoSprite++;
 
 		if (this.atualizacoesDesdeUltimoSprite < ATUALIZACOES_POR_SPRITE) {
@@ -79,6 +103,7 @@ public class gameLoop implements ActionListener {
 		}
 
 		this.atualizacoesDesdeUltimoSprite = 0;
+
 		this.cenaDoJogo.getJogador().atualizarSprite(
 				this.teclado.movePraEsq,
 				this.teclado.movePraCima,

@@ -1,14 +1,20 @@
 package DEAD.LAND.ui;
 
 import DEAD.LAND.core.ControladorFlechas;
+import DEAD.LAND.core.ControladorInimigos;
+import DEAD.LAND.core.ControladorItens;
+import DEAD.LAND.core.ControladorNPCs;
 import DEAD.LAND.core.gameLoop;
 import DEAD.LAND.entity.player;
 import DEAD.LAND.input.escutadorTeclado;
+import DEAD.LAND.story.SistemaHistoria;
 import DEAD.LAND.world.tileMap;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.util.function.Consumer;
 import javax.swing.JPanel;
 
 
@@ -22,9 +28,23 @@ public class panel extends JPanel{
     private Inventario inventario;
     private panel painelInventario;
     private ControladorFlechas controladorFlechas;
+    private ControladorItens controladorItens;
+    private ControladorInimigos controladorInimigos;
+    private ControladorNPCs controladorNPCs;
+    private BarraDeVida barradeVida;
+    private SistemaHistoria historia;
+    private InterfaceHistoria interfaceHistoria;
 
 
     public panel(String posicao, Inventario inventario) {
+        this(posicao, inventario, null);
+    }
+
+    public panel(
+            String posicao,
+            Inventario inventario,
+            Consumer<SistemaHistoria.Estado> aoFinalizar
+    ) {
         this.posicao = posicao.toLowerCase();
         this.inventario = inventario;
         
@@ -37,6 +57,8 @@ public class panel extends JPanel{
                 this.cenario = new tileMap();
                 this.iconeInteracao = new IconeInteracao();
                 this.controladorFlechas = new ControladorFlechas();
+                this.historia = new SistemaHistoria(aoFinalizar);
+                this.interfaceHistoria = new InterfaceHistoria();
 
                 
                 ET = new escutadorTeclado();
@@ -45,18 +67,22 @@ public class panel extends JPanel{
                 this.addKeyListener(ET);
                 this.setFocusable(true); 
                 
+                this.controladorItens = GL.getControladorItens();
+                this.controladorInimigos = GL.getControladorInimigos();
+                this.controladorNPCs = GL.getControladorNPCs();
+                this.barradeVida = new BarraDeVida();
                 GL.iniciar();
 
                 break;
 
             case "sul":
-            	this.setPreferredSize(new Dimension(768, 100));
+            	this.setPreferredSize(new Dimension(768, 125));
             	this.setBackground(new Color(38, 44, 58));
             	
                 break;
 
             default:
-            	this.setPreferredSize(new Dimension(768, 100));
+            	this.setPreferredSize(new Dimension(768, 125));
             	this.setBackground(Color.GRAY);
             	
                 break;
@@ -75,14 +101,22 @@ public class panel extends JPanel{
 
                 if (this.cenario == null) break;
 
+                AffineTransform transformacaoOriginal = g2.getTransform();
                 double escalaX = (double) getWidth()  / this.cenario.getLarguraTotal();
                 double escalaY = (double) getHeight() / this.cenario.getAlturaTotal();
                 g2.scale(escalaX, escalaY);
 
                 this.cenario.desenhar(g2);
+                if (this.controladorNPCs != null) this.controladorNPCs.desenhar(g2, this);
+                if (this.controladorInimigos != null) this.controladorInimigos.desenhar(g2, this.cenario.getCenarioAtualIndex());
                 getJogador().desenharPlayer(g2);
                 if (this.controladorFlechas != null) this.controladorFlechas.desenhar(g2);
+                if (this.controladorItens != null) this.controladorItens.desenhar(g2, this);
                 this.iconeInteracao.desenharArea(g2, this.cenario, getJogador());
+                if (this.controladorNPCs != null) this.controladorNPCs.desenharIndicadorInteracao(g2, this);
+                g2.setTransform(transformacaoOriginal);
+                if (this.barradeVida != null) this.barradeVida.desenhar(g2, getJogador(), getWidth(), getHeight());
+                if (this.interfaceHistoria != null) this.interfaceHistoria.desenhar(g2, getWidth(), getHeight(), this.historia);
                 break;
 
             case "sul":
@@ -107,6 +141,12 @@ public class panel extends JPanel{
 
 
     public ControladorFlechas getControladorFlechas() { return controladorFlechas; }
+
+    public ControladorNPCs getControladorNPCs() { return controladorNPCs; }
+
+    public ControladorInimigos getControladorInimigos() { return controladorInimigos; }
+
+    public SistemaHistoria getHistoria() { return historia; }
 
     public tileMap getCenario() {
         return cenario;
@@ -158,5 +198,23 @@ public class panel extends JPanel{
         getJogador().x = x;
         getJogador().y = y;
         getJogador().atualizarAreaColisao();
+    }
+
+    public void pausarJogo() {
+        if (GL != null) {
+            GL.parar();
+        }
+    }
+
+    public void continuarAposFinalNaFloresta() {
+        if (historia == null || GL == null) {
+            return;
+        }
+
+        historia.continuarNaFlorestaAposFinal();
+        irParaCenario(2, 745, 335);
+        GL.iniciar();
+        requestFocusInWindow();
+        repaint();
     }
 }
