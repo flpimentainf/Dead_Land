@@ -1,5 +1,6 @@
 package DEAD.LAND.core;
 
+import DEAD.LAND.entity.Boss;
 import DEAD.LAND.entity.Flecha;
 import DEAD.LAND.entity.Inimigo;
 import DEAD.LAND.entity.player;
@@ -17,15 +18,23 @@ public class ControladorInimigos {
 
     public ControladorInimigos() {
         // Esqueletos no cenário da floresta (index 7 = cenario do arco/floresta exterior)
-        adicionarInimigo(5 * tiles.LARGURA, 3 * tiles.ALTURA, 7);
-        adicionarInimigo(12 * tiles.LARGURA, 4 * tiles.ALTURA, 7);
-        adicionarInimigo(18 * tiles.LARGURA, 2 * tiles.ALTURA, 7);
+        adicionarInimigo(22* tiles.LARGURA, 3 * tiles.ALTURA, 5);
+        adicionarInimigo(25 * tiles.LARGURA, 4 * tiles.ALTURA, 5);
+        adicionarInimigo(29 * tiles.LARGURA, 2 * tiles.ALTURA, 5);
+        adicionarChefe( 15 * tiles.LARGURA, 3 * tiles.ALTURA, 7);
     }
 
     private void adicionarInimigo(int x, int y, int cenarioIndex) {
         Inimigo ini = new Inimigo(x, y);
         ini.setCenarioIndex(cenarioIndex);
         inimigos.add(ini);
+        
+    } 
+    
+    private void adicionarChefe(int x, int y, int cenarioIndex) {
+        Boss chefe = new Boss(x, y);
+        chefe.setCenarioIndex(cenarioIndex);
+        inimigos.add(chefe);
     }
 
     public void atualizar(panel cenaDoJogo, ControladorFlechas controladorFlechas) {

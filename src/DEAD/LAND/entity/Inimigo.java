@@ -8,24 +8,24 @@ import javax.swing.ImageIcon;
 
 public class Inimigo extends Rectangle {
     public static final int VIDA_MAXIMA = 60;
-    private static final int VELOCIDADE = 1;
+    private static final int VELOCIDADE = 3;
     private static final int DANO_NO_JOGADOR = 15;
     private static final int FRAMES_ATAQUE = 90;
     private static final int FRAMES_SPRITE = 12;
-    private static final int ALCANCE_DETECCAO = 200;
+    private static final int ALCANCE_DETECCAO = 120;
 
-    private int vida = VIDA_MAXIMA;
-    private boolean vivo = true;
+    protected int vida = VIDA_MAXIMA;
+    protected boolean vivo = true;
     private String direcao = "direita";
     private int frameAtual = 0;
     private int contadorSprite = 0;
     private int contadorAtaque = 0;
     private boolean atacando = false;
 
-    private Image[] spritesEsq = new Image[3];
-    private Image[] spritesDir = new Image[3];
-    private Image[] spritesAtaqueEsq = new Image[3];
-    private Image[] spritesAtaqueDir = new Image[3];
+    protected Image[] spritesEsq = new Image[3];
+    protected Image[] spritesDir = new Image[3];
+    protected Image[] spritesAtaqueEsq = new Image[3];
+    protected Image[] spritesAtaqueDir = new Image[3];
 
     public Rectangle areaColisao;
 
@@ -123,8 +123,8 @@ public class Inimigo extends Rectangle {
 
     private int cenarioIndex;
     public void setCenarioIndex(int i) { this.cenarioIndex = i; }
-
-    private void atualizarAreaColisao() {
+ 
+    protected void atualizarAreaColisao() {
         areaColisao.x = this.x + 6;
         areaColisao.y = this.y + 24;
         areaColisao.width = 36;
