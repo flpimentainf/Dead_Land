@@ -5,6 +5,7 @@ import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.ui.panel;
 
 public class ControladorMovimento {
+
     private static final int CENARIO_5 = 4;
     private static final int CENARIO_6 = 5;
     private static final int CENARIO_8 = 7;
@@ -81,7 +82,7 @@ public class ControladorMovimento {
                         1475,
                         cenaDoJogo.getJogador().y
                 );
-             } else if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 8) {
+            } else if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 8) {
                 cenaDoJogo.irParaCenario(
                         5,
                         1440,
@@ -149,8 +150,11 @@ public class ControladorMovimento {
                 * cenaDoJogo.getCenario().getTamanhoTile();
         int fimSaidaX = (COLUNA_DIREITA_SAIDA_INFERIOR + 1)
                 * cenaDoJogo.getCenario().getTamanhoTile();
+        // A colisão do limite inferior bloqueia o último passo do jogador.
+        // Por isso, a saída deve ser reconhecida quando ele encosta na borda,
+        // sem exigir que o sprite ultrapasse o tamanho total do mapa.
         boolean chegouAoFimDoMapa = jogador.y + jogador.height
-                >= cenaDoJogo.getCenario().getAlturaTotal();
+                >= cenaDoJogo.getCenario().getAlturaTotal() - jogador.passo;
 
         return chegouAoFimDoMapa
                 && centroJogadorX >= inicioSaidaX

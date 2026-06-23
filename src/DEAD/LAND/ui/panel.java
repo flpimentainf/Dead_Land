@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.util.function.Consumer;
 import javax.swing.JPanel;
 
 
@@ -36,6 +37,14 @@ public class panel extends JPanel{
 
 
     public panel(String posicao, Inventario inventario) {
+        this(posicao, inventario, null);
+    }
+
+    public panel(
+            String posicao,
+            Inventario inventario,
+            Consumer<SistemaHistoria.Estado> aoFinalizar
+    ) {
         this.posicao = posicao.toLowerCase();
         this.inventario = inventario;
         
@@ -48,7 +57,7 @@ public class panel extends JPanel{
                 this.cenario = new tileMap();
                 this.iconeInteracao = new IconeInteracao();
                 this.controladorFlechas = new ControladorFlechas();
-                this.historia = new SistemaHistoria();
+                this.historia = new SistemaHistoria(aoFinalizar);
                 this.interfaceHistoria = new InterfaceHistoria();
 
                 
@@ -187,5 +196,23 @@ public class panel extends JPanel{
         getJogador().x = x;
         getJogador().y = y;
         getJogador().atualizarAreaColisao();
+    }
+
+    public void pausarJogo() {
+        if (GL != null) {
+            GL.parar();
+        }
+    }
+
+    public void continuarAposFinalNaFloresta() {
+        if (historia == null || GL == null) {
+            return;
+        }
+
+        historia.continuarNaFlorestaAposFinal();
+        irParaCenario(2, 745, 335);
+        GL.iniciar();
+        requestFocusInWindow();
+        repaint();
     }
 }

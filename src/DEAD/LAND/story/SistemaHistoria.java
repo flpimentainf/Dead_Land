@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class SistemaHistoria {
     private enum TipoEscolha {
@@ -48,8 +49,15 @@ public class SistemaHistoria {
     private String nomeNpcFalando;
     private String opcaoNpc1 = "";
     private String opcaoNpc2 = "";
+    private final Consumer<Estado> aoFinalizar;
+    private boolean finalNotificado;
 
     public SistemaHistoria() {
+        this(null);
+    }
+
+    public SistemaHistoria(Consumer<Estado> aoFinalizar) {
+        this.aoFinalizar = aoFinalizar;
         mostrarMensagem(RoteiroHistoria.abertura());
     }
 
@@ -405,6 +413,22 @@ public class SistemaHistoria {
         this.exibindoMensagem = false;
         this.mensagem.clear();
         this.nomeNpcFalando = null;
+
+        if (historiaFinalizada() && !finalNotificado && aoFinalizar != null) {
+            finalNotificado = true;
+            aoFinalizar.accept(estado);
+        }
+    }
+
+    public void continuarNaFlorestaAposFinal() {
+        estado = Estado.FLORESTA;
+        objetivoAtual = "Explore a floresta.";
+        exibindoMensagem = false;
+        exibindoEscolha = false;
+        tipoEscolha = TipoEscolha.NENHUMA;
+        mensagem.clear();
+        telaEscura = false;
+        finalNotificado = false;
     }
 
     public Estado getEstado() {
