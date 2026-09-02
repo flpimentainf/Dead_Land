@@ -18,6 +18,7 @@ import DEAD.LAND.core.gameLoop;
 import DEAD.LAND.entity.player;
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.story.SistemaHistoria;
+import DEAD.LAND.world.CenarioId;
 import DEAD.LAND.world.tileMap;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -227,7 +228,7 @@ public class panel extends JPanel{
             desenharFlashDano(g2, LARGURA_LOGICA, ALTURA_LOGICA);
             if (this.barradeVida != null) this.barradeVida.desenhar(g2, getJogador(), LARGURA_LOGICA, ALTURA_LOGICA);
             if (this.sistemaVontade != null) this.sistemaVontade.desenharBarra(g2, LARGURA_LOGICA, ALTURA_LOGICA);
-            if (this.controladorInimigos != null && this.controladorInimigos.getChefe() != null) {
+            if (deveDesenharBarraBoss()) {
                 this.controladorInimigos.getChefe().desenharBarraBoss(g2, LARGURA_LOGICA);
             }
             desenharHudCombate(g2);
@@ -347,6 +348,14 @@ public class panel extends JPanel{
             g2.setColor(Color.WHITE);
             g2.drawString("Dash", dashX, dashY - 3);
         }
+    }
+
+    private boolean deveDesenharBarraBoss() {
+        return this.cenario != null
+                && this.cenario.getCenarioAtualIndex() == CenarioId.ARENA_BOSS.indice()
+                && this.controladorInimigos != null
+                && this.controladorInimigos.getChefe() != null
+                && this.controladorInimigos.getChefe().estaVivo();
     }
 
     public boolean atualizarMenuPausa(escutadorTeclado teclado) {
