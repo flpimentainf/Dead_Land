@@ -4,6 +4,7 @@ import DEAD.LAND.core.ControladorFlechas;
 import DEAD.LAND.core.ControladorInimigos;
 import DEAD.LAND.core.ControladorItens;
 import DEAD.LAND.core.ControladorNPCs;
+import DEAD.LAND.core.Camera;
 import DEAD.LAND.core.SistemaCheckpoint;
 import DEAD.LAND.core.SistemaMorte;
 import DEAD.LAND.core.gameLoop;
@@ -17,12 +18,17 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.awt.geom.AffineTransform;
 import java.util.function.Consumer;
 import javax.swing.JPanel;
 
 
 public class panel extends JPanel{
+    private static final int LARGURA_LOGICA = 768;
+    private static final int ALTURA_LOGICA = 480;
+
 	private String posicao;
 	gameLoop GL;
 	escutadorTeclado ET;
@@ -40,6 +46,8 @@ public class panel extends JPanel{
     private InterfaceHistoria interfaceHistoria;
     private SistemaCheckpoint sistemaCheckpoint;
     private SistemaMorte sistemaMorte;
+    private Camera camera;
+    private BufferedImage quadroLogico;
 
 
     public panel(String posicao, Inventario inventario) {
@@ -56,7 +64,7 @@ public class panel extends JPanel{
         
         switch (this.posicao) {
             case "centro":
-            	this.setPreferredSize(new Dimension(768, 480));
+                this.setPreferredSize(new Dimension(LARGURA_LOGICA, ALTURA_LOGICA));
             	this.setBackground(Color.BLACK);
                 
                 setJogador(new player());
@@ -67,6 +75,7 @@ public class panel extends JPanel{
                 this.interfaceHistoria = new InterfaceHistoria();
                 this.sistemaCheckpoint = new SistemaCheckpoint();
                 this.sistemaMorte = new SistemaMorte();
+                this.camera = new Camera(LARGURA_LOGICA, ALTURA_LOGICA);
 
                 
                 ET = new escutadorTeclado();
@@ -80,6 +89,7 @@ public class panel extends JPanel{
                 this.controladorNPCs = GL.getControladorNPCs();
                 this.barradeVida = new BarraDeVida();
                 this.sistemaCheckpoint.registrarCheckpointInicial(this);
+                sincronizarCameraImediatamente();
                 GL.iniciar();
 
                 break;
@@ -102,32 +112,11 @@ public class panel extends JPanel{
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
+        configurarRenderizacaoPixelArt(g2);
 
         switch (posicao) {
             case "centro":
-                g2.setColor(Color.BLACK);
-                g2.fillRect(0, 0, getWidth(), getHeight());
-
-                if (this.cenario == null) break;
-
-                AffineTransform transformacaoOriginal = g2.getTransform();
-                double escalaX = (double) getWidth()  / this.cenario.getLarguraTotal();
-                double escalaY = (double) getHeight() / this.cenario.getAlturaTotal();
-                g2.scale(escalaX, escalaY);
-
-                this.cenario.desenhar(g2);
-                if (this.controladorNPCs != null) this.controladorNPCs.desenhar(g2, this);
-                if (this.controladorInimigos != null) this.controladorInimigos.desenhar(g2, this.cenario.getCenarioAtualIndex());
-                getJogador().desenharPlayer(g2);
-                if (this.controladorFlechas != null) this.controladorFlechas.desenhar(g2);
-                if (this.controladorItens != null) this.controladorItens.desenhar(g2, this);
-                this.iconeInteracao.desenharArea(g2, this.cenario, getJogador());
-                if (this.controladorNPCs != null) this.controladorNPCs.desenharIndicadorInteracao(g2, this);
-                g2.setTransform(transformacaoOriginal);
-                desenharFlashDano(g2, getWidth(), getHeight());
-                if (this.barradeVida != null) this.barradeVida.desenhar(g2, getJogador(), getWidth(), getHeight());
-                if (this.interfaceHistoria != null) this.interfaceHistoria.desenhar(g2, getWidth(), getHeight(), this.historia);
-                if (this.sistemaMorte != null) this.sistemaMorte.desenhar(g2, getWidth(), getHeight());
+                desenharCentro(g2);
                 break;
 
             case "sul":
@@ -138,6 +127,101 @@ public class panel extends JPanel{
                 }
                 break;
         }
+    }
+
+    private void desenharCentro(Graphics2D g2Tela) {
+        g2Tela.setColor(Color.BLACK);
+        g2Tela.fillRect(0, 0, getWidth(), getHeight());
+
+        if (this.cenario == null) {
+            return;
+        }
+
+        BufferedImage quadro = getQuadroLogico();
+        Graphics2D g2 = quadro.createGraphics();
+        configurarRenderizacaoPixelArt(g2);
+        try {
+            g2.setColor(Color.BLACK);
+            g2.fillRect(0, 0, LARGURA_LOGICA, ALTURA_LOGICA);
+            atualizarCamera();
+
+            AffineTransform transformacaoOriginal = g2.getTransform();
+            g2.translate(-this.camera.getXRender(), -this.camera.getYRender());
+
+            this.cenario.desenhar(g2);
+            if (this.controladorNPCs != null) this.controladorNPCs.desenhar(g2, this);
+            if (this.controladorInimigos != null) this.controladorInimigos.desenhar(g2, this.cenario.getCenarioAtualIndex());
+            getJogador().desenharPlayer(g2);
+            if (this.controladorFlechas != null) this.controladorFlechas.desenhar(g2);
+            if (this.controladorItens != null) this.controladorItens.desenhar(g2, this);
+            this.iconeInteracao.desenharArea(g2, this.cenario, getJogador());
+            if (this.controladorNPCs != null) this.controladorNPCs.desenharIndicadorInteracao(g2, this);
+
+            g2.setTransform(transformacaoOriginal);
+            desenharFlashDano(g2, LARGURA_LOGICA, ALTURA_LOGICA);
+            if (this.barradeVida != null) this.barradeVida.desenhar(g2, getJogador(), LARGURA_LOGICA, ALTURA_LOGICA);
+            if (this.interfaceHistoria != null) this.interfaceHistoria.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA, this.historia);
+            if (this.sistemaMorte != null) this.sistemaMorte.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA);
+        } finally {
+            g2.dispose();
+        }
+
+        desenharQuadroLogicoNaTela(g2Tela, quadro);
+    }
+
+    private BufferedImage getQuadroLogico() {
+        if (this.quadroLogico == null
+                || this.quadroLogico.getWidth() != LARGURA_LOGICA
+                || this.quadroLogico.getHeight() != ALTURA_LOGICA) {
+            this.quadroLogico = new BufferedImage(
+                    LARGURA_LOGICA,
+                    ALTURA_LOGICA,
+                    BufferedImage.TYPE_INT_RGB
+            );
+        }
+
+        return this.quadroLogico;
+    }
+
+    private void atualizarCamera() {
+        if (this.camera == null || getJogador() == null || this.cenario == null) {
+            return;
+        }
+
+        this.camera.definirViewport(LARGURA_LOGICA, ALTURA_LOGICA);
+        this.camera.seguirSuavemente(
+                getJogador(),
+                this.cenario.getLarguraTotal(),
+                this.cenario.getAlturaTotal()
+        );
+    }
+
+    private void desenharQuadroLogicoNaTela(Graphics2D g2Tela, BufferedImage quadro) {
+        int larguraPainel = Math.max(1, getWidth());
+        int alturaPainel = Math.max(1, getHeight());
+        double escala = Math.min(
+                larguraPainel / (double) LARGURA_LOGICA,
+                alturaPainel / (double) ALTURA_LOGICA
+        );
+
+        int larguraDesenho = Math.max(1, (int) Math.round(LARGURA_LOGICA * escala));
+        int alturaDesenho = Math.max(1, (int) Math.round(ALTURA_LOGICA * escala));
+        int x = (larguraPainel - larguraDesenho) / 2;
+        int y = (alturaPainel - alturaDesenho) / 2;
+
+        configurarRenderizacaoPixelArt(g2Tela);
+        g2Tela.drawImage(quadro, x, y, larguraDesenho, alturaDesenho, null);
+    }
+
+    private void configurarRenderizacaoPixelArt(Graphics2D g2) {
+        g2.setRenderingHint(
+                RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+        );
+        g2.setRenderingHint(
+                RenderingHints.KEY_RENDERING,
+                RenderingHints.VALUE_RENDER_SPEED
+        );
     }
 
     private void desenharFlashDano(Graphics2D g2, int largura, int altura) {
@@ -185,6 +269,8 @@ public class panel extends JPanel{
 
     public SistemaMorte getSistemaMorte() { return sistemaMorte; }
 
+    public Camera getCamera() { return camera; }
+
     public tileMap getCenario() {
         return cenario;
     }
@@ -224,20 +310,36 @@ public class panel extends JPanel{
     public void irParaCenario(int indexCenario, int jogadorX, int jogadorY) {
         cenario.irParaCenario(indexCenario);
         posicionarJogador(jogadorX, jogadorY);
+        sincronizarCameraImediatamente();
     }
 
     public void irParaProximoCenario() {
         cenario.irParaProximoCenario();
         posicionarJogador(50, getJogador().y);
+        sincronizarCameraImediatamente();
     }
 
     public void irParaCenarioAnterior() {
         cenario.irParaCenarioAnterior();
         posicionarJogador(cenario.getLarguraTotal() - getJogador().width - 10, getJogador().y);
+        sincronizarCameraImediatamente();
     }
 
     private void posicionarJogador(int x, int y) {
         getJogador().posicionarEm(x, y);
+    }
+
+    private void sincronizarCameraImediatamente() {
+        if (this.camera == null || this.cenario == null || getJogador() == null) {
+            return;
+        }
+
+        this.camera.definirViewport(LARGURA_LOGICA, ALTURA_LOGICA);
+        this.camera.centralizarImediatamente(
+                getJogador(),
+                this.cenario.getLarguraTotal(),
+                this.cenario.getAlturaTotal()
+        );
     }
 
     public void pausarJogo() {
