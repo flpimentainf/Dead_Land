@@ -9,6 +9,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class ControladorItens {
     private static final int CENARIO_DOS_ITENS = 6;
@@ -88,6 +91,40 @@ public class ControladorItens {
                     cenaDoJogo.getHistoria().eventoItemColetado(itemDoJogo.getNome());
                 }
                 return;
+            }
+        }
+    }
+
+    public List<item> getItensPorNomes(Set<String> nomes) {
+        List<item> encontrados = new ArrayList<item>();
+        if (nomes == null) {
+            return encontrados;
+        }
+
+        for (item itemDoJogo : this.itens) {
+            if (nomes.contains(itemDoJogo.getNome())) {
+                encontrados.add(itemDoJogo);
+            }
+        }
+
+        return encontrados;
+    }
+
+    public void restaurarColetas(Set<String> nomesColetados, tileMap cenario) {
+        if (nomesColetados == null) {
+            return;
+        }
+
+        for (item itemDoJogo : this.itens) {
+            if (nomesColetados.contains(itemDoJogo.getNome())) {
+                itemDoJogo.coletar();
+                if (cenario != null) {
+                    cenario.removerObjeto(
+                            itemDoJogo.getCenarioIndex(),
+                            itemDoJogo.getLinha(),
+                            itemDoJogo.getColuna()
+                    );
+                }
             }
         }
     }

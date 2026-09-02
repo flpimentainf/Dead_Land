@@ -10,6 +10,17 @@ public class escutadorTeclado implements KeyListener{
 	public boolean confirmar;
 	public boolean abrirMenu;
 
+	public void resetar() {
+		movePraBaixo = false;
+		movePraCima = false;
+		movePraEsq = false;
+		movePraDir = false;
+		interagir = false;
+		atirar = false;
+		confirmar = false;
+		abrirMenu = false;
+	}
+
 
 	@Override
 	public void keyTyped(KeyEvent e) {

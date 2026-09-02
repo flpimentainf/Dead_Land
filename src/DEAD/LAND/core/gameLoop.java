@@ -20,6 +20,7 @@ public class gameLoop implements ActionListener {
 	private final ControladorFlechas controladorFlechas;
 	private final ControladorInimigos controladorInimigos;
 	private final ControladorNPCs controladorNPCs;
+	private final verificadorDeColisao verificadorEfeitos;
 	private final panel cenaDoJogo;
 	private final escutadorTeclado teclado;
 
@@ -35,6 +36,7 @@ public class gameLoop implements ActionListener {
 		this.controladorFlechas = P.getControladorFlechas();
 		this.controladorInimigos = new ControladorInimigos();
 		this.controladorNPCs = new ControladorNPCs();
+		this.verificadorEfeitos = new verificadorDeColisao();
 		this.temporizador = new Timer(INTERVALO_LOOP_MS, this);
 		this.temporizador.setCoalesce(true);
     }
@@ -65,8 +67,23 @@ public class gameLoop implements ActionListener {
 			return;
 		}
 
+		if (this.cenaDoJogo.getSistemaMorte() != null
+				&& this.cenaDoJogo.getSistemaMorte().atualizar(
+						this.cenaDoJogo,
+						this.teclado,
+						this.cenaDoJogo.getSistemaCheckpoint())) {
+			this.controladorInteracao.resetar();
+			return;
+		}
+
+		this.cenaDoJogo.getJogador().atualizarEfeitos(
+				this.cenaDoJogo.getCenario(),
+				this.verificadorEfeitos
+		);
+
 		if (this.cenaDoJogo.getHistoria() != null) {
 			this.cenaDoJogo.getHistoria().atualizar(this.cenaDoJogo, this.teclado);
+			atualizarCheckpointsAutomaticos();
 
 			if (this.cenaDoJogo.getHistoria().bloqueiaControleDoJogador()) {
 				this.controladorInteracao.resetar();
@@ -76,6 +93,7 @@ public class gameLoop implements ActionListener {
 
 		if (this.controladorQueda.atualizar(this.cenaDoJogo)) {
 			this.controladorInteracao.resetar();
+			atualizarCheckpointsAutomaticos();
 			return;
 		}
 
@@ -88,9 +106,21 @@ public class gameLoop implements ActionListener {
 			this.controladorFlechas.atualizar(this.cenaDoJogo, this.teclado);
 		}
 		this.controladorInimigos.atualizar(this.cenaDoJogo, this.controladorFlechas);
+		atualizarCheckpointsAutomaticos();
+	}
+
+	private void atualizarCheckpointsAutomaticos() {
+		if (this.cenaDoJogo.getSistemaCheckpoint() != null) {
+			this.cenaDoJogo.getSistemaCheckpoint().avaliarCheckpointAutomatico(this.cenaDoJogo);
+		}
 	}
 
 	private void atualizarSpriteQuandoNecessario() {
+		if (this.cenaDoJogo.getSistemaMorte() != null
+				&& this.cenaDoJogo.getSistemaMorte().bloqueiaControle()) {
+			return;
+		}
+
 		if (this.cenaDoJogo.getHistoria() != null
 				&& this.cenaDoJogo.getHistoria().bloqueiaControleDoJogador()) {
 			return;

@@ -47,8 +47,6 @@ public class ControladorInimigos {
         int cenarioAtual = cenaDoJogo.getCenario().getCenarioAtualIndex();
         player jogador = cenaDoJogo.getJogador();
 
-        jogador.atualizarInvencibilidade();
-
         for (Inimigo ini : inimigos) {
             if (!ini.estaVivo() || ini.getCenarioIndex() != cenarioAtual) {
                 continue;
@@ -77,5 +75,36 @@ public class ControladorInimigos {
 
     public boolean bossFoiDerrotado() {
         return chefe != null && !chefe.estaVivo();
+    }
+
+    public boolean existeCombateAtivo(panel cenaDoJogo) {
+        if (cenaDoJogo == null || cenaDoJogo.getCenario() == null) {
+            return false;
+        }
+
+        int cenarioAtual = cenaDoJogo.getCenario().getCenarioAtualIndex();
+        player jogador = cenaDoJogo.getJogador();
+
+        for (Inimigo ini : inimigos) {
+            if (ini.getCenarioIndex() == cenarioAtual && ini.estaEmCombateCom(jogador)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void resetarCenario(int cenarioIndex, boolean bossDerrotadoNoCheckpoint) {
+        for (Inimigo ini : inimigos) {
+            if (ini.getCenarioIndex() != cenarioIndex) {
+                continue;
+            }
+
+            if (ini == chefe && bossDerrotadoNoCheckpoint) {
+                ini.marcarDerrotado();
+            } else {
+                ini.resetarParaOrigem();
+            }
+        }
     }
 }

@@ -314,6 +314,22 @@ public class tileMap {
 		this.camadaObjetosValida[linha][coluna] = VAZIO;
 	}
 
+	public void removerObjeto(int cenarioIndex, int linha, int coluna) {
+		if (cenarioIndex < 0 || cenarioIndex >= this.todosOsObjetos.length) {
+			return;
+		}
+
+		int[][] camadaObjetos = this.todosOsObjetos[cenarioIndex];
+		if (linha < 0 || linha >= camadaObjetos.length) {
+			return;
+		}
+		if (coluna < 0 || coluna >= camadaObjetos[linha].length) {
+			return;
+		}
+
+		camadaObjetos[linha][coluna] = VAZIO;
+	}
+
 	private void desenharCamada(Graphics2D g, int[][] camada, boolean ignorarVazio) {
 		for (int col = 0; col < camada[0].length; col++) {
 			for (int lin = 0; lin < camada.length; lin++) {

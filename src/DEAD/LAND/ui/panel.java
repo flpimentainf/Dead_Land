@@ -4,12 +4,16 @@ import DEAD.LAND.core.ControladorFlechas;
 import DEAD.LAND.core.ControladorInimigos;
 import DEAD.LAND.core.ControladorItens;
 import DEAD.LAND.core.ControladorNPCs;
+import DEAD.LAND.core.SistemaCheckpoint;
+import DEAD.LAND.core.SistemaMorte;
 import DEAD.LAND.core.gameLoop;
 import DEAD.LAND.entity.player;
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.story.SistemaHistoria;
 import DEAD.LAND.world.tileMap;
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -34,6 +38,8 @@ public class panel extends JPanel{
     private BarraDeVida barradeVida;
     private SistemaHistoria historia;
     private InterfaceHistoria interfaceHistoria;
+    private SistemaCheckpoint sistemaCheckpoint;
+    private SistemaMorte sistemaMorte;
 
 
     public panel(String posicao, Inventario inventario) {
@@ -59,6 +65,8 @@ public class panel extends JPanel{
                 this.controladorFlechas = new ControladorFlechas();
                 this.historia = new SistemaHistoria(aoFinalizar);
                 this.interfaceHistoria = new InterfaceHistoria();
+                this.sistemaCheckpoint = new SistemaCheckpoint();
+                this.sistemaMorte = new SistemaMorte();
 
                 
                 ET = new escutadorTeclado();
@@ -71,6 +79,7 @@ public class panel extends JPanel{
                 this.controladorInimigos = GL.getControladorInimigos();
                 this.controladorNPCs = GL.getControladorNPCs();
                 this.barradeVida = new BarraDeVida();
+                this.sistemaCheckpoint.registrarCheckpointInicial(this);
                 GL.iniciar();
 
                 break;
@@ -115,8 +124,10 @@ public class panel extends JPanel{
                 this.iconeInteracao.desenharArea(g2, this.cenario, getJogador());
                 if (this.controladorNPCs != null) this.controladorNPCs.desenharIndicadorInteracao(g2, this);
                 g2.setTransform(transformacaoOriginal);
+                desenharFlashDano(g2, getWidth(), getHeight());
                 if (this.barradeVida != null) this.barradeVida.desenhar(g2, getJogador(), getWidth(), getHeight());
                 if (this.interfaceHistoria != null) this.interfaceHistoria.desenhar(g2, getWidth(), getHeight(), this.historia);
+                if (this.sistemaMorte != null) this.sistemaMorte.desenhar(g2, getWidth(), getHeight());
                 break;
 
             case "sul":
@@ -127,6 +138,26 @@ public class panel extends JPanel{
                 }
                 break;
         }
+    }
+
+    private void desenharFlashDano(Graphics2D g2, int largura, int altura) {
+        if (getJogador() == null) {
+            return;
+        }
+
+        float intensidade = getJogador().getIntensidadeFlashDano();
+        if (intensidade <= 0f) {
+            return;
+        }
+
+        Composite composicaoOriginal = g2.getComposite();
+        g2.setComposite(AlphaComposite.getInstance(
+                AlphaComposite.SRC_OVER,
+                Math.min(0.18f, intensidade * 0.18f)
+        ));
+        g2.setColor(Color.RED);
+        g2.fillRect(0, 0, largura, altura);
+        g2.setComposite(composicaoOriginal);
     }
 
 
@@ -142,11 +173,17 @@ public class panel extends JPanel{
 
     public ControladorFlechas getControladorFlechas() { return controladorFlechas; }
 
+    public ControladorItens getControladorItens() { return controladorItens; }
+
     public ControladorNPCs getControladorNPCs() { return controladorNPCs; }
 
     public ControladorInimigos getControladorInimigos() { return controladorInimigos; }
 
     public SistemaHistoria getHistoria() { return historia; }
+
+    public SistemaCheckpoint getSistemaCheckpoint() { return sistemaCheckpoint; }
+
+    public SistemaMorte getSistemaMorte() { return sistemaMorte; }
 
     public tileMap getCenario() {
         return cenario;
@@ -179,6 +216,11 @@ public class panel extends JPanel{
         return getInteracaoPerto() != null;
     }
 
+    public boolean existeCombateAtivo() {
+        return this.controladorInimigos != null
+                && this.controladorInimigos.existeCombateAtivo(this);
+    }
+
     public void irParaCenario(int indexCenario, int jogadorX, int jogadorY) {
         cenario.irParaCenario(indexCenario);
         posicionarJogador(jogadorX, jogadorY);
@@ -195,9 +237,7 @@ public class panel extends JPanel{
     }
 
     private void posicionarJogador(int x, int y) {
-        getJogador().x = x;
-        getJogador().y = y;
-        getJogador().atualizarAreaColisao();
+        getJogador().posicionarEm(x, y);
     }
 
     public void pausarJogo() {

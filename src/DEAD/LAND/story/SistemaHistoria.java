@@ -31,6 +31,31 @@ public class SistemaHistoria {
         FINAL_SECRETO
     }
 
+    public static class ProgressoHistoria {
+        private final Estado estado;
+        private final String objetivoAtual;
+        private final Set<String> npcsConhecidos;
+        private final int tentativasMenu;
+        private final boolean confrontoBossApresentado;
+        private final boolean finalNotificado;
+
+        private ProgressoHistoria(
+                Estado estado,
+                String objetivoAtual,
+                Set<String> npcsConhecidos,
+                int tentativasMenu,
+                boolean confrontoBossApresentado,
+                boolean finalNotificado
+        ) {
+            this.estado = estado;
+            this.objetivoAtual = objetivoAtual;
+            this.npcsConhecidos = new HashSet<String>(npcsConhecidos);
+            this.tentativasMenu = tentativasMenu;
+            this.confrontoBossApresentado = confrontoBossApresentado;
+            this.finalNotificado = finalNotificado;
+        }
+    }
+
     private Estado estado = Estado.QUARTO;
     private String objetivoAtual = "Deite-se na cama.";
     private List<String> mensagem = new ArrayList<String>();
@@ -439,6 +464,86 @@ public class SistemaHistoria {
         mensagem.clear();
         telaEscura = false;
         finalNotificado = false;
+    }
+
+    public ProgressoHistoria copiarProgresso() {
+        return new ProgressoHistoria(
+                estado,
+                objetivoAtual,
+                npcsConhecidos,
+                tentativasMenu,
+                confrontoBossApresentado,
+                finalNotificado
+        );
+    }
+
+    public void restaurarAposRespawn(ProgressoHistoria progresso,
+            Set<String> itensImportantes, int cenarioAtual, boolean bossDerrotado) {
+        if (progresso != null) {
+            this.estado = progresso.estado;
+            this.objetivoAtual = progresso.objetivoAtual;
+            this.npcsConhecidos.clear();
+            this.npcsConhecidos.addAll(progresso.npcsConhecidos);
+            this.tentativasMenu = progresso.tentativasMenu;
+            this.confrontoBossApresentado = progresso.confrontoBossApresentado;
+            this.finalNotificado = progresso.finalNotificado;
+        }
+
+        this.mensagem.clear();
+        this.exibindoMensagem = false;
+        this.exibindoEscolha = false;
+        this.tipoEscolha = TipoEscolha.NENHUMA;
+        this.npcEscolhaId = null;
+        this.nomeNpcFalando = null;
+        this.opcaoNpc1 = "";
+        this.opcaoNpc2 = "";
+        this.opcaoEscolhida = 0;
+        this.teclaConfirmarPressionada = false;
+        this.teclaMenuPressionada = false;
+        this.teclaCimaPressionada = false;
+        this.teclaBaixoPressionada = false;
+        this.telaEscura = false;
+
+        ajustarObjetivoAposRespawn(itensImportantes, cenarioAtual, bossDerrotado);
+    }
+
+    private void ajustarObjetivoAposRespawn(Set<String> itensImportantes,
+            int cenarioAtual, boolean bossDerrotado) {
+        if (historiaFinalizada()) {
+            return;
+        }
+
+        boolean temChavePrata = itensImportantes != null && itensImportantes.contains("chave");
+        boolean temChaveBoss = itensImportantes != null && itensImportantes.contains("chave_boss_63");
+
+        if (bossDerrotado) {
+            this.objetivoAtual = "Fale com o Porteiro.";
+            return;
+        }
+
+        if (temChaveBoss) {
+            if (this.estado.ordinal() < Estado.MEMORIAS.ordinal()) {
+                this.estado = Estado.MEMORIAS;
+            }
+            this.objetivoAtual = cenarioAtual == 7
+                    ? "Derrote o chefe."
+                    : "Abra a porta do confronto com a chave vermelha.";
+            this.confrontoBossApresentado = this.confrontoBossApresentado || cenarioAtual == 7;
+            return;
+        }
+
+        if (temChavePrata) {
+            if (this.estado.ordinal() < Estado.BUSCA_MEMORIA.ordinal()) {
+                this.estado = Estado.BUSCA_MEMORIA;
+            }
+            this.objetivoAtual = "Abra a porta inferior e encontre a chave vermelha.";
+            return;
+        }
+
+        if (cenarioAtual >= 2 && (this.estado == Estado.QUARTO || this.estado == Estado.QUEDA)) {
+            this.estado = Estado.FLORESTA;
+            this.objetivoAtual = "Explore a floresta e procure uma saída.";
+        }
     }
 
     public Estado getEstado() {

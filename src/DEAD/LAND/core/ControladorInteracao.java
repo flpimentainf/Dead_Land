@@ -87,6 +87,7 @@ public class ControladorInteracao {
                         JOGADOR_X_APOS_PORTA,
                         JOGADOR_Y_APOS_PORTA
                 );
+                avisarEntradaNoCenario(cenaDoJogo);
                 return;
             }
 
@@ -102,6 +103,7 @@ public class ControladorInteracao {
                         752,
                         290
                 );
+                        avisarEntradaNoCenario(cenaDoJogo);
                     }
                 } else {
                     if (!cenaDoJogo.getInventario().temChave()) {
@@ -124,6 +126,15 @@ public class ControladorInteracao {
     private void mostrarPortaTrancada(panel cenaDoJogo, boolean portaDoBoss) {
         if (cenaDoJogo.getHistoria() != null) {
             cenaDoJogo.getHistoria().eventoPortaSemChave(portaDoBoss);
+        }
+    }
+
+    private void avisarEntradaNoCenario(panel cenaDoJogo) {
+        if (cenaDoJogo.getHistoria() != null) {
+            cenaDoJogo.getHistoria().eventoEntrouCenario(
+                    cenaDoJogo.getCenario().getCenarioAtualIndex(),
+                    cenaDoJogo
+            );
         }
     }
 

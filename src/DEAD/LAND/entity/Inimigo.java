@@ -19,6 +19,8 @@ public class Inimigo extends Rectangle {
     protected int vida = VIDA_MAXIMA;
     protected int vidaMaxima = VIDA_MAXIMA;
     protected boolean vivo = true;
+    private final int origemX;
+    private final int origemY;
     private String direcao = "direita";
     private int frameAtual = 0;
     private int contadorSprite = 0;
@@ -33,6 +35,8 @@ public class Inimigo extends Rectangle {
     public Rectangle areaColisao;
 
     public Inimigo(int x, int y) {
+        this.origemX = x;
+        this.origemY = y;
         this.x = x;
         this.y = y;
         this.width = 48;
@@ -53,7 +57,7 @@ public class Inimigo extends Rectangle {
             tileMap cenario,
             verificadorDeColisao verificadorColisao
     ) {
-        if (!vivo) return;
+        if (!vivo || jogador == null || jogador.estaMorto()) return;
 
         atualizarAreaColisao();
         contadorAtaque = Math.max(0, contadorAtaque - 1);
@@ -81,7 +85,11 @@ public class Inimigo extends Rectangle {
                 // Está perto — atacar
                 atacando = true;
                 if (contadorAtaque == 0) {
-                    jogador.levarDano(getDanoNoJogador());
+                    jogador.levarDano(
+                            getDanoNoJogador(),
+                            this.x + this.width / 2,
+                            this.y + this.height / 2
+                    );
                     contadorAtaque = getFramesAtaque();
                 }
             }
@@ -147,6 +155,37 @@ public class Inimigo extends Rectangle {
         if (!vivo) return;
         vida = Math.max(0, vida - dano);
         if (vida == 0) vivo = false;
+    }
+
+    public void resetarParaOrigem() {
+        this.x = origemX;
+        this.y = origemY;
+        this.vida = this.vidaMaxima;
+        this.vivo = true;
+        this.atacando = false;
+        this.contadorAtaque = 0;
+        this.contadorSprite = 0;
+        this.frameAtual = 0;
+        atualizarAreaColisao();
+    }
+
+    public void marcarDerrotado() {
+        this.vida = 0;
+        this.vivo = false;
+        this.atacando = false;
+        this.contadorAtaque = 0;
+    }
+
+    public boolean estaEmCombateCom(player jogador) {
+        if (!vivo || jogador == null || jogador.estaMorto()) {
+            return false;
+        }
+
+        int dx = (jogador.x + jogador.width / 2) - (this.x + this.width / 2);
+        int dy = (jogador.y + jogador.height / 2) - (this.y + this.height / 2);
+        double dist = Math.sqrt(dx * dx + dy * dy);
+
+        return dist < getAlcanceDeteccao() + 40 || atacando || contadorAtaque > 0;
     }
 
     public boolean estaVivo() { return vivo; }

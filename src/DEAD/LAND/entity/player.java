@@ -1,6 +1,10 @@
 package DEAD.LAND.entity;
 
+import DEAD.LAND.core.verificadorDeColisao;
+import DEAD.LAND.world.tileMap;
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -14,6 +18,9 @@ public class player extends Rectangle{
 
     public static final int VIDA_MAXIMA = 100;
     private static final int FRAMES_INVENCIVEL = 60;
+    private static final int FRAMES_FLASH_DANO = 10;
+    private static final int FRAMES_KNOCKBACK = 5;
+    private static final int FORCA_KNOCKBACK = 5;
 
     private Color CorFundo = Color.WHITE;
     public Rectangle AreaColisao;
@@ -21,6 +28,10 @@ public class player extends Rectangle{
     private boolean caindo;
     private int vida = VIDA_MAXIMA;
     private int framesInvencivel = 0;
+    private int framesFlashDano = 0;
+    private int framesKnockback = 0;
+    private int knockbackX = 0;
+    private int knockbackY = 0;
     private int velocidadeQueda;
     private int contadorFramesQueda;
     private String direcao = "baixo";
@@ -58,7 +69,26 @@ public class player extends Rectangle{
         // g.fillRect(this.x, this.y, this.width, this.height);
         // Para visualizar a area de colisao, descomente a linha abaixo.
         // g.fillRect(this.AreaColisao.x, this.AreaColisao.y, this.AreaColisao.width, this.AreaColisao.height);
+
+        Composite composicaoOriginal = g.getComposite();
+        if (estaInvencivel() && !estaMorto()) {
+            float alpha = (framesInvencivel / 6) % 2 == 0 ? 0.45f : 1.0f;
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+        }
+
         g.drawImage(imagemPlayer, x, y, width, height, null);
+        g.setComposite(composicaoOriginal);
+
+        if (framesFlashDano > 0) {
+            float intensidade = getIntensidadeFlashDano();
+            g.setComposite(AlphaComposite.getInstance(
+                    AlphaComposite.SRC_OVER,
+                    Math.min(0.45f, intensidade * 0.45f)
+            ));
+            g.setColor(Color.RED);
+            g.fillRect(x, y, width, height);
+            g.setComposite(composicaoOriginal);
+        }
     }
     
     public void mover(int movimentoX, int movimentoY) {
@@ -67,22 +97,122 @@ public class player extends Rectangle{
         atualizarAreaColisao();
     }
 
+    public void posicionarEm(int x, int y) {
+        this.x = x;
+        this.y = y;
+        atualizarAreaColisao();
+    }
+
     public String getDirecao() { return direcao; }
 
     public int getVida() { return vida; }
     public boolean estaVivo() { return vida > 0; }
+    public boolean estaMorto() { return vida <= 0; }
 
-    public void levarDano(int dano) {
-        if (framesInvencivel > 0) return;
+    public boolean levarDano(int dano) {
+        return levarDano(dano, this.x + this.width / 2, this.y + this.height / 2);
+    }
+
+    public boolean levarDano(int dano, int origemX, int origemY) {
+        if (dano <= 0 || estaMorto() || framesInvencivel > 0) return false;
         vida = Math.max(0, vida - dano);
+        framesInvencivel = FRAMES_INVENCIVEL;
+        framesFlashDano = FRAMES_FLASH_DANO;
+        prepararKnockback(origemX, origemY);
+
+        if (vida == 0) {
+            interromperMovimentoTemporario();
+        }
+
+        return true;
+    }
+
+    public void curar(int quantidade) {
+        if (quantidade <= 0 || estaMorto()) return;
+        vida = Math.min(VIDA_MAXIMA, vida + quantidade);
+    }
+
+    public void restaurarVidaCompleta() {
+        vida = VIDA_MAXIMA;
+    }
+
+    public void prepararRespawn() {
+        restaurarVidaCompleta();
+        interromperMovimentoTemporario();
+        framesFlashDano = 0;
         framesInvencivel = FRAMES_INVENCIVEL;
     }
 
     public void atualizarInvencibilidade() {
         if (framesInvencivel > 0) framesInvencivel--;
+        if (framesFlashDano > 0) framesFlashDano--;
     }
 
     public boolean estaInvencivel() { return framesInvencivel > 0; }
+
+    public float getIntensidadeFlashDano() {
+        if (framesFlashDano <= 0) return 0f;
+        return framesFlashDano / (float) FRAMES_FLASH_DANO;
+    }
+
+    public void atualizarEfeitos(tileMap cenario, verificadorDeColisao verificador) {
+        atualizarInvencibilidade();
+        atualizarKnockback(cenario, verificador);
+    }
+
+    private void prepararKnockback(int origemX, int origemY) {
+        int centroX = this.x + this.width / 2;
+        int centroY = this.y + this.height / 2;
+        int deltaX = centroX - origemX;
+        int deltaY = centroY - origemY;
+
+        if (deltaX == 0 && deltaY == 0) {
+            deltaY = "cima".equals(direcao) ? 1 : -1;
+        }
+
+        double distancia = Math.max(1, Math.sqrt(deltaX * deltaX + deltaY * deltaY));
+        this.knockbackX = (int) Math.round(FORCA_KNOCKBACK * deltaX / distancia);
+        this.knockbackY = (int) Math.round(FORCA_KNOCKBACK * deltaY / distancia);
+        this.framesKnockback = FRAMES_KNOCKBACK;
+    }
+
+    private void atualizarKnockback(tileMap cenario, verificadorDeColisao verificador) {
+        if (framesKnockback <= 0 || (knockbackX == 0 && knockbackY == 0)) {
+            return;
+        }
+
+        moverComColisao(cenario, verificador, knockbackX, 0);
+        moverComColisao(cenario, verificador, 0, knockbackY);
+        framesKnockback--;
+
+        if (framesKnockback <= 0) {
+            knockbackX = 0;
+            knockbackY = 0;
+        }
+    }
+
+    private void moverComColisao(tileMap cenario, verificadorDeColisao verificador,
+            int movimentoX, int movimentoY) {
+        if (movimentoX == 0 && movimentoY == 0) {
+            return;
+        }
+
+        if (cenario != null && verificador != null
+                && verificador.ocorreuColisao(this, cenario, movimentoX, movimentoY)) {
+            return;
+        }
+
+        mover(movimentoX, movimentoY);
+    }
+
+    private void interromperMovimentoTemporario() {
+        this.caindo = false;
+        this.velocidadeQueda = 0;
+        this.framesKnockback = 0;
+        this.knockbackX = 0;
+        this.knockbackY = 0;
+        atualizarAreaColisao();
+    }
 
     public void atualizarAreaColisao() {
         this.AreaColisao.x = this.x + 3;
@@ -140,7 +270,7 @@ public class player extends Rectangle{
     
     public void atualizarSprite(boolean moveEsq, boolean moveCima,
             boolean moveDir, boolean moveBaixo) {
-        if (this.caindo) {
+        if (this.caindo || estaMorto()) {
             return;
         }
 

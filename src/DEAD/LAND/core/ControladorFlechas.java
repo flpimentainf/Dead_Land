@@ -56,6 +56,11 @@ public class ControladorFlechas {
         return flechas;
     }
 
+    public void limpar() {
+        flechas.clear();
+        atirarPressionado = false;
+    }
+
     public void desenhar(Graphics2D g) {
         for (Flecha f : flechas) {
             f.desenhar(g);

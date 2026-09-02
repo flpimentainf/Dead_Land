@@ -5,7 +5,10 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import DEAD.LAND.entity.item;
 
@@ -17,8 +20,28 @@ public class Inventario {
     private List<item> itens = new ArrayList<item>();
 
     public void adicionar(item itemColetado) {
+        if (itemColetado == null) {
+            return;
+        }
+
+        String nome = itemColetado.getNome();
+        if (nome != null && !nome.isBlank() && temItem(nome)) {
+            return;
+        }
+
         if (!this.itens.contains(itemColetado)) {
             this.itens.add(itemColetado);
+        }
+    }
+
+    public void substituirPorItens(Collection<item> itensRestaurados) {
+        this.itens.clear();
+        if (itensRestaurados == null) {
+            return;
+        }
+
+        for (item itemRestaurado : itensRestaurados) {
+            adicionar(itemRestaurado);
         }
     }
 
@@ -49,6 +72,16 @@ public class Inventario {
             if (nome.equals(i.getNome())) return true;
         }
         return false;
+    }
+
+    public Set<String> getNomesItens() {
+        Set<String> nomes = new LinkedHashSet<String>();
+        for (item i : itens) {
+            if (i.getNome() != null && !i.getNome().isBlank()) {
+                nomes.add(i.getNome());
+            }
+        }
+        return nomes;
     }
 
     private void desenharDicaTecla(Graphics2D g2, item itemColetado, int x, int y) {
