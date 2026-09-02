@@ -1,6 +1,7 @@
 package DEAD.LAND.entity;
 
 import DEAD.LAND.core.verificadorDeColisao;
+import DEAD.LAND.core.ResourceManager;
 import DEAD.LAND.world.tileMap;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -8,7 +9,6 @@ import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
-import javax.swing.ImageIcon;
 
 public class player extends Rectangle{
     private static final int VELOCIDADE_QUEDA_INICIAL = 1;
@@ -21,6 +21,10 @@ public class player extends Rectangle{
     private static final int FRAMES_FLASH_DANO = 10;
     private static final int FRAMES_KNOCKBACK = 5;
     private static final int FORCA_KNOCKBACK = 5;
+    private static final int VELOCIDADE_DASH = 12;
+    private static final long DURACAO_DASH_MS = 240;
+    private static final long INVENCIBILIDADE_DASH_MS = 170;
+    private static final long COOLDOWN_DASH_MS = 1000;
 
     private Color CorFundo = Color.WHITE;
     public Rectangle AreaColisao;
@@ -32,6 +36,12 @@ public class player extends Rectangle{
     private int framesKnockback = 0;
     private int knockbackX = 0;
     private int knockbackY = 0;
+    private boolean dashAtivo;
+    private int direcaoDashX;
+    private int direcaoDashY;
+    private long fimDashMs;
+    private long invulneravelDashAteMs;
+    private long ultimoDashMs = -COOLDOWN_DASH_MS;
     private int velocidadeQueda;
     private int contadorFramesQueda;
     private String direcao = "baixo";
@@ -55,11 +65,11 @@ public class player extends Rectangle{
         //icon = new ImageIcon("res/PLAYERS/down1.png");
         //this.imagemPlayer = icon.getImage();
         for (int i = 0; i < 3; i++) {
-            this.imgPlayerDown[i] = new ImageIcon("repos/PLAYERS/down" + (i+1) + ".png").getImage();
-            this.imgPlayerRight[i] = new ImageIcon("repos/PLAYERS/right" + (i+1) + ".png").getImage();
-            this.imgPlayerLeft[i] = new ImageIcon("repos/PLAYERS/left" + (i+1) + ".png").getImage();
-            this.imgPlayerUp[i] = new ImageIcon("repos/PLAYERS/up" + (i+1) + ".png").getImage();
-            this.imgPlayerFall[i] = new ImageIcon("repos/PLAYERS/fall" + (i+1) + ".png").getImage();
+            this.imgPlayerDown[i] = ResourceManager.getInstancia().carregarImagem("repos/PLAYERS/down" + (i+1) + ".png");
+            this.imgPlayerRight[i] = ResourceManager.getInstancia().carregarImagem("repos/PLAYERS/right" + (i+1) + ".png");
+            this.imgPlayerLeft[i] = ResourceManager.getInstancia().carregarImagem("repos/PLAYERS/left" + (i+1) + ".png");
+            this.imgPlayerUp[i] = ResourceManager.getInstancia().carregarImagem("repos/PLAYERS/up" + (i+1) + ".png");
+            this.imgPlayerFall[i] = ResourceManager.getInstancia().carregarImagem("repos/PLAYERS/fall" + (i+1) + ".png");
         } 
         this.imagemPlayer = this.imgPlayerDown[frameJogador];
 
@@ -89,6 +99,11 @@ public class player extends Rectangle{
             g.fillRect(x, y, width, height);
             g.setComposite(composicaoOriginal);
         }
+
+        if (estaEmDash()) {
+            g.setColor(new Color(120, 210, 255, 150));
+            g.drawRect(x - 2, y - 2, width + 4, height + 4);
+        }
     }
     
     public void mover(int movimentoX, int movimentoY) {
@@ -109,12 +124,16 @@ public class player extends Rectangle{
     public boolean estaVivo() { return vida > 0; }
     public boolean estaMorto() { return vida <= 0; }
 
+    public void definirVida(int vida) {
+        this.vida = Math.max(0, Math.min(VIDA_MAXIMA, vida));
+    }
+
     public boolean levarDano(int dano) {
         return levarDano(dano, this.x + this.width / 2, this.y + this.height / 2);
     }
 
     public boolean levarDano(int dano, int origemX, int origemY) {
-        if (dano <= 0 || estaMorto() || framesInvencivel > 0) return false;
+        if (dano <= 0 || estaMorto() || estaInvencivel()) return false;
         vida = Math.max(0, vida - dano);
         framesInvencivel = FRAMES_INVENCIVEL;
         framesFlashDano = FRAMES_FLASH_DANO;
@@ -148,7 +167,9 @@ public class player extends Rectangle{
         if (framesFlashDano > 0) framesFlashDano--;
     }
 
-    public boolean estaInvencivel() { return framesInvencivel > 0; }
+    public boolean estaInvencivel() {
+        return framesInvencivel > 0 || System.currentTimeMillis() < invulneravelDashAteMs;
+    }
 
     public float getIntensidadeFlashDano() {
         if (framesFlashDano <= 0) return 0f;
@@ -158,6 +179,67 @@ public class player extends Rectangle{
     public void atualizarEfeitos(tileMap cenario, verificadorDeColisao verificador) {
         atualizarInvencibilidade();
         atualizarKnockback(cenario, verificador);
+    }
+
+    public boolean iniciarDash(boolean moveEsq, boolean moveCima, boolean moveDir, boolean moveBaixo) {
+        long agora = System.currentTimeMillis();
+        if (estaMorto() || caindo || dashAtivo || agora - ultimoDashMs < COOLDOWN_DASH_MS) {
+            return false;
+        }
+
+        int dx = 0;
+        int dy = 0;
+        if (moveEsq) dx--;
+        if (moveDir) dx++;
+        if (moveCima) dy--;
+        if (moveBaixo) dy++;
+
+        if (dx == 0 && dy == 0) {
+            if ("esquerda".equals(direcao)) dx = -1;
+            else if ("direita".equals(direcao)) dx = 1;
+            else if ("cima".equals(direcao)) dy = -1;
+            else dy = 1;
+        }
+
+        this.direcaoDashX = dx;
+        this.direcaoDashY = dy;
+        this.dashAtivo = true;
+        this.ultimoDashMs = agora;
+        this.fimDashMs = agora + DURACAO_DASH_MS;
+        this.invulneravelDashAteMs = agora + INVENCIBILIDADE_DASH_MS;
+        return true;
+    }
+
+    public boolean atualizarDash(tileMap cenario, verificadorDeColisao verificador) {
+        if (!dashAtivo) {
+            return false;
+        }
+
+        if (System.currentTimeMillis() >= fimDashMs || estaMorto()) {
+            dashAtivo = false;
+            return false;
+        }
+
+        int movimentoX = direcaoDashX * VELOCIDADE_DASH;
+        int movimentoY = direcaoDashY * VELOCIDADE_DASH;
+        if (direcaoDashX != 0 && direcaoDashY != 0) {
+            int diagonal = Math.max(1, (int) Math.round(VELOCIDADE_DASH / Math.sqrt(2)));
+            movimentoX = direcaoDashX * diagonal;
+            movimentoY = direcaoDashY * diagonal;
+        }
+
+        moverComColisao(cenario, verificador, movimentoX, 0);
+        moverComColisao(cenario, verificador, 0, movimentoY);
+        return true;
+    }
+
+    public boolean estaEmDash() {
+        return dashAtivo;
+    }
+
+    public float getProgressoCooldownDash() {
+        long decorrido = System.currentTimeMillis() - ultimoDashMs;
+        return Math.max(0f, Math.min(1f, decorrido / (float) COOLDOWN_DASH_MS));
     }
 
     private void prepararKnockback(int origemX, int origemY) {
@@ -207,6 +289,8 @@ public class player extends Rectangle{
 
     private void interromperMovimentoTemporario() {
         this.caindo = false;
+        this.dashAtivo = false;
+        this.invulneravelDashAteMs = 0;
         this.velocidadeQueda = 0;
         this.framesKnockback = 0;
         this.knockbackX = 0;

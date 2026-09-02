@@ -18,6 +18,7 @@ public class tileMap {
 	private int cenarioAtualIndex = 0;
 	private int [][][] todosOsCenarios;
 	private int [][][] todosOsObjetos;
+	private Cenario[] cenarios;
 
 	int [][] cenario1DoJogo = {
 		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37},
@@ -238,8 +239,62 @@ public class tileMap {
 			criarCamadaVazia(this.cenario8DoJogo),
 			criarCamadaVazia(this.cenario9DoJogo)
 		};
+		this.cenarios = criarCenarios();
 		this.cenarioAtualIndex = 0;
 		atualizarCenarioValido();
+	}
+
+	private Cenario[] criarCenarios() {
+		Cenario[] lista = new Cenario[] {
+			new Cenario(CenarioId.QUARTO, "Quarto", "inicio", "sonho",
+					this.todosOsCenarios[0], this.todosOsObjetos[0]),
+			new Cenario(CenarioId.QUEDA, "Queda", "queda", "sonho",
+					this.todosOsCenarios[1], this.todosOsObjetos[1]),
+			new Cenario(CenarioId.FLORESTA, "Floresta", "queda_concluida", "floresta",
+					this.todosOsCenarios[2], this.todosOsObjetos[2]),
+			new Cenario(CenarioId.BOSQUE_ARI, "Bosque de Ari", "bosque_ari", "floresta",
+					this.todosOsCenarios[3], this.todosOsObjetos[3]),
+			new Cenario(CenarioId.RUINAS, "Ruinas", "ruinas", "floresta",
+					this.todosOsCenarios[4], this.todosOsObjetos[4]),
+			new Cenario(CenarioId.REGIAO_PRINCIPAL, "Regiao principal", "regiao_principal", "floresta",
+					this.todosOsCenarios[5], this.todosOsObjetos[5]),
+			new Cenario(CenarioId.AREA_MEMORIA, "Area de memoria", "chave_prata", "tensao",
+					this.todosOsCenarios[6], this.todosOsObjetos[6]),
+			new Cenario(CenarioId.ARENA_BOSS, "Arena do Esquecido", "antes_boss", "boss",
+					this.todosOsCenarios[7], this.todosOsObjetos[7]),
+			new Cenario(CenarioId.TRILHA_LATERAL, "Trilha lateral", "trilha_lateral", "floresta",
+					this.todosOsCenarios[8], this.todosOsObjetos[8])
+		};
+
+		lista[CenarioId.RUINAS.indice()].adicionarPortal(Portal.porTiles(
+				"ruinas_para_regiao_principal",
+				CenarioId.RUINAS,
+				15,
+				1,
+				1,
+				1,
+				CenarioId.REGIAO_PRINCIPAL,
+				725,
+				400,
+				null,
+				false
+		));
+
+		lista[CenarioId.REGIAO_PRINCIPAL.indice()].adicionarPortal(Portal.porTiles(
+				"regiao_principal_para_boss",
+				CenarioId.REGIAO_PRINCIPAL,
+				15,
+				0,
+				2,
+				2,
+				CenarioId.ARENA_BOSS,
+				752,
+				290,
+				"chave_boss_63",
+				true
+		));
+
+		return lista;
 	}
 
 	public void irParaProximoCenario() {
@@ -275,6 +330,31 @@ public class tileMap {
 
 	public int getCenarioAtualIndex() {
 		return this.cenarioAtualIndex;
+	}
+
+	public Cenario getCenarioAtual() {
+		if (this.cenarios == null
+				|| this.cenarioAtualIndex < 0
+				|| this.cenarioAtualIndex >= this.cenarios.length) {
+			return null;
+		}
+
+		return this.cenarios[this.cenarioAtualIndex];
+	}
+
+	public Portal getPortalNaArea(Rectangle area) {
+		Cenario cenarioAtual = getCenarioAtual();
+		if (cenarioAtual == null || area == null) {
+			return null;
+		}
+
+		for (Portal portal : cenarioAtual.getPortais()) {
+			if (portal.intersecta(area)) {
+				return portal;
+			}
+		}
+
+		return null;
 	}
 
 	private int[][] criarCamadaVazia(int[][] cenarioBase) {

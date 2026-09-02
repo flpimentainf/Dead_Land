@@ -1,11 +1,10 @@
 package DEAD.LAND.world;
 
+import DEAD.LAND.core.ResourceManager;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.swing.ImageIcon;
 
 public class tiles {
     public static final int LARGURA = 48;
@@ -76,7 +75,7 @@ public class tiles {
     }
 
     private Image carregarImagem(String caminho) {
-        return new ImageIcon(caminho).getImage();
+        return ResourceManager.getInstancia().carregarImagem(caminho);
     }
 
     private void carregarTodasImagens() {

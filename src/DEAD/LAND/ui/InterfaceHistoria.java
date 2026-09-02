@@ -19,7 +19,7 @@ public class InterfaceHistoria {
             desenharEscurecimento(g2, largura, altura);
         }
 
-        desenharObjetivo(g2, largura, historia.getObjetivoAtual());
+        desenharObjetivo(g2, largura, historia);
 
         if (historia.isExibindoEscolha()) {
             desenharEscolha(g2, largura, altura, historia);
@@ -43,12 +43,22 @@ public class InterfaceHistoria {
         g2.fillRect(0, 0, largura, altura);
     }
 
-    private void desenharObjetivo(Graphics2D g2, int largura, String objetivoAtual) {
+    private void desenharObjetivo(Graphics2D g2, int largura, SistemaHistoria historia) {
+        String objetivoAtual = historia.getObjetivoAtual();
+        String objetivoSecundario = historia.getObjetivoSecundario();
+        boolean temSecundario = objetivoSecundario != null && !objetivoSecundario.trim().isEmpty();
         g2.setFont(new Font("Arial", Font.BOLD, 16));
         g2.setColor(new Color(0, 0, 0, 150));
-        g2.fillRoundRect(20, 18, Math.min(largura - 40, 560), 34, 12, 12);
+        int alturaCaixa = temSecundario ? 56 : 34;
+        g2.fillRoundRect(20, 18, Math.min(largura - 40, 600), alturaCaixa, 12, 12);
         g2.setColor(Color.WHITE);
         g2.drawString("Missão: " + objetivoAtual, 34, 41);
+
+        if (temSecundario) {
+            g2.setFont(new Font("Arial", Font.PLAIN, 13));
+            g2.setColor(new Color(215, 215, 215));
+            g2.drawString("Secundária: " + objetivoSecundario, 34, 62);
+        }
     }
 
     private void desenharEscolha(Graphics2D g2, int largura, int altura, SistemaHistoria historia) {

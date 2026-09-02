@@ -3,6 +3,7 @@ package DEAD.LAND.core;
 import DEAD.LAND.entity.NPC;
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.ui.panel;
+import DEAD.LAND.world.Portal;
 import DEAD.LAND.world.tileMap;
 
 public class ControladorInteracao {
@@ -80,40 +81,38 @@ public class ControladorInteracao {
                 return;
             }
 
-            if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 4) {
+            Portal portal = cenaDoJogo.getCenario().getPortalNaArea(interacao.area);
+            if (portal != null) {
+                if (!podeUsarPortal(cenaDoJogo, portal)) {
+                    mostrarPortaTrancada(cenaDoJogo, portal.isPortaDoBoss());
+                    AudioManager.getInstancia().tocarEfeito("porta_trancada");
+                    return;
+                }
 
                 cenaDoJogo.irParaCenario(
-                        5,
-                        JOGADOR_X_APOS_PORTA,
-                        JOGADOR_Y_APOS_PORTA
+                        portal.getDestinoIndex(),
+                        portal.getDestinoX(),
+                        portal.getDestinoY()
                 );
+                AudioManager.getInstancia().tocarEfeito("porta");
+                cenaDoJogo.salvarAuto();
                 avisarEntradaNoCenario(cenaDoJogo);
                 return;
             }
 
             if (cenaDoJogo.getCenario().getCenarioAtualIndex() == 5) {
-                if (interacao.area.y == 0) {
-                    if (!cenaDoJogo.getInventario().temChaveBoss63()) {
-                        mostrarPortaTrancada(cenaDoJogo, true);
-                        return;
-                    }
-                    else if (cenaDoJogo.getInventario().temChaveBoss63()) {
-                        cenaDoJogo.irParaCenario(
-                        7,
-                        752,
-                        290
-                );
-                        avisarEntradaNoCenario(cenaDoJogo);
-                    }
-                } else {
+                if (interacao.area.y != 0) {
                     if (!cenaDoJogo.getInventario().temChave()) {
                         mostrarPortaTrancada(cenaDoJogo, false);
+                        AudioManager.getInstancia().tocarEfeito("porta_trancada");
                         return;
                     }
                     else if (cenaDoJogo.getInventario().temChave()) {
                         cenaDoJogo.getCenario().definirTile(6, 22, 61);
                         cenaDoJogo.getCenario().definirTile(6, 23, 61);
 
+                        AudioManager.getInstancia().tocarEfeito("porta");
+                        cenaDoJogo.salvarAutoForcado();
                         cenaDoJogo.repaint();
                         return;
                     }
@@ -127,6 +126,22 @@ public class ControladorInteracao {
         if (cenaDoJogo.getHistoria() != null) {
             cenaDoJogo.getHistoria().eventoPortaSemChave(portaDoBoss);
         }
+    }
+
+    private boolean podeUsarPortal(panel cenaDoJogo, Portal portal) {
+        if (portal.getItemNecessario() == null) {
+            return true;
+        }
+
+        if (portal.requerItem("chave")) {
+            return cenaDoJogo.getInventario().temChave();
+        }
+
+        if (portal.requerItem("chave_boss_63")) {
+            return cenaDoJogo.getInventario().temChaveBoss63();
+        }
+
+        return false;
     }
 
     private void avisarEntradaNoCenario(panel cenaDoJogo) {

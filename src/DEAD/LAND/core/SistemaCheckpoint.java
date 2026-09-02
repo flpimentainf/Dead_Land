@@ -62,8 +62,14 @@ public class SistemaCheckpoint {
         }
 
         Set<String> itensPreservados = new LinkedHashSet<String>(checkpointAtual.itensImportantes);
+        Set<String> coletasPreservadas = new LinkedHashSet<String>(checkpointAtual.itensImportantes);
+        coletasPreservadas.addAll(checkpointAtual.memoriasDescobertas);
         if (cenaDoJogo.getInventario() != null) {
             itensPreservados.addAll(cenaDoJogo.getInventario().getNomesItens());
+            coletasPreservadas.addAll(cenaDoJogo.getInventario().getNomesItens());
+        }
+        if (cenaDoJogo.getMemoryManager() != null) {
+            coletasPreservadas.addAll(cenaDoJogo.getMemoryManager().getIdsDescobertas());
         }
 
         boolean bossDerrotado = checkpointAtual.bossDerrotado
@@ -84,13 +90,25 @@ public class SistemaCheckpoint {
 
         if (cenaDoJogo.getControladorItens() != null && cenaDoJogo.getInventario() != null) {
             cenaDoJogo.getControladorItens().restaurarColetas(
-                    itensPreservados,
+                    coletasPreservadas,
                     cenaDoJogo.getCenario()
             );
             cenaDoJogo.getInventario().substituirPorItens(
-                    cenaDoJogo.getControladorItens().getItensPorNomes(itensPreservados)
+                    cenaDoJogo.getControladorItens().getItensPorNomes(itensPreservados),
+                    checkpointAtual.flechas,
+                    checkpointAtual.fragmentosCura
             );
             cenaDoJogo.atualizarInventario();
+        }
+
+        if (cenaDoJogo.getMemoryManager() != null) {
+            Set<String> memorias = new LinkedHashSet<String>(checkpointAtual.memoriasDescobertas);
+            memorias.addAll(coletasPreservadas);
+            cenaDoJogo.getMemoryManager().definirDescobertas(memorias);
+        }
+
+        if (cenaDoJogo.getSistemaVontade() != null) {
+            cenaDoJogo.getSistemaVontade().definirVontade(checkpointAtual.vontade);
         }
 
         if (cenaDoJogo.getControladorInimigos() != null) {
@@ -120,6 +138,7 @@ public class SistemaCheckpoint {
         }
 
         registrar(id, cenaDoJogo);
+        cenaDoJogo.salvarAuto();
     }
 
     private void registrar(String id, panel cenaDoJogo) {
@@ -132,6 +151,18 @@ public class SistemaCheckpoint {
         Set<String> itens = cenaDoJogo.getInventario() == null
                 ? new LinkedHashSet<String>()
                 : cenaDoJogo.getInventario().getNomesItens();
+        Set<String> memorias = cenaDoJogo.getMemoryManager() == null
+                ? new LinkedHashSet<String>()
+                : cenaDoJogo.getMemoryManager().getIdsDescobertas();
+        int flechas = cenaDoJogo.getInventario() == null
+                ? 0
+                : cenaDoJogo.getInventario().getQuantidadeFlechas();
+        int fragmentosCura = cenaDoJogo.getInventario() == null
+                ? 0
+                : cenaDoJogo.getInventario().getQuantidadeCura();
+        int vontade = cenaDoJogo.getSistemaVontade() == null
+                ? SistemaVontade.VONTADE_MAXIMA
+                : cenaDoJogo.getSistemaVontade().getVontade();
 
         SistemaHistoria.ProgressoHistoria progresso = cenaDoJogo.getHistoria() == null
                 ? null
@@ -147,6 +178,10 @@ public class SistemaCheckpoint {
                 cenaDoJogo.getJogador().y,
                 cenaDoJogo.getJogador().getVida(),
                 itens,
+                flechas,
+                fragmentosCura,
+                vontade,
+                memorias,
                 progresso,
                 bossDerrotado
         );
@@ -160,6 +195,10 @@ public class SistemaCheckpoint {
         private final int jogadorY;
         private final int vida;
         private final Set<String> itensImportantes;
+        private final int flechas;
+        private final int fragmentosCura;
+        private final int vontade;
+        private final Set<String> memoriasDescobertas;
         private final SistemaHistoria.ProgressoHistoria progressoHistoria;
         private final boolean bossDerrotado;
 
@@ -170,6 +209,10 @@ public class SistemaCheckpoint {
                 int jogadorY,
                 int vida,
                 Set<String> itensImportantes,
+                int flechas,
+                int fragmentosCura,
+                int vontade,
+                Set<String> memoriasDescobertas,
                 SistemaHistoria.ProgressoHistoria progressoHistoria,
                 boolean bossDerrotado
         ) {
@@ -179,6 +222,10 @@ public class SistemaCheckpoint {
             this.jogadorY = jogadorY;
             this.vida = vida;
             this.itensImportantes = new LinkedHashSet<String>(itensImportantes);
+            this.flechas = flechas;
+            this.fragmentosCura = fragmentosCura;
+            this.vontade = vontade;
+            this.memoriasDescobertas = new LinkedHashSet<String>(memoriasDescobertas);
             this.progressoHistoria = progressoHistoria;
             this.bossDerrotado = bossDerrotado;
         }

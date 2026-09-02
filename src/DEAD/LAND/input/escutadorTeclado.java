@@ -7,6 +7,8 @@ public class escutadorTeclado implements KeyListener{
 	public boolean movePraBaixo, movePraCima, movePraEsq, movePraDir;
 	public boolean interagir;
 	public boolean atirar;
+	public boolean dash;
+	public boolean usarItem;
 	public boolean confirmar;
 	public boolean abrirMenu;
 
@@ -17,6 +19,8 @@ public class escutadorTeclado implements KeyListener{
 		movePraDir = false;
 		interagir = false;
 		atirar = false;
+		dash = false;
+		usarItem = false;
 		confirmar = false;
 		abrirMenu = false;
 	}
@@ -56,6 +60,12 @@ public class escutadorTeclado implements KeyListener{
 		case KeyEvent.VK_SPACE:
 			this.atirar = true;
 			break;
+		case KeyEvent.VK_SHIFT:
+			this.dash = true;
+			break;
+		case KeyEvent.VK_Q:
+			this.usarItem = true;
+			break;
 		default:
 			System.out.println("Tecla sem Efeito");
 			break;
@@ -90,6 +100,12 @@ public class escutadorTeclado implements KeyListener{
 			break;
 		case KeyEvent.VK_SPACE:
 			this.atirar = false;
+			break;
+		case KeyEvent.VK_SHIFT:
+			this.dash = false;
+			break;
+		case KeyEvent.VK_Q:
+			this.usarItem = false;
 			break;
 		default:
 			System.out.println("Tecla sem Efeito");

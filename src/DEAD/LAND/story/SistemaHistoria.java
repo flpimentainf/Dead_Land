@@ -1,6 +1,7 @@
 package DEAD.LAND.story;
 
 import DEAD.LAND.input.escutadorTeclado;
+import DEAD.LAND.core.MemoryManager;
 import DEAD.LAND.ui.panel;
 import java.awt.Toolkit;
 import java.util.ArrayList;
@@ -12,6 +13,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public class SistemaHistoria {
+    private static final String EVENTO_CACADOR_RECOMPENSA = "cacador_recompensa";
+    private static final String EVENTO_ECO_VONTADE = "eco_vontade";
+    private static final int MEMORIAS_PARA_RECOMPENSA = 3;
+
     private enum TipoEscolha {
         NENHUMA,
         FINAL,
@@ -34,7 +39,9 @@ public class SistemaHistoria {
     public static class ProgressoHistoria {
         private final Estado estado;
         private final String objetivoAtual;
+        private final String objetivoSecundario;
         private final Set<String> npcsConhecidos;
+        private final Set<String> eventosHistoria;
         private final int tentativasMenu;
         private final boolean confrontoBossApresentado;
         private final boolean finalNotificado;
@@ -42,14 +49,18 @@ public class SistemaHistoria {
         private ProgressoHistoria(
                 Estado estado,
                 String objetivoAtual,
+                String objetivoSecundario,
                 Set<String> npcsConhecidos,
+                Set<String> eventosHistoria,
                 int tentativasMenu,
                 boolean confrontoBossApresentado,
                 boolean finalNotificado
         ) {
             this.estado = estado;
             this.objetivoAtual = objetivoAtual;
+            this.objetivoSecundario = objetivoSecundario;
             this.npcsConhecidos = new HashSet<String>(npcsConhecidos);
+            this.eventosHistoria = new HashSet<String>(eventosHistoria);
             this.tentativasMenu = tentativasMenu;
             this.confrontoBossApresentado = confrontoBossApresentado;
             this.finalNotificado = finalNotificado;
@@ -58,6 +69,7 @@ public class SistemaHistoria {
 
     private Estado estado = Estado.QUARTO;
     private String objetivoAtual = "Deite-se na cama.";
+    private String objetivoSecundario = "";
     private List<String> mensagem = new ArrayList<String>();
     private boolean exibindoMensagem = true;
     private boolean exibindoEscolha;
@@ -69,6 +81,7 @@ public class SistemaHistoria {
     private boolean teclaBaixoPressionada;
     private boolean telaEscura;
     private final Set<String> npcsConhecidos = new HashSet<String>();
+    private final Set<String> eventosHistoria = new HashSet<String>();
     private TipoEscolha tipoEscolha = TipoEscolha.NENHUMA;
     private String npcEscolhaId;
     private String nomeNpcFalando;
@@ -130,7 +143,7 @@ public class SistemaHistoria {
                 concluirEscolhaNpc(cenaDoJogo);
             } else {
                 if (opcaoEscolhida == 0) {
-                    iniciarFinalAcordar();
+                    iniciarFinalAcordar(cenaDoJogo);
                 } else {
                     iniciarFinalFicar(cenaDoJogo);
                 }
@@ -206,6 +219,26 @@ public class SistemaHistoria {
 
         this.nomeNpcFalando = nomeExibicaoNpc(npcId);
 
+        if ("sobrevivente_perdido".equals(npcId)) {
+            conversarComSobrevivente(npcId);
+            return;
+        }
+
+        if ("eco".equals(npcId)) {
+            conversarComEco(npcId, cenaDoJogo);
+            return;
+        }
+
+        if ("cacador_memorias".equals(npcId)) {
+            conversarComCacador(npcId, cenaDoJogo);
+            return;
+        }
+
+        if ("alma_esquecida".equals(npcId)) {
+            conversarComAlma(npcId);
+            return;
+        }
+
         if (npcsConhecidos.contains(npcId)) {
             iniciarEscolhaNpc(npcId);
             return;
@@ -277,6 +310,110 @@ public class SistemaHistoria {
         mostrarMensagem(RoteiroHistoria.npcDesconhecido());
     }
 
+    private void conversarComSobrevivente(String npcId) {
+        boolean primeiraConversa = npcsConhecidos.add(npcId);
+        if (primeiraConversa && objetivoSecundario.trim().isEmpty()) {
+            objetivoSecundario = "Encontre 3 fragmentos de memoria.";
+        }
+
+        mostrarMensagem(
+                "Sobrevivente perdido",
+                primeiraConversa
+                        ? "Os esqueletos carregam flechas quebradas. As vezes ainda servem."
+                        : "Se ficar sem flechas, recue e procure restos depois das lutas.",
+                "Algumas criaturas podem deixar municao ou cura."
+        );
+    }
+
+    private void conversarComEco(String npcId, panel cenaDoJogo) {
+        npcsConhecidos.add(npcId);
+
+        if (!eventosHistoria.contains(EVENTO_ECO_VONTADE)) {
+            eventosHistoria.add(EVENTO_ECO_VONTADE);
+            if (cenaDoJogo != null && cenaDoJogo.getSistemaVontade() != null) {
+                cenaDoJogo.getSistemaVontade().recuperar(15);
+            }
+            if (cenaDoJogo != null && cenaDoJogo.getFeedback() != null) {
+                cenaDoJogo.getFeedback().mostrarMensagemCentro("Vontade restaurada");
+            }
+            mostrarMensagem(
+                    "Eco",
+                    "Dead Land repete o medo ate voce acreditar que ele e seu.",
+                    "Respire. Nem toda voz aqui e sua."
+            );
+            return;
+        }
+
+        mostrarMensagem(
+                "Eco",
+                "Quando a Vontade cai, o mundo mente melhor.",
+                "Memorias e checkpoints ajudam a manter voce inteiro."
+        );
+    }
+
+    private void conversarComCacador(String npcId, panel cenaDoJogo) {
+        npcsConhecidos.add(npcId);
+        int memorias = cenaDoJogo != null && cenaDoJogo.getMemoryManager() != null
+                ? cenaDoJogo.getMemoryManager().getQuantidadeDescoberta()
+                : 0;
+
+        if (memorias >= MEMORIAS_PARA_RECOMPENSA
+                && !eventosHistoria.contains(EVENTO_CACADOR_RECOMPENSA)) {
+            eventosHistoria.add(EVENTO_CACADOR_RECOMPENSA);
+            objetivoSecundario = "Ajuda do Cacador concluida.";
+            if (cenaDoJogo != null && cenaDoJogo.getInventario() != null) {
+                cenaDoJogo.getInventario().adicionarFlechas(6);
+                cenaDoJogo.getInventario().definirQuantidadeCura(
+                        cenaDoJogo.getInventario().getQuantidadeCura() + 1
+                );
+                cenaDoJogo.atualizarInventario();
+            }
+            if (cenaDoJogo != null && cenaDoJogo.getFeedback() != null) {
+                cenaDoJogo.getFeedback().mostrarMensagemCentro("Recompensa recebida");
+            }
+            if (cenaDoJogo != null) {
+                cenaDoJogo.salvarAutoForcado();
+            }
+            mostrarMensagem(
+                    "Cacador",
+                    "Tres lembrancas ja sao uma trilha. Pegue isto.",
+                    "Voce recebeu flechas e um Fragmento de Memoria."
+            );
+            return;
+        }
+
+        if (!eventosHistoria.contains(EVENTO_CACADOR_RECOMPENSA)) {
+            objetivoSecundario = "Encontre 3 fragmentos de memoria.";
+            mostrarMensagem(
+                    "Cacador",
+                    "Traga tres fragmentos de memoria e eu divido meus suprimentos.",
+                    "Memorias encontradas: " + memorias + "/" + MEMORIAS_PARA_RECOMPENSA
+            );
+            return;
+        }
+
+        mostrarMensagem(
+                "Cacador",
+                "Use o dash antes de atirar. O Esquecido odeia alvo que se move.",
+                "Nao gaste suas ultimas flechas sem carga."
+        );
+    }
+
+    private void conversarComAlma(String npcId) {
+        boolean primeiraConversa = npcsConhecidos.add(npcId);
+        if (primeiraConversa && objetivoSecundario.trim().isEmpty()) {
+            objetivoSecundario = "Descubra por que o menu reage ao medo.";
+        }
+
+        mostrarMensagem(
+                "Alma esquecida",
+                primeiraConversa
+                        ? "Algumas saidas so aparecem quando voce insiste no impossivel."
+                        : "Tres tentativas diante da escolha final podem abrir outro caminho.",
+                "A floresta observa ate o que voce tenta evitar."
+        );
+    }
+
     private void iniciarEscolhaNpc(String npcId) {
         this.npcEscolhaId = npcId;
         this.tipoEscolha = TipoEscolha.NPC;
@@ -338,7 +475,7 @@ public class SistemaHistoria {
     }
 
     public void eventoItemColetado(String nome) {
-        if (nome == null || nome.isBlank()) return;
+        if (nome == null || nome.trim().isEmpty()) return;
 
         if ("chave".equals(nome)) {
             estado = Estado.BUSCA_MEMORIA;
@@ -354,6 +491,10 @@ public class SistemaHistoria {
 
         if ("flecha".equals(nome)) {
             mostrarMensagem(RoteiroHistoria.flechaColetada());
+            return;
+        }
+
+        if (nome.startsWith("memoria_")) {
             return;
         }
 
@@ -410,12 +551,15 @@ public class SistemaHistoria {
         mostrarMensagemSemAbrirCaixa(linhas);
     }
 
-    private void iniciarFinalAcordar() {
+    private void iniciarFinalAcordar(panel cenaDoJogo) {
         exibindoEscolha = false;
         tipoEscolha = TipoEscolha.NENHUMA;
         estado = Estado.FINAL_ACORDAR;
         objetivoAtual = "Fim.";
-        mostrarMensagem(RoteiroHistoria.finalAcordar());
+        mostrarMensagem(comComplementoDeMemoria(
+                RoteiroHistoria.finalAcordar(),
+                complementoFinalPorMemorias(cenaDoJogo)
+        ));
     }
 
     private void iniciarFinalFicar(panel cenaDoJogo) {
@@ -433,6 +577,27 @@ public class SistemaHistoria {
         estado = Estado.FINAL_SECRETO;
         objetivoAtual = "Loop reiniciado.";
         mostrarMensagem(RoteiroHistoria.finalSecreto());
+    }
+
+    private String complementoFinalPorMemorias(panel cenaDoJogo) {
+        if (cenaDoJogo == null || cenaDoJogo.getMemoryManager() == null) {
+            return "Algumas lembrancas ficaram presas na floresta.";
+        }
+
+        int percentual = cenaDoJogo.getMemoryManager().getPercentualConclusao();
+        if (percentual >= 100) {
+            return "Com todas as memorias, voce acorda lembrando quem precisou deixar para tras.";
+        }
+        if (percentual >= 30) {
+            return "Voce acorda com partes suficientes de si para continuar.";
+        }
+        return "Voce acorda, mas Dead Land ainda guarda quase tudo que era seu.";
+    }
+
+    private String[] comComplementoDeMemoria(String[] base, String complemento) {
+        String[] resultado = Arrays.copyOf(base, base.length + 1);
+        resultado[base.length] = complemento;
+        return resultado;
     }
 
     private void mostrarMensagem(String... linhas) {
@@ -470,7 +635,9 @@ public class SistemaHistoria {
         return new ProgressoHistoria(
                 estado,
                 objetivoAtual,
+                objetivoSecundario,
                 npcsConhecidos,
+                eventosHistoria,
                 tentativasMenu,
                 confrontoBossApresentado,
                 finalNotificado
@@ -482,8 +649,11 @@ public class SistemaHistoria {
         if (progresso != null) {
             this.estado = progresso.estado;
             this.objetivoAtual = progresso.objetivoAtual;
+            this.objetivoSecundario = progresso.objetivoSecundario;
             this.npcsConhecidos.clear();
             this.npcsConhecidos.addAll(progresso.npcsConhecidos);
+            this.eventosHistoria.clear();
+            this.eventosHistoria.addAll(progresso.eventosHistoria);
             this.tentativasMenu = progresso.tentativasMenu;
             this.confrontoBossApresentado = progresso.confrontoBossApresentado;
             this.finalNotificado = progresso.finalNotificado;
@@ -546,12 +716,46 @@ public class SistemaHistoria {
         }
     }
 
+    public void eventoBossDerrotado() {
+        if (historiaFinalizada()) {
+            return;
+        }
+
+        objetivoAtual = "Fale com o Porteiro.";
+        mostrarMensagem(
+                "O Esquecido se desfaz em silêncio.",
+                "O Porteiro agora pode ouvir seus passos."
+        );
+    }
+
+    public void eventoMemoriaColetada(MemoryManager.Memoria memoria, int total, int encontradas) {
+        if (memoria == null || historiaFinalizada()) {
+            return;
+        }
+
+        if (!eventosHistoria.contains(EVENTO_CACADOR_RECOMPENSA)) {
+            objetivoSecundario = encontradas >= MEMORIAS_PARA_RECOMPENSA
+                    ? "Volte ao Cacador."
+                    : "Encontre 3 fragmentos de memoria.";
+        }
+
+        mostrarMensagem(
+                memoria.getTitulo(),
+                memoria.getDescricao(),
+                "Memorias: " + encontradas + "/" + total
+        );
+    }
+
     public Estado getEstado() {
         return estado;
     }
 
     public String getObjetivoAtual() {
         return objetivoAtual;
+    }
+
+    public String getObjetivoSecundario() {
+        return objetivoSecundario;
     }
 
     public List<String> getMensagem() {
@@ -594,11 +798,102 @@ public class SistemaHistoria {
         return npcsConhecidos.contains(npcId);
     }
 
+    public Set<String> getNpcsConhecidos() {
+        return new HashSet<String>(npcsConhecidos);
+    }
+
+    public Set<String> getEventosHistoria() {
+        return new HashSet<String>(eventosHistoria);
+    }
+
+    public boolean isConfrontoBossApresentado() {
+        return confrontoBossApresentado;
+    }
+
+    public String getSimboloNpc(String npcId, panel cenaDoJogo) {
+        if (npcId == null || npcId.trim().isEmpty()) {
+            return "";
+        }
+
+        if ("cacador_memorias".equals(npcId)) {
+            boolean recompensa = eventosHistoria.contains(EVENTO_CACADOR_RECOMPENSA);
+            int memorias = cenaDoJogo != null && cenaDoJogo.getMemoryManager() != null
+                    ? cenaDoJogo.getMemoryManager().getQuantidadeDescoberta()
+                    : 0;
+            if (recompensa) return "✓";
+            if (memorias >= MEMORIAS_PARA_RECOMPENSA || !npcsConhecidos.contains(npcId)) return "!";
+            return "?";
+        }
+
+        if ("porteiro_morto".equals(npcId)) {
+            boolean bossDerrotado = cenaDoJogo != null
+                    && cenaDoJogo.getControladorInimigos() != null
+                    && cenaDoJogo.getControladorInimigos().bossFoiDerrotado();
+            return bossDerrotado ? "!" : "?";
+        }
+
+        if ("sobrevivente_perdido".equals(npcId)
+                || "eco".equals(npcId)
+                || "alma_esquecida".equals(npcId)) {
+            return npcsConhecidos.contains(npcId) ? "✓" : "!";
+        }
+
+        if (!npcsConhecidos.contains(npcId)) {
+            return "!";
+        }
+
+        if ("guardiao_memoria".equals(npcId)
+                && cenaDoJogo != null
+                && cenaDoJogo.getInventario().temChaveBoss63()) {
+            return "✓";
+        }
+
+        return "?";
+    }
+
+    public void restaurarEstadoPersistido(String estadoNome, String objetivo,
+            Set<String> npcs, boolean bossApresentado) {
+        restaurarEstadoPersistido(estadoNome, objetivo, "", npcs, new HashSet<String>(), bossApresentado);
+    }
+
+    public void restaurarEstadoPersistido(String estadoNome, String objetivo,
+            String objetivoSecundario, Set<String> npcs, Set<String> eventos,
+            boolean bossApresentado) {
+        try {
+            this.estado = Estado.valueOf(estadoNome);
+        } catch (Exception e) {
+            this.estado = Estado.QUARTO;
+        }
+
+        this.objetivoAtual = objetivo == null || objetivo.trim().isEmpty()
+                ? "Explore Dead Land."
+                : objetivo;
+        this.objetivoSecundario = objetivoSecundario == null ? "" : objetivoSecundario;
+        this.npcsConhecidos.clear();
+        if (npcs != null) {
+            this.npcsConhecidos.addAll(npcs);
+        }
+        this.eventosHistoria.clear();
+        if (eventos != null) {
+            this.eventosHistoria.addAll(eventos);
+        }
+        this.confrontoBossApresentado = bossApresentado;
+        this.exibindoMensagem = false;
+        this.exibindoEscolha = false;
+        this.tipoEscolha = TipoEscolha.NENHUMA;
+        this.mensagem.clear();
+        this.telaEscura = false;
+    }
+
     private String nomeExibicaoNpc(String npcId) {
         if ("ari".equals(npcId)) return "Ari";
         if ("mara".equals(npcId)) return "Mara";
         if ("guardiao_memoria".equals(npcId)) return "Guardião";
         if ("porteiro_morto".equals(npcId)) return "Porteiro";
+        if ("sobrevivente_perdido".equals(npcId)) return "Sobrevivente perdido";
+        if ("eco".equals(npcId)) return "Eco";
+        if ("cacador_memorias".equals(npcId)) return "Cacador";
+        if ("alma_esquecida".equals(npcId)) return "Alma esquecida";
         return "Desconhecido";
     }
 

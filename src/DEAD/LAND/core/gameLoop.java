@@ -25,6 +25,9 @@ public class gameLoop implements ActionListener {
 	private final escutadorTeclado teclado;
 
 	private int atualizacoesDesdeUltimoSprite;
+	private boolean usarItemPressionado;
+	private int vidaJogadorAnterior = -1;
+	private String musicaAtual = "";
 
     public gameLoop(panel P, escutadorTeclado ET) {
 		this.cenaDoJogo = P;
@@ -58,6 +61,7 @@ public class gameLoop implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		atualizarJogo();
+		registrarFeedbackDanoJogador();
 		atualizarSpriteQuandoNecessario();
 		this.cenaDoJogo.repaint();
 	}
@@ -80,6 +84,12 @@ public class gameLoop implements ActionListener {
 				this.cenaDoJogo.getCenario(),
 				this.verificadorEfeitos
 		);
+		atualizarSistemasDeFeedback();
+
+		if (this.cenaDoJogo.atualizarMenuPausa(this.teclado)) {
+			this.controladorInteracao.resetar();
+			return;
+		}
 
 		if (this.cenaDoJogo.getHistoria() != null) {
 			this.cenaDoJogo.getHistoria().atualizar(this.cenaDoJogo, this.teclado);
@@ -100,12 +110,14 @@ public class gameLoop implements ActionListener {
 		this.controladorMovimento.atualizar(this.cenaDoJogo, this.teclado);
 		this.controladorNPCs.atualizar(this.cenaDoJogo);
 		this.controladorInteracao.atualizar(this.cenaDoJogo, this.teclado);
+		atualizarUsoDeConsumivel();
 		this.controladorItens.atualizar(this.cenaDoJogo, this.teclado);
 
 		if (this.controladorFlechas != null) {
 			this.controladorFlechas.atualizar(this.cenaDoJogo, this.teclado);
 		}
 		this.controladorInimigos.atualizar(this.cenaDoJogo, this.controladorFlechas);
+		atualizarAudioContextual();
 		atualizarCheckpointsAutomaticos();
 	}
 
@@ -115,7 +127,84 @@ public class gameLoop implements ActionListener {
 		}
 	}
 
+	private void atualizarSistemasDeFeedback() {
+		if (this.cenaDoJogo.getFeedback() != null) {
+			this.cenaDoJogo.getFeedback().atualizar();
+		}
+
+		if (this.cenaDoJogo.getSistemaVontade() == null) {
+			return;
+		}
+
+		this.cenaDoJogo.getSistemaVontade().atualizar();
+		if (this.cenaDoJogo.getSistemaVontade().consumirDesistenciaPendente()
+				&& this.cenaDoJogo.getSistemaCheckpoint() != null) {
+			this.cenaDoJogo.getSistemaCheckpoint().restaurar(this.cenaDoJogo);
+			this.cenaDoJogo.getSistemaVontade().recuperar(20);
+			if (this.cenaDoJogo.getFeedback() != null) {
+				this.cenaDoJogo.getFeedback().mostrarMensagemCentro("Sua vontade quase se perdeu");
+			}
+		}
+	}
+
+	private void atualizarUsoDeConsumivel() {
+		if (!this.teclado.usarItem) {
+			this.usarItemPressionado = false;
+			return;
+		}
+
+		if (this.usarItemPressionado) {
+			return;
+		}
+
+		this.usarItemPressionado = true;
+		if (this.cenaDoJogo.getInventario().usarCura(this.cenaDoJogo.getJogador())) {
+			this.cenaDoJogo.atualizarInventario();
+			if (this.cenaDoJogo.getFeedback() != null) {
+				this.cenaDoJogo.getFeedback().mostrarMensagemCentro("Fragmento de Memoria usado");
+			}
+			AudioManager.getInstancia().tocarEfeito("cura");
+		}
+	}
+
+	private void registrarFeedbackDanoJogador() {
+		if (this.cenaDoJogo.getJogador() == null) {
+			return;
+		}
+
+		int vidaAtual = this.cenaDoJogo.getJogador().getVida();
+		if (this.vidaJogadorAnterior >= 0 && vidaAtual < this.vidaJogadorAnterior) {
+			AudioManager.getInstancia().tocarEfeito("jogador_dano");
+			if (this.cenaDoJogo.getCamera() != null) {
+				this.cenaDoJogo.getCamera().iniciarTremor(3, 8);
+			}
+		}
+		this.vidaJogadorAnterior = vidaAtual;
+	}
+
+	private void atualizarAudioContextual() {
+		String novaMusica;
+		if (this.cenaDoJogo.getCenario().getCenarioAtualIndex() == 7) {
+			novaMusica = "boss";
+		} else if (this.cenaDoJogo.existeCombateAtivo()) {
+			novaMusica = "tensao";
+		} else if (this.cenaDoJogo.getCenario().getCenarioAtualIndex() <= 1) {
+			novaMusica = "sonho";
+		} else {
+			novaMusica = "floresta";
+		}
+
+		if (!novaMusica.equals(this.musicaAtual)) {
+			this.musicaAtual = novaMusica;
+			AudioManager.getInstancia().trocarMusica(novaMusica);
+		}
+	}
+
 	private void atualizarSpriteQuandoNecessario() {
+		if (this.cenaDoJogo.isMenuPausaAberto()) {
+			return;
+		}
+
 		if (this.cenaDoJogo.getSistemaMorte() != null
 				&& this.cenaDoJogo.getSistemaMorte().bloqueiaControle()) {
 			return;

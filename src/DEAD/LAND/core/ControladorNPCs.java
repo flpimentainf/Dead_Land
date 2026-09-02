@@ -17,6 +17,10 @@ public class ControladorNPCs {
         adicionarNPC("mara", "Mara", 2, 5, 14, 7, true);
         adicionarNPC("guardiao_memoria", "Guardião", 3, 6, 4, 7, false);
         adicionarNPC("porteiro_morto", "Porteiro", 4, 7, 24, 6, false);
+        adicionarNPC("sobrevivente_perdido", "Sobrevivente", 5, 5, 6, 7, true);
+        adicionarNPC("eco", "Eco", 6, 2, 22, 6, false);
+        adicionarNPC("cacador_memorias", "Cacador", 7, 6, 20, 4, true);
+        adicionarNPC("alma_esquecida", "Alma", 8, 8, 16, 6, false);
     }
 
     private void adicionarNPC(String id, String nome, int numeroNpc, int cenarioIndex,
@@ -46,7 +50,7 @@ public class ControladorNPCs {
                 npc.desenhar(
                         g2,
                         getSimboloEstado(npc, cenaDoJogo),
-                        cenaDoJogo.getInventario().temChaveBoss63()
+                        npcDeveBrilhar(npc, cenaDoJogo)
                 );
             }
         }
@@ -85,15 +89,20 @@ public class ControladorNPCs {
     }
 
     private String getSimboloEstado(NPC npc, panel cenaDoJogo) {
-        boolean falou = cenaDoJogo.getHistoria() != null
-                && cenaDoJogo.getHistoria().jaFalouComNpc(npc.getId());
+        if (cenaDoJogo.getHistoria() == null) {
+            return "";
+        }
 
-        if (cenaDoJogo.getInventario().temChaveBoss63()) {
-            return "✓";
+        return cenaDoJogo.getHistoria().getSimboloNpc(npc.getId(), cenaDoJogo);
+    }
+
+    private boolean npcDeveBrilhar(NPC npc, panel cenaDoJogo) {
+        if (npc == null || cenaDoJogo.getHistoria() == null) {
+            return false;
         }
-        if (!falou) {
-            return "!";
-        }
-        return "?";
+
+        String simbolo = cenaDoJogo.getHistoria().getSimboloNpc(npc.getId(), cenaDoJogo);
+        return "porteiro_morto".equals(npc.getId())
+                || ("cacador_memorias".equals(npc.getId()) && "!".equals(simbolo));
     }
 }

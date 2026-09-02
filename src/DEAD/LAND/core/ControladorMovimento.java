@@ -23,6 +23,22 @@ public class ControladorMovimento {
 
     public void atualizar(panel cenaDoJogo, escutadorTeclado teclado) {
         player jogador = cenaDoJogo.getJogador();
+
+        if (teclado.dash) {
+            jogador.iniciarDash(
+                    teclado.movePraEsq,
+                    teclado.movePraCima,
+                    teclado.movePraDir,
+                    teclado.movePraBaixo
+            );
+        }
+
+        if (jogador.atualizarDash(cenaDoJogo.getCenario(), this.verificadorDeColisao)) {
+            trocarCenarioAoSairPelasLaterais(cenaDoJogo);
+            trocarCenarioAoDescer(cenaDoJogo, 1);
+            return;
+        }
+
         int movimentoX = obterMovimentoEixo(teclado.movePraEsq, teclado.movePraDir, jogador.passo);
         int movimentoY = obterMovimentoEixo(teclado.movePraCima, teclado.movePraBaixo, jogador.passo);
 

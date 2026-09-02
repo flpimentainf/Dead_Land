@@ -6,7 +6,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
-import javax.swing.ImageIcon;
+import DEAD.LAND.core.ResourceManager;
 import DEAD.LAND.core.verificadorDeColisao;
 import DEAD.LAND.world.tileMap;
 
@@ -86,7 +86,7 @@ public class NPC extends Rectangle {
                         + indice
                         + ".png";
 
-                sprites[d][i] = new ImageIcon(caminho).getImage();
+                sprites[d][i] = ResourceManager.getInstancia().carregarImagem(caminho);
             }
         }
     }
@@ -218,7 +218,7 @@ public class NPC extends Rectangle {
         g2.setColor(Color.WHITE);
         g2.drawString(nome, caixaX + 7, caixaY + 12);
 
-        if (simboloEstado != null && !simboloEstado.isBlank()) {
+        if (simboloEstado != null && !simboloEstado.trim().isEmpty()) {
             g2.setFont(new Font("Arial", Font.BOLD, 16));
 
             if ("✓".equals(simboloEstado)) {
