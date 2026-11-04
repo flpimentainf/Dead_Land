@@ -24,8 +24,11 @@ public class IconeInteracao {
             desenharIndicador(g2, interacao.area, limites, jogador,
                     "E  DORMIR", new Color(24, 24, 32, 220));
         } else if (interacao.tipo == tileMap.TIPO_PORTA) {
-            desenharIndicador(g2, interacao.area, limites, jogador,
-                    "E", new Color(120, 70, 20, 180));
+            Rectangle porta = interacao.area;
+            Rectangle caixa = new Rectangle(porta.x + (porta.width - TAMANHO) / 2,
+                    porta.y + (porta.height - TAMANHO) / 2, TAMANHO, TAMANHO);
+            // A porta ancora o E; o jogador pode passar atrás da indicação.
+            desenharBotao(g2, caixa, "E", new Color(120, 70, 20, 220));
         }
     }
 
@@ -33,6 +36,11 @@ public class IconeInteracao {
             Rectangle jogador, String texto, Color corFundo) {
         int largura = "E".equals(texto) ? TAMANHO : 96;
         Rectangle caixa = posicionar(alvo, limites, jogador, largura);
+        desenharBotao(g2, caixa, texto, corFundo);
+    }
+
+    private static void desenharBotao(Graphics2D g2, Rectangle caixa, String texto, Color corFundo) {
+        int largura = caixa.width;
         Graphics2D g = (Graphics2D) g2.create();
         try {
             g.setStroke(new java.awt.BasicStroke(1));
