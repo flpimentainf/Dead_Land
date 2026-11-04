@@ -9,6 +9,9 @@ import DEAD.LAND.ui.LayoutMenuPausa;
 import DEAD.LAND.ui.panel;
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.world.tileMap;
+import DEAD.LAND.world.Cenario;
+import DEAD.LAND.world.CenarioId;
+import DEAD.LAND.world.RenderizadorTiles;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Optional;
@@ -23,6 +26,7 @@ public class ValidacaoTecnica {
     public static void main(String[] args) throws Exception {
         validarColisaoETransicao();
         validarCamaDoisTiles();
+        validarTilesDosCenarios();
         validarInventario();
         validarDano();
         validarEstamina();
@@ -70,6 +74,38 @@ public class ValidacaoTecnica {
                         "segurar E junto da peseira deve iniciar a sequencia de dormir");
             } finally { cena.pausarJogo(); }
         });
+    }
+
+    private static void validarTilesDosCenarios() throws Exception {
+        for (RenderizadorTiles.Material material : RenderizadorTiles.Material.values()) {
+            var imagem = javax.imageio.ImageIO.read(new File(material.getCaminho()));
+            exigir(imagem != null && imagem.getWidth() == 24 && imagem.getHeight() == 24,
+                    "textura deve existir em 24x24: " + material.getCaminho());
+        }
+        // Assinaturas físicas anteriores à troca do visual: nenhum caminho pode mudar.
+        long[] colisoesOriginais = {3438794768L, 2915522381L, 1126653853L, 3096947269L,
+                2415417690L, 2952865556L, 4056105978L, 688305776L, 3813518656L};
+        tileMap mapa = new tileMap();
+        for (CenarioId id : CenarioId.values()) {
+            mapa.irParaCenario(id.indice());
+            Cenario cenario = mapa.getCenarioAtual();
+            java.util.zip.CRC32 assinatura = new java.util.zip.CRC32();
+            for (int linha = 0; linha < cenario.getMapaBase().length; linha++) {
+                for (int coluna = 0; coluna < cenario.getMapaBase()[linha].length; coluna++) {
+                    assinatura.update(mapa.tileTemColisao(linha, coluna) ? 1 : 0);
+                    exigir(RenderizadorTiles.temNovoVisual(cenario.getMapaBase()[linha][coluna]),
+                            "todo terreno deve usar o novo visual em " + id);
+                }
+            }
+            exigir(assinatura.getValue() == colisoesOriginais[id.indice()],
+                    "troca visual deve preservar colisoes de " + id);
+            var imagem = new java.awt.image.BufferedImage(mapa.getLarguraTotal(), mapa.getAlturaTotal(),
+                    java.awt.image.BufferedImage.TYPE_INT_ARGB);
+            var g = imagem.createGraphics();
+            try { mapa.desenhar(g); } finally { g.dispose(); }
+            exigir((imagem.getRGB(imagem.getWidth() / 2, imagem.getHeight() / 2) >>> 24) == 255,
+                    "o terreno deve renderizar sem buracos em " + id);
+        }
     }
 
     private static void validarInventario() {

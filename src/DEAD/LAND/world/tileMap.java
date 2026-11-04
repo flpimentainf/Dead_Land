@@ -400,6 +400,7 @@ public class tileMap {
 	}
 
 	private void desenharCamada(Graphics2D g, int[][] camada, boolean ignorarVazio) {
+		CenarioId cenarioId = CenarioId.porIndice(cenarioAtualIndex);
 		for (int col = 0; col < camada[0].length; col++) {
 			for (int lin = 0; lin < camada.length; lin++) {
 				int pecaDaMatriz = camada[lin][col];
@@ -409,7 +410,7 @@ public class tileMap {
 				}
 
 				this.pecaDoCenario.carregaPecaDaMatriz(pecaDaMatriz);
-				this.pecaDoCenario.desenhar(g, lin, col);
+				this.pecaDoCenario.desenhar(g, lin, col, cenarioId, ignorarVazio);
 			}
 		}
 	}

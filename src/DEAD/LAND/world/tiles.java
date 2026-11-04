@@ -19,6 +19,7 @@ public class tiles {
     private Image[] imagensTiles = new Image[TOTAL_TILES + 1];
     private Image imgAtual;
     private int valorAtual;
+    private final RenderizadorTiles renderizador = new RenderizadorTiles();
 
     private static final int AJUSTE_ID_ARQUIVO = 1;
 
@@ -79,13 +80,19 @@ public class tiles {
         }
     }
 
+    public void desenhar(Graphics2D g, int linha, int coluna, CenarioId cenario, boolean objeto) {
+        if (!renderizador.desenhar(g, valorAtual, linha, coluna, cenario, objeto)) desenhar(g, linha, coluna);
+    }
+
     private Image carregarImagem(String caminho) {
         return ResourceManager.getInstancia().carregarImagem(caminho);
     }
 
     private void carregarTodasImagens() {
         for (int i = 1; i <= TILES_BASE; i++) {
-            this.imagensTiles[i] = carregarImagem(PASTA_TILES + "tile (" + i + ").png");
+            if (!RenderizadorTiles.temNovoVisual(i - AJUSTE_ID_ARQUIVO)) {
+                this.imagensTiles[i] = carregarImagem(PASTA_TILES + "tile (" + i + ").png");
+            }
         }
         this.imagensTiles[TILE_CAMA_CABECEIRA + AJUSTE_ID_ARQUIVO] = carregarImagem("repos/quarto/cama_cima.png");
         this.imagensTiles[TILE_CAMA_PESEIRA + AJUSTE_ID_ARQUIVO] = carregarImagem("repos/quarto/cama_baixo.png");
