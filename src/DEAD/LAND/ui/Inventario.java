@@ -220,7 +220,7 @@ public class Inventario {
     private void desenharDicaTecla(Graphics2D g2, item itemColetado, int x, int y) {
         String tecla = null;
         if ("arco".equals(itemColetado.getNome())) {
-            tecla = "SPACE";
+            tecla = "M1";
         }
         if ("pocao_cura".equals(itemColetado.getNome())) {
             tecla = "Q";

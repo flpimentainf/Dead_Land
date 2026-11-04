@@ -90,6 +90,7 @@ public final class RoteiroHistoria {
                 "Item obtido: Arco do Eco",
                 "A madeira é fria.",
                 "Mesmo assim, sua mão sabe como segurá-lo.",
+                "Mire com o mouse e clique com o botão esquerdo para atirar.",
                 "Você já lutou antes.",
                 "Só não lembra contra o quê."
         };

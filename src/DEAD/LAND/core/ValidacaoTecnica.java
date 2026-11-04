@@ -2,12 +2,22 @@ package DEAD.LAND.core;
 
 import DEAD.LAND.entity.item;
 import DEAD.LAND.entity.player;
+import DEAD.LAND.entity.Flecha;
 import DEAD.LAND.ui.Inventario;
+import DEAD.LAND.ui.ViewportJogo;
+import DEAD.LAND.ui.LayoutMenuPausa;
+import DEAD.LAND.ui.panel;
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.world.tileMap;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Optional;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Cursor;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
+import javax.swing.SwingUtilities;
 
 public class ValidacaoTecnica {
     public static void main(String[] args) throws Exception {
@@ -16,6 +26,9 @@ public class ValidacaoTecnica {
         validarDano();
         validarEstamina();
         validarDashECorrida();
+        validarViewport();
+        validarFlechasDirecionais();
+        SwingUtilities.invokeAndWait(ValidacaoTecnica::validarMouse);
         validarSave();
         System.out.println("Validacoes tecnicas OK");
     }
@@ -114,12 +127,6 @@ public class ValidacaoTecnica {
                 "propriedade antiga removida nao deve alterar a posicao salva");
     }
 
-    private static void exigir(boolean condicao, String mensagem) {
-        if (!condicao) {
-            throw new AssertionError(mensagem);
-        }
-    }
-
     private static void validarEstamina() {
         SistemaEstamina estamina = new SistemaEstamina();
         exigir(estamina.consumirDash(), "dash deve aceitar estamina cheia");
@@ -190,4 +197,127 @@ public class ValidacaoTecnica {
                 "dash nao pode atravessar parede");
     }
 
+    private static void exigir(boolean condicao, String mensagem) {
+        if (!condicao) {
+            throw new AssertionError(mensagem);
+        }
+    }
+
+    private static void validarViewport() {
+        ViewportJogo viewport = new ViewportJogo(768, 480);
+        Point2D centro = viewport.paraLogico(new Point(960, 540), 1920, 1080);
+        exigir(centro.getX() == 384 && centro.getY() == 240, "mira deve compensar escala e margens laterais");
+        exigir(viewport.paraLogico(new Point(30, 540), 1920, 1080) == null, "margem preta nao deve aceitar disparos");
+        centro = viewport.paraLogico(new Point(400, 400), 800, 800);
+        exigir(centro.getX() == 384 && centro.getY() == 240, "mira deve compensar margens verticais");
+        exigir(viewport.paraLogico(new Point(400, 20), 800, 800) == null, "margem vertical deve ignorar cliques");
+        for (int i = 0; i < 5; i++) {
+            Rectangle opcao = LayoutMenuPausa.opcaoPrincipal(i);
+            exigir(LayoutMenuPausa.indicePrincipal(new Point(opcao.x + 10, opcao.y + 10)) == i,
+                    "cada opcao deve ter area de clique independente");
+        }
+        exigir(LayoutMenuPausa.volumeEmX(-100) == 0f && LayoutMenuPausa.volumeEmX(1000) == 1f,
+                "arraste de volume deve ser limitado entre zero e cem por cento");
+    }
+
+    private static void validarFlechasDirecionais() {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                if (dx == 0 && dy == 0) continue;
+                Flecha flecha = new Flecha(100, 100, dx, dy, 10, 30, 8, 400);
+                for (int i = 0; i < 10; i++) flecha.atualizar();
+                double tamanho = Math.hypot(dx, dy);
+                exigir(Math.abs(flecha.getCentroX() - (100 + 100 * dx / tamanho)) <= 1,
+                        "flecha deve viajar no eixo X da mira");
+                exigir(Math.abs(flecha.getCentroY() - (100 + 100 * dy / tamanho)) <= 1,
+                        "flecha deve viajar no eixo Y da mira");
+                exigir(Math.abs(flecha.getAngulo() - Math.atan2(dy, dx)) < 0.0001,
+                        "ponta da flecha deve acompanhar o angulo de movimento");
+            }
+        }
+        Flecha livre = new Flecha(100, 100, 3, 4, 10, 30, 8, 100);
+        for (int i = 0; i < 10; i++) livre.atualizar();
+        exigir(livre.getCentroX() == 160 && livre.getCentroY() == 180, "mira deve permitir angulos alem de oito direcoes");
+        exigir(!livre.isAtiva(), "alcance deve ser igual para tiros diagonais");
+        Flecha diagonal = new Flecha(100, 100, 1, 1, 10, 30, 8, 400);
+        exigir(diagonal.intersects(new Rectangle(105, 105, 3, 3)), "corpo diagonal deve acertar alvos");
+        exigir(!diagonal.intersects(new Rectangle(89, 109, 2, 2)), "canto vazio da caixa diagonal nao deve acertar alvos");
+    }
+
+    private static void validarMouse() {
+        Inventario inventario = new Inventario();
+        inventario.adicionar(new item("repos/tiles/tile (47).png", 0, 0, 0, -1, "arco"));
+        inventario.adicionar(new item("repos/tiles/tile (48).png", 0, 0, 0, -1, "flecha"));
+        panel cena = new panel("centro", inventario);
+        float volumeAnterior = AudioManager.getInstancia().getVolume(AudioManager.Canal.MASTER);
+        try {
+            cena.pausarJogo();
+            cena.setSize(1280, 960);
+            cena.getCenario().irParaCenario(1);
+            cena.getHistoria().restaurarAposRespawn(null, inventario.getNomesItens(), 1, false);
+            int municao = inventario.getQuantidadeFlechas();
+            clicar(cena, new Point2D.Double(500, 100));
+            exigir(inventario.getQuantidadeFlechas() == municao - 1, "clique esquerdo deve consumir uma flecha");
+            exigir(cena.getControladorFlechas().getFlechas().size() == 1, "clique deve gerar somente um projetil");
+            Point2D mira = cena.getMiraMundo();
+            player jogador = cena.getJogador();
+            double angulo = Math.atan2(mira.getY() - jogador.y - jogador.height / 2.0,
+                    mira.getX() - jogador.x - jogador.width / 2.0);
+            exigir(Math.abs(cena.getControladorFlechas().getFlechas().get(0).getAngulo() - angulo) < 0.0001,
+                    "disparo deve compensar o deslocamento da camera");
+            clicar(cena, new Point2D.Double(300, 100));
+            exigir(inventario.getQuantidadeFlechas() == municao - 1, "cliques durante cooldown nao devem consumir municao");
+
+            escutadorTeclado teclado = new escutadorTeclado();
+            teclado.abrirMenu = true;
+            cena.atualizarMenuPausa(teclado);
+            teclado.abrirMenu = false;
+            cena.atualizarMenuPausa(teclado);
+            clicar(cena, new Point2D.Double(384, 290));
+            eventoMouse(cena, MouseEvent.MOUSE_MOVED, new Point2D.Double(400, 127));
+            exigir(cena.getCursor().getType() == Cursor.HAND_CURSOR, "opcoes do menu devem indicar clique com o cursor");
+            clicar(cena, new Point2D.Double(382.5, 127));
+            exigir(Math.abs(AudioManager.getInstancia().getVolume(AudioManager.Canal.MASTER) - 0.25f) < 0.02f,
+                    "clique na barra deve ajustar o volume");
+            eventoMouse(cena, MouseEvent.MOUSE_PRESSED, new Point2D.Double(400, 127));
+            eventoMouse(cena, MouseEvent.MOUSE_DRAGGED, new Point2D.Double(495, 127));
+            eventoMouse(cena, MouseEvent.MOUSE_RELEASED, new Point2D.Double(495, 127));
+            exigir(AudioManager.getInstancia().getVolume(AudioManager.Canal.MASTER) == 1f, "arrastar deve ajustar o volume ate o fim");
+            clicar(cena, new Point2D.Double(384, 327));
+            clicar(cena, new Point2D.Double(384, 246));
+            clicar(cena, new Point2D.Double(384, 440));
+            clicar(cena, new Point2D.Double(384, 158));
+            exigir(!cena.isMenuPausaAberto(), "botoes de voltar e continuar devem funcionar com mouse");
+            exigir(cena.getControladorFlechas().getFlechas().size() == 1, "cliques no menu nao podem disparar flechas");
+
+            long[] agora = {0};
+            ControladorFlechas tiros = new ControladorFlechas(() -> agora[0]);
+            exigir(tiros.dispararMouse(cena, new Point2D.Double(1000, 100)), "tiro valido deve ser permitido");
+            agora[0] = 449;
+            exigir(!tiros.dispararMouse(cena, new Point2D.Double(1000, 100)), "cooldown de tiro deve ser preservado");
+            agora[0] = 450;
+            exigir(tiros.dispararMouse(cena, new Point2D.Double(1000, 100)), "novo tiro deve ser permitido apos cooldown");
+            inventario.definirFlechas(0);
+            agora[0] = 900;
+            exigir(!tiros.dispararMouse(cena, new Point2D.Double(1000, 100)), "arco sem municao nao deve disparar");
+        } finally {
+            cena.pausarJogo();
+            AudioManager.getInstancia().definirVolume(AudioManager.Canal.MASTER, volumeAnterior);
+        }
+    }
+
+    private static void clicar(panel cena, Point2D ponto) {
+        eventoMouse(cena, MouseEvent.MOUSE_PRESSED, ponto);
+        eventoMouse(cena, MouseEvent.MOUSE_RELEASED, ponto);
+    }
+
+    private static void eventoMouse(panel cena, int tipo, Point2D logico) {
+        Rectangle area = new ViewportJogo(768, 480).getArea(cena.getWidth(), cena.getHeight());
+        int x = (int) Math.round(area.x + logico.getX() * area.width / 768.0);
+        int y = (int) Math.round(area.y + logico.getY() * area.height / 480.0);
+        boolean movimento = tipo == MouseEvent.MOUSE_MOVED || tipo == MouseEvent.MOUSE_DRAGGED;
+        cena.dispatchEvent(new MouseEvent(cena, tipo, System.currentTimeMillis(),
+                tipo == MouseEvent.MOUSE_DRAGGED ? MouseEvent.BUTTON1_DOWN_MASK : 0,
+                x, y, movimento ? 0 : 1, false, movimento ? MouseEvent.NOBUTTON : MouseEvent.BUTTON1));
+    }
 }

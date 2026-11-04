@@ -23,6 +23,9 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Dimension;
+import java.awt.Cursor;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Font;
@@ -30,6 +33,11 @@ import java.awt.FontMetrics;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -97,6 +105,9 @@ public class panel extends JPanel{
     private boolean teclaEsquerdaPausaPressionada;
     private boolean teclaDireitaPausaPressionada;
     private boolean teclaConfirmarPausaPressionada;
+    private final ViewportJogo viewport = new ViewportJogo(LARGURA_LOGICA, ALTURA_LOGICA);
+    private Point posicaoMouse;
+    private int volumeArrastando = -1;
 
 
     public panel(String posicao, Inventario inventario) {
@@ -146,6 +157,7 @@ public class panel extends JPanel{
                 
                 this.addKeyListener(ET);
                 this.setFocusable(true); 
+                configurarMouse();
                 
                 this.controladorItens = GL.getControladorItens();
                 this.controladorInimigos = GL.getControladorInimigos();
@@ -191,6 +203,122 @@ public class panel extends JPanel{
                 }
                 break;
         }
+    }
+
+    private void configurarMouse() {
+        MouseAdapter mouse = new MouseAdapter() {
+            @Override public void mouseMoved(MouseEvent e) { moverMouse(e); }
+            @Override public void mouseDragged(MouseEvent e) { moverMouse(e); }
+            @Override public void mouseEntered(MouseEvent e) { moverMouse(e); }
+            @Override public void mouseExited(MouseEvent e) {
+                posicaoMouse = null;
+                atualizarCursorMouse();
+            }
+            @Override public void mouseReleased(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) volumeArrastando = -1;
+            }
+            @Override public void mousePressed(MouseEvent e) {
+                posicaoMouse = e.getPoint();
+                if (e.getButton() != MouseEvent.BUTTON1) return;
+                requestFocusInWindow();
+                Point2D ponto = mouseLogico();
+                if (menuPausaAberto) {
+                    clicarMenuPausa(ponto);
+                } else if (ponto != null && podeUsarArco()) {
+                    controladorFlechas.dispararMouse(panel.this, getMiraMundo());
+                }
+                atualizarCursorMouse();
+                repaint();
+            }
+        };
+        addMouseListener(mouse);
+        addMouseMotionListener(mouse);
+        addFocusListener(new FocusAdapter() {
+            @Override public void focusLost(FocusEvent e) {
+                ET.resetar();
+                volumeArrastando = -1;
+                controladorFlechas.cancelarCarga();
+            }
+        });
+    }
+
+    private Point2D.Double mouseLogico() {
+        return viewport.paraLogico(posicaoMouse, getWidth(), getHeight());
+    }
+
+    public Point2D.Double getMiraMundo() {
+        Point2D.Double ponto = mouseLogico();
+        if (ponto == null || camera == null) return null;
+        ponto.x += camera.getXRender();
+        ponto.y += camera.getYRender();
+        return ponto;
+    }
+
+    public boolean podeUsarArco() {
+        return !menuPausaAberto && jogador != null && jogador.estaVivo() && !jogador.estaCaindo()
+                && inventario != null && inventario.temArco()
+                && (historia == null || !historia.bloqueiaControleDoJogador())
+                && (sistemaMorte == null || !sistemaMorte.bloqueiaControle());
+    }
+
+    private void moverMouse(MouseEvent e) {
+        posicaoMouse = e.getPoint();
+        Point2D ponto = mouseLogico();
+        if (menuPausaAberto && ponto != null) {
+            if (volumeArrastando >= 0) {
+                definirVolumeMouse(volumeArrastando, ponto.getX());
+            } else if (telaPausa == TelaPausa.PRINCIPAL) {
+                int indice = LayoutMenuPausa.indicePrincipal(ponto);
+                if (indice >= 0) opcaoMenuPausa = indice;
+            } else if (telaPausa == TelaPausa.CONFIGURACOES) {
+                int indice = LayoutMenuPausa.indiceConfiguracao(ponto);
+                if (indice >= 0) opcaoConfiguracao = indice;
+            }
+        }
+        atualizarCursorMouse();
+        if (menuPausaAberto) repaint();
+    }
+
+    private void clicarMenuPausa(Point2D ponto) {
+        if (ponto == null) return;
+        if (telaPausa == TelaPausa.PRINCIPAL) {
+            int indice = LayoutMenuPausa.indicePrincipal(ponto);
+            if (indice >= 0) {
+                opcaoMenuPausa = indice;
+                executarOpcaoPausa();
+            }
+        } else if (telaPausa == TelaPausa.MEMORIAS) {
+            if (LayoutMenuPausa.voltarMemorias().contains(ponto)) voltarOuFecharMenuPausa();
+        } else {
+            int indice = LayoutMenuPausa.indiceConfiguracao(ponto);
+            if (indice < 0) return;
+            opcaoConfiguracao = indice;
+            if (indice == OPCOES_CONFIGURACOES.length - 1) {
+                voltarOuFecharMenuPausa();
+            } else if (LayoutMenuPausa.volume(indice).contains(ponto)) {
+                volumeArrastando = indice;
+                definirVolumeMouse(indice, ponto.getX());
+            }
+        }
+    }
+
+    private void definirVolumeMouse(int indice, double x) {
+        Canal[] canais = {Canal.MASTER, Canal.MUSIC, Canal.SFX, Canal.AMBIENT};
+        AudioManager.getInstancia().definirVolume(canais[indice], LayoutMenuPausa.volumeEmX(x));
+    }
+
+    private void atualizarCursorMouse() {
+        Point2D ponto = mouseLogico();
+        int tipo = Cursor.DEFAULT_CURSOR;
+        if (menuPausaAberto && ponto != null) {
+            boolean clicavel = telaPausa == TelaPausa.PRINCIPAL ? LayoutMenuPausa.indicePrincipal(ponto) >= 0
+                    : telaPausa == TelaPausa.CONFIGURACOES ? LayoutMenuPausa.indiceConfiguracao(ponto) >= 0
+                    : LayoutMenuPausa.voltarMemorias().contains(ponto);
+            if (clicavel) tipo = Cursor.HAND_CURSOR;
+        } else if (ponto != null && podeUsarArco()) {
+            tipo = Cursor.CROSSHAIR_CURSOR;
+        }
+        if (getCursor().getType() != tipo) setCursor(Cursor.getPredefinedCursor(tipo));
     }
 
     private void desenharStatus(Graphics2D g2) {
@@ -248,6 +376,7 @@ public class panel extends JPanel{
         }
 
         desenharQuadroLogicoNaTela(g2Tela, quadro);
+        atualizarCursorMouse();
     }
 
     private BufferedImage getQuadroLogico() {
@@ -278,20 +407,9 @@ public class panel extends JPanel{
     }
 
     private void desenharQuadroLogicoNaTela(Graphics2D g2Tela, BufferedImage quadro) {
-        int larguraPainel = Math.max(1, getWidth());
-        int alturaPainel = Math.max(1, getHeight());
-        double escala = Math.min(
-                larguraPainel / (double) LARGURA_LOGICA,
-                alturaPainel / (double) ALTURA_LOGICA
-        );
-
-        int larguraDesenho = Math.max(1, (int) Math.round(LARGURA_LOGICA * escala));
-        int alturaDesenho = Math.max(1, (int) Math.round(ALTURA_LOGICA * escala));
-        int x = (larguraPainel - larguraDesenho) / 2;
-        int y = (alturaPainel - alturaDesenho) / 2;
-
+        Rectangle area = viewport.getArea(getWidth(), getHeight());
         configurarRenderizacaoPixelArt(g2Tela);
-        g2Tela.drawImage(quadro, x, y, larguraDesenho, alturaDesenho, null);
+        g2Tela.drawImage(quadro, area.x, area.y, area.width, area.height, null);
     }
 
     private void configurarRenderizacaoPixelArt(Graphics2D g2) {
@@ -357,6 +475,8 @@ public class panel extends JPanel{
     }
 
     private void abrirMenuPausa() {
+        this.controladorFlechas.cancelarCarga();
+        this.volumeArrastando = -1;
         this.menuPausaAberto = true;
         this.telaPausa = TelaPausa.PRINCIPAL;
         this.opcaoMenuPausa = 0;
@@ -364,6 +484,7 @@ public class panel extends JPanel{
     }
 
     private void voltarOuFecharMenuPausa() {
+        this.volumeArrastando = -1;
         if (this.telaPausa == TelaPausa.PRINCIPAL) {
             this.menuPausaAberto = false;
         } else {
@@ -442,6 +563,7 @@ public class panel extends JPanel{
     }
 
     private void executarOpcaoPausa() {
+        this.volumeArrastando = -1;
         AudioManager.getInstancia().tocarEfeito("interface");
         switch (this.opcaoMenuPausa) {
             case 0:
@@ -521,8 +643,12 @@ public class panel extends JPanel{
             }
         }
 
-        desenharTextoCentralizado(g2, "ENTER/E ou ESC para voltar", ALTURA_LOGICA - 34,
-                12, Font.PLAIN, new Color(190, 190, 190));
+        Rectangle botao = LayoutMenuPausa.voltarMemorias();
+        boolean sobre = mouseLogico() != null && botao.contains(mouseLogico());
+        g2.setColor(new Color(70, 70, 80, sobre ? 220 : 140));
+        g2.fillRoundRect(botao.x, botao.y, botao.width, botao.height, 8, 8);
+        desenharTextoCentralizado(g2, "VOLTAR", ALTURA_LOGICA - 34,
+                16, Font.BOLD, sobre ? new Color(245, 226, 166) : Color.WHITE);
     }
 
     private void desenharTelaConfiguracoes(Graphics2D g2) {
@@ -560,12 +686,17 @@ public class panel extends JPanel{
         g2.fillRoundRect(barraX, barraY, barraW, barraH, 8, 8);
         g2.setColor(new Color(120, 210, 255));
         g2.fillRoundRect(barraX, barraY, Math.round(barraW * valor), barraH, 8, 8);
+        g2.fillRoundRect(barraX + Math.round(barraW * valor) - 3, barraY - 3, 6, barraH + 6, 4, 4);
         g2.setColor(new Color(220, 220, 220));
         g2.drawRoundRect(barraX, barraY, barraW, barraH, 8, 8);
         g2.drawString(Math.round(valor * 100) + "%", x + largura - 20, y);
     }
 
     private void desenharOpcao(Graphics2D g2, String texto, int y, boolean selecionado) {
+        if (selecionado) {
+            g2.setColor(new Color(80, 80, 95, 100));
+            g2.fillRoundRect(184, y - 26, 400, 40, 8, 8);
+        }
         Color cor = selecionado ? new Color(245, 226, 166) : Color.WHITE;
         desenharTextoCentralizado(g2, (selecionado ? "> " : "  ") + texto, y,
                 18, Font.BOLD, cor);
@@ -611,6 +742,7 @@ public class panel extends JPanel{
     public SistemaFeedback getFeedback() { return feedback; }
 
     public MemoryManager getMemoryManager() { return memoryManager; }
+
 
     public Camera getCamera() { return camera; }
 

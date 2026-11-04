@@ -78,6 +78,7 @@ public class gameLoop implements ActionListener {
 						this.teclado,
 						this.cenaDoJogo.getSistemaCheckpoint())) {
 			this.controladorMovimento.suspender(this.cenaDoJogo.getJogador(), this.teclado);
+			this.controladorFlechas.cancelarCarga();
 			this.controladorInteracao.resetar();
 			return;
 		}
@@ -90,6 +91,7 @@ public class gameLoop implements ActionListener {
 
 		if (this.cenaDoJogo.atualizarMenuPausa(this.teclado)) {
 			this.controladorMovimento.suspender(this.cenaDoJogo.getJogador(), this.teclado);
+			this.controladorFlechas.cancelarCarga();
 			this.controladorInteracao.resetar();
 			return;
 		}
@@ -100,6 +102,7 @@ public class gameLoop implements ActionListener {
 
 			if (this.cenaDoJogo.getHistoria().bloqueiaControleDoJogador()) {
 				this.controladorMovimento.suspender(this.cenaDoJogo.getJogador(), this.teclado);
+				this.controladorFlechas.cancelarCarga();
 				this.controladorInteracao.resetar();
 				return;
 			}
@@ -107,6 +110,7 @@ public class gameLoop implements ActionListener {
 
 		if (this.controladorQueda.atualizar(this.cenaDoJogo)) {
 			this.controladorMovimento.suspender(this.cenaDoJogo.getJogador(), this.teclado);
+			this.controladorFlechas.cancelarCarga();
 			this.controladorInteracao.resetar();
 			atualizarCheckpointsAutomaticos();
 			return;
