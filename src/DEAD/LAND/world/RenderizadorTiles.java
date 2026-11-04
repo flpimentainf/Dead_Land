@@ -90,7 +90,7 @@ public final class RenderizadorTiles {
                 desenharArbusto(g, variacao);
             } else if (id <= 10 || id == 53 || (id >= 57 && id <= 59)) {
                 desenharTrilha(g, id, variacao);
-            } else if (id >= 11 && id <= 14) {
+            } else if (id >= 11 && id <= 18) {
                 desenharTelhado(g, id, variacao);
             } else if ((id >= 15 && id <= 22) || id == 27) {
                 desenharCasa(g, id, variacao);
@@ -214,25 +214,63 @@ public final class RenderizadorTiles {
         else if (id == 13) forma = new Polygon(new int[]{0, 18, 48, 48, 0}, new int[]{0, 0, 30, 48, 48}, 5);
         else forma = new Polygon(new int[]{0, 48, 48, 0}, new int[]{0, 0, 48, 48}, 4);
         texturaRecortada(g, Material.TELHADO, forma, variacao & 1);
-        g.setColor(new Color(51, 29, 23));
-        g.fillRect(0, 42, 48, 6);
-        g.setColor(new Color(130, 73, 41));
-        g.fillRect(0, 40, 48, 2);
-        if (id == 14) janela(g, 16, 16, 18, 22);
+        if (id >= 15) {
+            g.setColor(new Color(51, 29, 23));
+            g.fillRect(0, 42, 48, 6);
+            g.setColor(new Color(130, 73, 41));
+            g.fillRect(0, 40, 48, 2);
+        }
+        if (id == 14) desenharChamine(g);
+        if (id == 18) desenharFrontao(g);
+    }
+
+    private void desenharChamine(Graphics2D g) {
+        g.setColor(new Color(43, 29, 25, 180));
+        g.fillRect(16, 8, 26, 36);
+        g.setColor(new Color(109, 66, 49));
+        g.fillRect(14, 8, 22, 32);
+        g.setColor(new Color(161, 107, 76));
+        g.fillRect(14, 8, 4, 32);
+        g.setColor(new Color(67, 45, 39));
+        for (int y = 16; y < 40; y += 8) {
+            g.fillRect(18, y, 18, 2);
+            g.fillRect(y % 16 == 0 ? 24 : 30, y - 6, 2, 6);
+        }
+        g.setColor(new Color(49, 39, 37));
+        g.fillRect(10, 6, 30, 8);
+        g.setColor(new Color(174, 161, 140));
+        g.fillRect(10, 4, 30, 4);
+        g.setColor(new Color(28, 26, 29));
+        g.fillRect(16, 6, 18, 4);
+        g.setColor(new Color(102, 98, 99, 130));
+        g.fillRect(20, 0, 6, 2);
+        g.fillRect(26, 2, 6, 2);
+    }
+
+    private void desenharFrontao(Graphics2D g) {
+        Polygon frente = new Polygon(new int[]{2, 24, 46, 46, 2}, new int[]{30, 8, 30, 48, 48}, 5);
+        texturaRecortada(g, Material.ARENITO, frente, 0);
+        g.setColor(new Color(55, 37, 28));
+        g.setStroke(new BasicStroke(6, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
+        g.drawPolyline(new int[]{2, 24, 46}, new int[]{30, 8, 30}, 3);
+        g.fillRect(22, 16, 4, 32);
+        g.fillRect(2, 42, 44, 6);
+        g.setStroke(new BasicStroke(1));
+        g.setColor(new Color(163, 113, 64));
+        g.drawPolyline(new int[]{2, 24, 46}, new int[]{27, 5, 27}, 3);
     }
 
     private void desenharCasa(Graphics2D g, int id, int variacao) {
         textura(g, Material.ARENITO, variacao);
         g.setColor(new Color(49, 36, 29, 190));
         g.fillRect(0, 0, 48, 4);
-        if (id == 15 || id == 19) g.fillRect(0, 0, 6, 48);
-        if (id == 17 || id == 22) g.fillRect(42, 0, 6, 48);
+        if (id == 19) g.fillRect(0, 0, 6, 48);
+        if (id == 22) g.fillRect(42, 0, 6, 48);
         if (id >= 19) {
             g.fillRect(0, 42, 48, 6);
             g.setColor(new Color(129, 91, 55));
             g.fillRect(0, 40, 48, 2);
         }
-        if (id == 16 || id == 18) janela(g, 12, 10, 24, 28);
         if (id == 21 || id == 27) porta(g, id == 21);
     }
 
