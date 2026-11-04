@@ -18,7 +18,6 @@ public class Inventario {
     private static final int TAMANHO_SLOT = 64;
     private static final int ESPACO = 12;
     private static final int MARGEM = 20;
-    private static final int FLECHAS_INICIAIS = 8;
     private static final int CURA_FRAGMENTO = 30;
 
     private List<item> itens = new ArrayList<item>();
@@ -26,6 +25,7 @@ public class Inventario {
     private int capacidadeMaximaFlechas = 20;
     private int fragmentosCura;
     private String armaEquipada = "";
+    private final item iconeFlechas = new item("repos/tiles/tile (48).png", 0, 0, 0, -1, "flecha");
 
     public void adicionar(item itemColetado) {
         if (itemColetado == null) {
@@ -49,9 +49,7 @@ public class Inventario {
             return;
         }
 
-        if (!this.itens.contains(itemColetado)) {
-            this.itens.add(itemColetado);
-        }
+        this.itens.add(itemColetado);
 
         if ("arco".equals(nome)) {
             armaEquipada = "arco";
@@ -80,13 +78,25 @@ public class Inventario {
 
     public void desenhar(Graphics2D g2, int largura, int altura) {
         int y = (altura - TAMANHO_SLOT) / 2;
+        int indiceSlot = 0;
+        boolean mostrarFlechas = temArco();
 
-        for (int i = 0; i < this.itens.size(); i++) {
-            int x = largura - MARGEM - (i + 1) * TAMANHO_SLOT - i * ESPACO;
-            desenharSlot(g2, this.itens.get(i), x, y);
-            desenharQuantidade(g2, this.itens.get(i), x, y);
-            desenharDicaTecla(g2, this.itens.get(i), x, y);
+        for (item itemColetado : this.itens) {
+            if ("flecha".equals(itemColetado.getNome()) && !mostrarFlechas) {
+                continue;
+            }
+            desenharItem(g2, itemColetado, largura, y, indiceSlot++);
         }
+        if (mostrarFlechas && !temItem("flecha")) {
+            desenharItem(g2, iconeFlechas, largura, y, indiceSlot);
+        }
+    }
+
+    private void desenharItem(Graphics2D g2, item itemColetado, int largura, int y, int indiceSlot) {
+        int x = largura - MARGEM - (indiceSlot + 1) * TAMANHO_SLOT - indiceSlot * ESPACO;
+        desenharSlot(g2, itemColetado, x, y);
+        desenharQuantidade(g2, itemColetado, x, y);
+        desenharDicaTecla(g2, itemColetado, x, y);
     }
 
    public boolean temArco() {
@@ -254,7 +264,9 @@ public class Inventario {
         FontMetrics fm = g2.getFontMetrics();
         int larguraTexto = fm.stringWidth(texto) + 10;
         int alturaTexto = 18;
-        int tx = x + TAMANHO_SLOT - larguraTexto - 4;
+        int tx = "flecha".equals(itemColetado.getNome())
+                ? x + 4
+                : x + TAMANHO_SLOT - larguraTexto - 4;
         int ty = y + TAMANHO_SLOT - alturaTexto - 4;
 
         g2.setColor(new Color(0, 0, 0, 175));

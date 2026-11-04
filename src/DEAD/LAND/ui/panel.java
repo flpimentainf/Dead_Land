@@ -242,7 +242,7 @@ public class panel extends JPanel{
             if (deveDesenharBarraBoss()) {
                 this.controladorInimigos.getChefe().desenharBarraBoss(g2, LARGURA_LOGICA);
             }
-            desenharHudCombate(g2);
+            desenharIndicadorDash(g2);
             if (this.feedback != null) this.feedback.desenharHud(g2, LARGURA_LOGICA, ALTURA_LOGICA);
             if (this.interfaceHistoria != null) this.interfaceHistoria.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA, this.historia);
             if (this.sistemaMorte != null) this.sistemaMorte.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA);
@@ -329,27 +329,10 @@ public class panel extends JPanel{
         g2.setComposite(composicaoOriginal);
     }
 
-    private void desenharHudCombate(Graphics2D g2) {
-        if (this.inventario == null) {
-            return;
-        }
-
-        int x = 200;
-        int y = ALTURA_LOGICA - 42;
-        String flechas = "Flechas: " + inventario.getQuantidadeFlechas()
-                + "/" + inventario.getCapacidadeMaximaFlechas();
-
-        g2.setFont(new Font("Arial", Font.BOLD, 13));
-        FontMetrics fm = g2.getFontMetrics();
-        int largura = Math.max(135, fm.stringWidth(flechas) + 18);
-        g2.setColor(new Color(0, 0, 0, 165));
-        g2.fillRoundRect(x, y - 18, largura, 24, 8, 8);
-        g2.setColor(new Color(245, 225, 170));
-        g2.drawString(flechas, x + 9, y);
-
+    private void desenharIndicadorDash(Graphics2D g2) {
         if (getJogador() != null && getJogador().getProgressoCooldownDash() < 1f) {
-            int dashX = x + largura + 12;
-            int dashY = y - 14;
+            int dashX = 200;
+            int dashY = ALTURA_LOGICA - 56;
             int dashW = 70;
             int dashH = 8;
             g2.setColor(new Color(0, 0, 0, 165));
@@ -357,6 +340,7 @@ public class panel extends JPanel{
             g2.setColor(new Color(120, 210, 255));
             g2.fillRoundRect(dashX, dashY, Math.round(dashW * getJogador().getProgressoCooldownDash()), dashH, 4, 4);
             g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.BOLD, 13));
             g2.drawString("Dash", dashX, dashY - 3);
         }
     }
