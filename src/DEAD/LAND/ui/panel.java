@@ -69,6 +69,7 @@ public class panel extends JPanel{
     private IconeInteracao iconeInteracao;
     private Inventario inventario;
     private panel painelInventario;
+    private panel painelJogo;
     private ControladorFlechas controladorFlechas;
     private ControladorItens controladorItens;
     private ControladorInimigos controladorInimigos;
@@ -187,11 +188,23 @@ public class panel extends JPanel{
             case "sul":
                 g2.setColor(new Color(38, 44, 58));
                 g2.fillRect(0, 0, getWidth(), getHeight());
+                desenharStatus(g2);
                 if (this.inventario != null) {
                     this.inventario.desenhar(g2, getWidth(), getHeight());
                 }
                 break;
         }
+    }
+
+    private void desenharStatus(Graphics2D g2) {
+        if (this.painelJogo == null || this.painelJogo.getJogador() == null) {
+            return;
+        }
+
+        int x = 20;
+        int y = (getHeight() - 72) / 2 + 14;
+        this.painelJogo.barradeVida.desenhar(g2, this.painelJogo.getJogador(), x, y);
+        this.painelJogo.sistemaVontade.desenharBarra(g2, x, y + 40);
     }
 
     private void desenharCentro(Graphics2D g2Tela) {
@@ -226,8 +239,6 @@ public class panel extends JPanel{
             g2.setTransform(transformacaoOriginal);
             if (this.sistemaVontade != null) this.sistemaVontade.desenharEfeitoMental(g2, LARGURA_LOGICA, ALTURA_LOGICA);
             desenharFlashDano(g2, LARGURA_LOGICA, ALTURA_LOGICA);
-            if (this.barradeVida != null) this.barradeVida.desenhar(g2, getJogador(), LARGURA_LOGICA, ALTURA_LOGICA);
-            if (this.sistemaVontade != null) this.sistemaVontade.desenharBarra(g2, LARGURA_LOGICA, ALTURA_LOGICA);
             if (deveDesenharBarraBoss()) {
                 this.controladorInimigos.getChefe().desenharBarraBoss(g2, LARGURA_LOGICA);
             }
@@ -765,6 +776,10 @@ public class panel extends JPanel{
 
     public void setPainelInventario(panel painelInventario) {
         this.painelInventario = painelInventario;
+        if (painelInventario != null) {
+            painelInventario.painelJogo = this;
+            painelInventario.repaint();
+        }
     }
 
     public void atualizarInventario() {

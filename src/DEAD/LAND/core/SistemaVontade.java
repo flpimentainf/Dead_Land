@@ -65,11 +65,9 @@ public class SistemaVontade {
         return NivelVontade.DESISTENCIA;
     }
 
-    public void desenharBarra(Graphics2D g2, int larguraTela, int alturaTela) {
+    public void desenharBarra(Graphics2D g2, int x, int y) {
         int largura = 160;
         int altura = 12;
-        int x = 16;
-        int y = alturaTela - 22;
         float prop = vontade / (float) VONTADE_MAXIMA;
 
         g2.setColor(new Color(20, 20, 20, 200));

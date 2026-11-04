@@ -9,17 +9,12 @@ import java.awt.RenderingHints;
 public class BarraDeVida {
     private static final int LARGURA = 160;
     private static final int ALTURA = 16;
-    private static final int MARGEM_X = 16;
-    private static final int MARGEM_Y = 16;
     private static final int RAIO = 6;
 
-    public void desenhar(Graphics2D g2, player jogador, int larguraTela, int alturaTela) {
+    public void desenhar(Graphics2D g2, player jogador, int x, int y) {
         int vida = jogador.getVida();
         int vidaMax = player.VIDA_MAXIMA;
         float proporcao = (float) vida / vidaMax;
-
-        int x = MARGEM_X;
-        int y = alturaTela - MARGEM_Y - ALTURA - 24;
 
         // Fundo escuro
         g2.setColor(new Color(20, 20, 20, 200));

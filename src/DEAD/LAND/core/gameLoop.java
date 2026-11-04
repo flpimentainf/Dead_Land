@@ -64,6 +64,7 @@ public class gameLoop implements ActionListener {
 		registrarFeedbackDanoJogador();
 		atualizarSpriteQuandoNecessario();
 		this.cenaDoJogo.repaint();
+		this.cenaDoJogo.atualizarInventario();
 	}
 
 	private void atualizarJogo() {
