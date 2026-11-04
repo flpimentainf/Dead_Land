@@ -18,7 +18,7 @@ public class Inventario {
     private static final int TAMANHO_SLOT = 64;
     private static final int ESPACO = 12;
     private static final int MARGEM = 20;
-    private static final int CURA_FRAGMENTO = 30;
+    private static final int CURA_POCAO = 30;
 
     private List<item> itens = new ArrayList<item>();
     private int quantidadeFlechas;
@@ -26,6 +26,7 @@ public class Inventario {
     private int fragmentosCura;
     private String armaEquipada = "";
     private final item iconeFlechas = new item("repos/tiles/tile (48).png", 0, 0, 0, -1, "flecha");
+    private final item iconePocaoCura = new item(item.SPRITE_POCAO_CURA, 0, 0, 0, -1, "pocao_cura");
 
     public void adicionar(item itemColetado) {
         if (itemColetado == null) {
@@ -39,7 +40,7 @@ public class Inventario {
             return;
         }
 
-        if ("fragmento_cura".equals(nome)) {
+        if ("pocao_cura".equals(nome)) {
             fragmentosCura += itemColetado.getQuantidade();
             adicionarRepresentanteSeNecessario(itemColetado);
             return;
@@ -73,7 +74,7 @@ public class Inventario {
     public void substituirPorItens(Collection<item> itensRestaurados, int flechas, int curas) {
         substituirPorItens(itensRestaurados);
         this.quantidadeFlechas = Math.max(0, Math.min(capacidadeMaximaFlechas, flechas));
-        this.fragmentosCura = Math.max(0, curas);
+        definirQuantidadeCura(curas);
     }
 
     public void desenhar(Graphics2D g2, int largura, int altura) {
@@ -185,6 +186,9 @@ public class Inventario {
 
     public void definirQuantidadeCura(int quantidade) {
         fragmentosCura = Math.max(0, quantidade);
+        if (fragmentosCura > 0) {
+            adicionarRepresentanteSeNecessario(iconePocaoCura);
+        }
     }
 
     public boolean usarCura(player jogador) {
@@ -193,7 +197,7 @@ public class Inventario {
         }
 
         fragmentosCura--;
-        jogador.curar(CURA_FRAGMENTO);
+        jogador.curar(CURA_POCAO);
         return true;
     }
 
@@ -218,7 +222,7 @@ public class Inventario {
         if ("arco".equals(itemColetado.getNome())) {
             tecla = "SPACE";
         }
-        if ("fragmento_cura".equals(itemColetado.getNome())) {
+        if ("pocao_cura".equals(itemColetado.getNome())) {
             tecla = "Q";
         }
         if (tecla == null) return;
@@ -252,7 +256,7 @@ public class Inventario {
         String texto = null;
         if ("flecha".equals(itemColetado.getNome())) {
             texto = String.valueOf(quantidadeFlechas);
-        } else if ("fragmento_cura".equals(itemColetado.getNome())) {
+        } else if ("pocao_cura".equals(itemColetado.getNome())) {
             texto = String.valueOf(fragmentosCura);
         }
 

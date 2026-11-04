@@ -29,8 +29,8 @@ public class ControladorItens {
         this.itens.add(new item("repos/tiles/tile (47).png", CENARIO_DOS_ITENS, 1, 22, TILE_CHAO, "arco"));
         this.itens.add(new item("repos/tiles/tile (48).png", CENARIO_DOS_ITENS, 1, 23, TILE_CHAO, "flecha"));
         this.itens.add(new item("repos/tiles/tile (64).png", CENARIO_CHAVE_BOSS, 1, 26, TILE_TERRA, "chave_boss_63"));
-        this.itens.add(new item("repos/tiles/tile (63).png", 5, 480, 144,
-                "fragmento_cura", Categoria.CONSUMIVEL, 1, true));
+        this.itens.add(new item(item.SPRITE_POCAO_CURA, 5, 480, 144,
+                "pocao_cura", Categoria.CONSUMIVEL, 1, true));
         this.itens.add(new item("repos/tiles/tile (64).png", 2, 600, 240,
                 "memoria_01", Categoria.ITEM_HISTORIA, 1, false));
         this.itens.add(new item("repos/tiles/tile (64).png", 3, 210, 245,
@@ -163,7 +163,7 @@ public class ControladorItens {
         boolean empilhavel = item.ehEmpilhavel(nome);
         String sprite = "flecha".equals(nome)
                 ? "repos/tiles/tile (48).png"
-                : "repos/tiles/tile (63).png";
+                : item.SPRITE_POCAO_CURA;
         this.itens.add(new item(sprite, cenarioIndex, x, y, nome, categoria, quantidade, empilhavel));
     }
 

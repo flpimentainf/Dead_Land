@@ -377,7 +377,7 @@ public class SistemaHistoria {
             mostrarMensagem(
                     "Cacador",
                     "Tres lembrancas ja sao uma trilha. Pegue isto.",
-                    "Voce recebeu flechas e um Fragmento de Memoria."
+                    "Você recebeu flechas e uma Poção de Cura."
             );
             return;
         }

@@ -94,6 +94,9 @@ public class SaveManager {
             state.tempoJogoMs = lerLong(props, "tempoJogoMs", 0);
             state.salvoEmMs = lerLong(props, "salvoEmMs", 0);
             state.itens = separar(props.getProperty("itens", ""));
+            if (state.itens.remove("fragmento_cura")) {
+                state.itens.add("pocao_cura");
+            }
             state.npcsConhecidos = separar(props.getProperty("npcsConhecidos", ""));
             state.eventosHistoria = separar(props.getProperty("eventosHistoria", ""));
             state.memorias = separar(props.getProperty("memorias", ""));

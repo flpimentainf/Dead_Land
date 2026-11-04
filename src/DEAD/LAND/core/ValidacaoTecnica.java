@@ -47,11 +47,23 @@ public class ValidacaoTecnica {
         exigir(inventario.consumirFlecha(), "deve consumir uma flecha");
         exigir(inventario.getQuantidadeFlechas() == antes - 1, "municao deve diminuir");
 
-        inventario.definirQuantidadeCura(1);
+        inventario.adicionar(new item(
+                item.SPRITE_POCAO_CURA, 0, 0, 0,
+                "pocao_cura", item.Categoria.CONSUMIVEL, 2, true
+        ));
+        exigir(inventario.temItem("pocao_cura"), "pocao coletada deve aparecer no inventario");
+        exigir(inventario.getQuantidadeCura() == 2, "pocoes devem empilhar");
         player jogador = new player();
+        exigir(!inventario.usarCura(jogador), "vida cheia nao deve consumir pocao");
+        exigir(inventario.getQuantidadeCura() == 2, "pocoes devem ser preservadas com vida cheia");
         jogador.levarDano(40);
-        inventario.usarCura(jogador);
-        exigir(jogador.getVida() > 60, "cura deve restaurar vida");
+        exigir(inventario.usarCura(jogador), "pocao deve poder ser usada apos dano");
+        exigir(jogador.getVida() == 90, "pocao deve restaurar 30 HP");
+        exigir(inventario.getQuantidadeCura() == 1, "cura deve consumir uma pocao");
+
+        Inventario recompensa = new Inventario();
+        recompensa.definirQuantidadeCura(1);
+        exigir(recompensa.temItem("pocao_cura"), "pocao de recompensa deve aparecer no inventario");
     }
 
     private static void validarDano() {
@@ -80,6 +92,7 @@ public class ValidacaoTecnica {
         state.fragmentosCura = 1;
         state.checkpoint = "regiao_principal";
         state.itens.add("chave");
+        state.itens.add("fragmento_cura");
         state.memorias.add("memoria_01");
 
         exigir(saves.salvar(state), "save deve ser gravado");
@@ -88,6 +101,9 @@ public class ValidacaoTecnica {
         exigir(carregado.get().cenarioIndex == 5, "cenario salvo deve voltar");
         exigir("regiao_principal".equals(carregado.get().checkpoint), "checkpoint deve persistir");
         exigir(carregado.get().itens.contains("chave"), "itens devem persistir");
+        exigir(carregado.get().itens.contains("pocao_cura"), "cura de save antigo deve virar pocao");
+        exigir(!carregado.get().itens.contains("fragmento_cura"), "identificador antigo deve ser migrado");
+        exigir(carregado.get().fragmentosCura == 1, "migracao deve preservar quantidade de pocoes");
     }
 
     private static void exigir(boolean condicao, String mensagem) {

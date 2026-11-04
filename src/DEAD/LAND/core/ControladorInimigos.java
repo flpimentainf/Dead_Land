@@ -127,7 +127,7 @@ public class ControladorInimigos {
             );
         } else if (rolagem < 42) {
             cenaDoJogo.getControladorItens().criarDrop(
-                    "fragmento_cura",
+                    "pocao_cura",
                     cenarioAtual,
                     inimigo.x + inimigo.width / 2,
                     inimigo.y + inimigo.height / 2,

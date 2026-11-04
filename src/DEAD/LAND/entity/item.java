@@ -6,6 +6,7 @@ import java.awt.Image;
 import java.awt.Rectangle;
 
 public class item extends Rectangle {
+    public static final String SPRITE_POCAO_CURA = "repos/itens/pocao_cura.png";
     public enum Categoria {
         ITEM_CHAVE,
         ARMA,
@@ -127,7 +128,7 @@ public class item extends Rectangle {
         if ("chave_boss_63".equals(nome)) return "Chave Vermelha";
         if ("arco".equals(nome)) return "Arco";
         if ("flecha".equals(nome)) return "Flecha";
-        if ("fragmento_cura".equals(nome)) return "Fragmento de Memoria";
+        if ("pocao_cura".equals(nome)) return "Poção de Cura";
         if (nome != null && nome.startsWith("memoria_")) return "Memoria";
         return nome == null || nome.trim().isEmpty() ? "Item" : nome;
     }
@@ -135,18 +136,18 @@ public class item extends Rectangle {
     public static Categoria categoriaPadrao(String nome) {
         if ("arco".equals(nome)) return Categoria.ARMA;
         if ("flecha".equals(nome)) return Categoria.MUNICAO;
-        if ("fragmento_cura".equals(nome)) return Categoria.CONSUMIVEL;
+        if ("pocao_cura".equals(nome)) return Categoria.CONSUMIVEL;
         if (nome != null && nome.startsWith("memoria_")) return Categoria.ITEM_HISTORIA;
         return Categoria.ITEM_CHAVE;
     }
 
     public static int quantidadePadrao(String nome) {
         if ("flecha".equals(nome)) return 8;
-        if ("fragmento_cura".equals(nome)) return 1;
+        if ("pocao_cura".equals(nome)) return 1;
         return 1;
     }
 
     public static boolean ehEmpilhavel(String nome) {
-        return "flecha".equals(nome) || "fragmento_cura".equals(nome);
+        return "flecha".equals(nome) || "pocao_cura".equals(nome);
     }
 }

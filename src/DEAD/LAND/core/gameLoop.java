@@ -162,7 +162,7 @@ public class gameLoop implements ActionListener {
 		if (this.cenaDoJogo.getInventario().usarCura(this.cenaDoJogo.getJogador())) {
 			this.cenaDoJogo.atualizarInventario();
 			if (this.cenaDoJogo.getFeedback() != null) {
-				this.cenaDoJogo.getFeedback().mostrarMensagemCentro("Fragmento de Memoria usado");
+				this.cenaDoJogo.getFeedback().mostrarMensagemCentro("Poção de Cura usada");
 			}
 			AudioManager.getInstancia().tocarEfeito("cura");
 		}
