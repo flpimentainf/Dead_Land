@@ -84,6 +84,10 @@ public class tiles {
         if (!renderizador.desenhar(g, valorAtual, linha, coluna, cenario, objeto)) desenhar(g, linha, coluna);
     }
 
+    public void desenharFundo(Graphics2D g, CenarioId cenario, int[][] mapa) {
+        renderizador.desenharFundo(g, cenario, mapa);
+    }
+
     private Image carregarImagem(String caminho) {
         return ResourceManager.getInstancia().carregarImagem(caminho);
     }

@@ -416,6 +416,7 @@ public class tileMap {
 	}
 
 	public void desenhar(Graphics2D g) {
+		this.pecaDoCenario.desenharFundo(g, CenarioId.porIndice(cenarioAtualIndex), this.cenarioValido);
 		desenharCamada(g, this.cenarioValido, false);
 		desenharCamada(g, this.camadaObjetosValida, true);
 	}

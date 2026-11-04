@@ -19,7 +19,7 @@ public final class RenderizadorTiles {
         PAREDE_PEDRA("parede_pedra"), PAREDE_MUSGO("parede_musgo"),
         PISO_PEDRA("piso_pedra"), PISO_MUSGO("piso_musgo"),
         GRAMA("grama"), FOLHAGEM("folhagem"), TERRA("terra"),
-        AGUA("agua"), ABISMO("abismo"), TAPETE("tapete"), OBSIDIANA("obsidiana"),
+        AGUA("agua"), ABISMO("abismo"), TAPETE("tapete"),
         TELHADO("telhado"), ARENITO("arenito");
 
         private final String arquivo;
@@ -30,6 +30,7 @@ public final class RenderizadorTiles {
     private static final int TAMANHO = tiles.LARGURA;
     private final Image[] materiais = new Image[Material.values().length];
     private final Map<Integer, BufferedImage> cache = new HashMap<>();
+    private final RenderizadorTorre torre = new RenderizadorTorre();
 
     public RenderizadorTiles() {
         for (Material material : Material.values()) {
@@ -39,9 +40,10 @@ public final class RenderizadorTiles {
 
     public boolean desenhar(Graphics2D g, int id, int linha, int coluna, CenarioId cenario, boolean objeto) {
         if (!temNovoVisual(id)) return false;
+        int idVisual = cenario == CenarioId.ARENA_BOSS ? torre.orientarParede(id, linha, coluna) : id;
         int variacao = Math.floorMod((coluna * 73856093) ^ (linha * 19349663), 8);
-        int chave = (cenario.indice() << 16) | (id << 4) | variacao | (objeto ? 1 << 24 : 0);
-        BufferedImage imagem = cache.computeIfAbsent(chave, k -> criarTile(id, cenario, variacao, objeto));
+        int chave = (cenario.indice() << 16) | (idVisual << 4) | variacao | (objeto ? 1 << 24 : 0);
+        BufferedImage imagem = cache.computeIfAbsent(chave, k -> criarTile(idVisual, cenario, variacao, objeto));
         g.drawImage(imagem, coluna * TAMANHO, linha * TAMANHO, null);
         return true;
     }
@@ -50,12 +52,17 @@ public final class RenderizadorTiles {
         return id >= 1 && id <= 61 && id != 45 && id != 46 && id != 47;
     }
 
+    public void desenharFundo(Graphics2D g, CenarioId cenario, int[][] mapa) {
+        if (cenario == CenarioId.ARENA_BOSS) torre.desenharFundo(g, mapa);
+    }
+
     private BufferedImage criarTile(int id, CenarioId cenario, int variacao, boolean objeto) {
         BufferedImage tile = new BufferedImage(TAMANHO, TAMANHO, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = tile.createGraphics();
         try {
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+            if (cenario == CenarioId.ARENA_BOSS && torre.desenharTile(g, id, variacao)) return tile;
             if (id == 37 || id == 38) {
                 textura(g, Material.ABISMO, variacao);
                 if (id == 37) {
@@ -111,7 +118,6 @@ public final class RenderizadorTiles {
         return switch (cenario) {
             case QUARTO -> Material.MADEIRA_CLARA;
             case AREA_MEMORIA -> Material.PISO_MUSGO;
-            case ARENA_BOSS -> Material.OBSIDIANA;
             case TRILHA_LATERAL -> Material.TERRA;
             default -> Material.PISO_PEDRA;
         };
@@ -120,7 +126,6 @@ public final class RenderizadorTiles {
     private Material parede(CenarioId cenario) {
         return switch (cenario) {
             case RUINAS, AREA_MEMORIA -> Material.PAREDE_MUSGO;
-            case ARENA_BOSS -> Material.OBSIDIANA;
             default -> Material.PAREDE_PEDRA;
         };
     }
@@ -347,7 +352,7 @@ public final class RenderizadorTiles {
 
     private void desenharMuralha(Graphics2D g, int id, CenarioId cenario, int variacao) {
         textura(g, parede(cenario), variacao);
-        Color borda = cenario == CenarioId.ARENA_BOSS ? new Color(116, 95, 93) : new Color(137, 145, 146);
+        Color borda = new Color(137, 145, 146);
         g.setColor(new Color(18, 20, 28));
         if (id == 33 || id == 34 || id == 35) g.fillRect(0, 40, 48, 8);
         if (id == 48 || id == 49 || id == 50) g.fillRect(0, 0, 48, 8);
