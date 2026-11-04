@@ -14,7 +14,6 @@ import java.util.function.Consumer;
 
 public class SistemaHistoria {
     private static final String EVENTO_CACADOR_RECOMPENSA = "cacador_recompensa";
-    private static final String EVENTO_ECO_VONTADE = "eco_vontade";
     private static final int MEMORIAS_PARA_RECOMPENSA = 3;
 
     private enum TipoEscolha {
@@ -225,7 +224,7 @@ public class SistemaHistoria {
         }
 
         if ("eco".equals(npcId)) {
-            conversarComEco(npcId, cenaDoJogo);
+            conversarComEco(npcId);
             return;
         }
 
@@ -325,17 +324,8 @@ public class SistemaHistoria {
         );
     }
 
-    private void conversarComEco(String npcId, panel cenaDoJogo) {
-        npcsConhecidos.add(npcId);
-
-        if (!eventosHistoria.contains(EVENTO_ECO_VONTADE)) {
-            eventosHistoria.add(EVENTO_ECO_VONTADE);
-            if (cenaDoJogo != null && cenaDoJogo.getSistemaVontade() != null) {
-                cenaDoJogo.getSistemaVontade().recuperar(15);
-            }
-            if (cenaDoJogo != null && cenaDoJogo.getFeedback() != null) {
-                cenaDoJogo.getFeedback().mostrarMensagemCentro("Vontade restaurada");
-            }
+    private void conversarComEco(String npcId) {
+        if (npcsConhecidos.add(npcId)) {
             mostrarMensagem(
                     "Eco",
                     "Dead Land repete o medo ate voce acreditar que ele e seu.",
@@ -346,8 +336,8 @@ public class SistemaHistoria {
 
         mostrarMensagem(
                 "Eco",
-                "Quando a Vontade cai, o mundo mente melhor.",
-                "Memorias e checkpoints ajudam a manter voce inteiro."
+                "Cada memória guarda um pedaço da sua história.",
+                "Você pode revê-las no menu Memórias."
         );
     }
 

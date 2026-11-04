@@ -8,7 +8,6 @@ public class ProjetilInimigo extends Rectangle {
     private final double velocidadeX;
     private final double velocidadeY;
     private final int danoVida;
-    private final int danoVontade;
     private final int alcanceMaximo;
     private final Color cor;
     private final int origemX;
@@ -19,13 +18,12 @@ public class ProjetilInimigo extends Rectangle {
     private boolean ativo = true;
 
     public ProjetilInimigo(int x, int y, double velocidadeX, double velocidadeY,
-            int danoVida, int danoVontade, int alcanceMaximo, Color cor) {
+            int danoVida, int alcanceMaximo, Color cor) {
         this.mundoX = x;
         this.mundoY = y;
         this.velocidadeX = velocidadeX;
         this.velocidadeY = velocidadeY;
         this.danoVida = danoVida;
-        this.danoVontade = danoVontade;
         this.alcanceMaximo = alcanceMaximo;
         this.cor = cor;
         this.origemX = x;
@@ -67,10 +65,6 @@ public class ProjetilInimigo extends Rectangle {
 
     public int getDanoVida() {
         return danoVida;
-    }
-
-    public int getDanoVontade() {
-        return danoVontade;
     }
 
     public int getCentroX() {

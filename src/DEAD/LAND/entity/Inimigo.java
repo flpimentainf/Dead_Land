@@ -407,7 +407,6 @@ public class Inimigo extends Rectangle {
                         jogador.y + jogador.height / 2,
                         4.0,
                         getDanoNoJogador(),
-                        5,
                         new Color(135, 90, 230)
                 );
                 AudioManager.getInstancia().tocarEfeito("inimigo_projetil");

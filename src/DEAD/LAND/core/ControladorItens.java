@@ -131,9 +131,6 @@ public class ControladorItens {
                             cenaDoJogo.getMemoryManager().getQuantidadeDescoberta()
                     );
                 }
-                if (cenaDoJogo.getSistemaVontade() != null) {
-                    cenaDoJogo.getSistemaVontade().recuperar(18);
-                }
                 if (cenaDoJogo.getFeedback() != null) {
                     cenaDoJogo.getFeedback().brilhoItem(itemDoJogo.x + 24, itemDoJogo.y + 24);
                     cenaDoJogo.getFeedback().mostrarMensagemCentro("Fragmento de Memoria encontrado");

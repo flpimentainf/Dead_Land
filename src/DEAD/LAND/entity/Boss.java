@@ -316,7 +316,6 @@ public class Boss extends Inimigo {
                         jogador.y + jogador.height / 2,
                         3.4,
                         18,
-                        8,
                         new Color(190, 80, 235)
                 );
             }
@@ -334,7 +333,6 @@ public class Boss extends Inimigo {
                         Math.sin(angulo),
                         3.2,
                         16,
-                        7,
                         new Color(230, 70, 145)
                 );
             }

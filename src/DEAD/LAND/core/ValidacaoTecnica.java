@@ -99,6 +99,8 @@ public class ValidacaoTecnica {
         state.memorias.add("memoria_01");
 
         exigir(saves.salvar(state), "save deve ser gravado");
+        Files.writeString(new File(pasta, "slot1.properties").toPath(), "\nvontade=0\n",
+                java.nio.file.StandardOpenOption.APPEND);
         Optional<GameState> carregado = saves.carregar(1);
         exigir(carregado.isPresent(), "save deve carregar");
         exigir(carregado.get().cenarioIndex == 5, "cenario salvo deve voltar");
@@ -107,6 +109,9 @@ public class ValidacaoTecnica {
         exigir(carregado.get().itens.contains("pocao_cura"), "cura de save antigo deve virar pocao");
         exigir(!carregado.get().itens.contains("fragmento_cura"), "identificador antigo deve ser migrado");
         exigir(carregado.get().fragmentosCura == 1, "migracao deve preservar quantidade de pocoes");
+        exigir(carregado.get().memorias.contains("memoria_01"), "save antigo deve preservar memorias coletadas");
+        exigir(carregado.get().jogadorX == 100 && carregado.get().jogadorY == 200,
+                "propriedade antiga removida nao deve alterar a posicao salva");
     }
 
     private static void exigir(boolean condicao, String mensagem) {

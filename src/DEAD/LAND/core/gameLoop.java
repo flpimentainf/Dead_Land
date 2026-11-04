@@ -86,7 +86,7 @@ public class gameLoop implements ActionListener {
 				this.cenaDoJogo.getCenario(),
 				this.verificadorEfeitos
 		);
-		atualizarSistemasDeFeedback();
+		atualizarFeedback();
 
 		if (this.cenaDoJogo.atualizarMenuPausa(this.teclado)) {
 			this.controladorMovimento.suspender(this.cenaDoJogo.getJogador(), this.teclado);
@@ -132,23 +132,9 @@ public class gameLoop implements ActionListener {
 		}
 	}
 
-	private void atualizarSistemasDeFeedback() {
+	private void atualizarFeedback() {
 		if (this.cenaDoJogo.getFeedback() != null) {
 			this.cenaDoJogo.getFeedback().atualizar();
-		}
-
-		if (this.cenaDoJogo.getSistemaVontade() == null) {
-			return;
-		}
-
-		this.cenaDoJogo.getSistemaVontade().atualizar();
-		if (this.cenaDoJogo.getSistemaVontade().consumirDesistenciaPendente()
-				&& this.cenaDoJogo.getSistemaCheckpoint() != null) {
-			this.cenaDoJogo.getSistemaCheckpoint().restaurar(this.cenaDoJogo);
-			this.cenaDoJogo.getSistemaVontade().recuperar(20);
-			if (this.cenaDoJogo.getFeedback() != null) {
-				this.cenaDoJogo.getFeedback().mostrarMensagemCentro("Sua vontade quase se perdeu");
-			}
 		}
 	}
 

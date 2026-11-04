@@ -47,7 +47,6 @@ public class SaveManager {
         props.setProperty("flechas", String.valueOf(state.flechas));
         props.setProperty("capacidadeFlechas", String.valueOf(state.capacidadeFlechas));
         props.setProperty("fragmentosCura", String.valueOf(state.fragmentosCura));
-        props.setProperty("vontade", String.valueOf(state.vontade));
         props.setProperty("bossDerrotado", String.valueOf(state.bossDerrotado));
         props.setProperty("estadoHistoria", state.estadoHistoria);
         props.setProperty("objetivoHistoria", state.objetivoHistoria);
@@ -85,7 +84,6 @@ public class SaveManager {
             state.flechas = lerInt(props, "flechas", 0);
             state.capacidadeFlechas = lerInt(props, "capacidadeFlechas", 20);
             state.fragmentosCura = lerInt(props, "fragmentosCura", 0);
-            state.vontade = lerInt(props, "vontade", SistemaVontade.VONTADE_MAXIMA);
             state.bossDerrotado = Boolean.parseBoolean(props.getProperty("bossDerrotado", "false"));
             state.estadoHistoria = props.getProperty("estadoHistoria", "QUARTO");
             state.objetivoHistoria = props.getProperty("objetivoHistoria", "Deite-se na cama.");

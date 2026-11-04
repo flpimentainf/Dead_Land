@@ -13,7 +13,6 @@ import DEAD.LAND.core.SaveManager;
 import DEAD.LAND.core.SistemaCheckpoint;
 import DEAD.LAND.core.SistemaFeedback;
 import DEAD.LAND.core.SistemaMorte;
-import DEAD.LAND.core.SistemaVontade;
 import DEAD.LAND.core.gameLoop;
 import DEAD.LAND.entity.player;
 import DEAD.LAND.input.escutadorTeclado;
@@ -81,7 +80,6 @@ public class panel extends JPanel{
     private SistemaMorte sistemaMorte;
     private SistemaFeedback feedback;
     private MemoryManager memoryManager;
-    private SistemaVontade sistemaVontade;
     private Camera camera;
     private BufferedImage quadroLogico;
     private SaveManager saveManager;
@@ -138,7 +136,6 @@ public class panel extends JPanel{
                 this.sistemaMorte = new SistemaMorte();
                 this.feedback = new SistemaFeedback();
                 this.memoryManager = new MemoryManager();
-                this.sistemaVontade = new SistemaVontade();
                 this.camera = new Camera(LARGURA_LOGICA, ALTURA_LOGICA);
                 this.saveManager = new SaveManager();
                 this.inicioJogoMs = System.currentTimeMillis();
@@ -202,9 +199,10 @@ public class panel extends JPanel{
         }
 
         int x = 20;
-        int y = (getHeight() - 72) / 2 + 14;
+        int y = (getHeight() - 64) / 2 + 14;
         this.painelJogo.barradeVida.desenhar(g2, this.painelJogo.getJogador(), x, y);
-        this.painelJogo.sistemaVontade.desenharBarra(g2, x, y + 40);
+        EstiloHUD.desenharBarra(g2, "ESTAMINA", x, y + 32, 12,
+                this.painelJogo.getJogador().getProporcaoEstamina(), new Color(230, 175, 50));
     }
 
     private void desenharCentro(Graphics2D g2Tela) {
@@ -237,12 +235,10 @@ public class panel extends JPanel{
             if (this.feedback != null) this.feedback.desenharMundo(g2);
 
             g2.setTransform(transformacaoOriginal);
-            if (this.sistemaVontade != null) this.sistemaVontade.desenharEfeitoMental(g2, LARGURA_LOGICA, ALTURA_LOGICA);
             desenharFlashDano(g2, LARGURA_LOGICA, ALTURA_LOGICA);
             if (deveDesenharBarraBoss()) {
                 this.controladorInimigos.getChefe().desenharBarraBoss(g2, LARGURA_LOGICA);
             }
-            desenharIndicadorDash(g2);
             if (this.feedback != null) this.feedback.desenharHud(g2, LARGURA_LOGICA, ALTURA_LOGICA);
             if (this.interfaceHistoria != null) this.interfaceHistoria.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA, this.historia);
             if (this.sistemaMorte != null) this.sistemaMorte.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA);
@@ -327,22 +323,6 @@ public class panel extends JPanel{
         g2.setColor(Color.RED);
         g2.fillRect(0, 0, largura, altura);
         g2.setComposite(composicaoOriginal);
-    }
-
-    private void desenharIndicadorDash(Graphics2D g2) {
-        if (getJogador() != null && getJogador().getProgressoCooldownDash() < 1f) {
-            int dashX = 200;
-            int dashY = ALTURA_LOGICA - 56;
-            int dashW = 70;
-            int dashH = 8;
-            g2.setColor(new Color(0, 0, 0, 165));
-            g2.fillRoundRect(dashX - 1, dashY - 1, dashW + 2, dashH + 2, 5, 5);
-            g2.setColor(new Color(120, 210, 255));
-            g2.fillRoundRect(dashX, dashY, Math.round(dashW * getJogador().getProgressoCooldownDash()), dashH, 4, 4);
-            g2.setColor(Color.WHITE);
-            g2.setFont(new Font("Arial", Font.BOLD, 13));
-            g2.drawString("Dash", dashX, dashY - 3);
-        }
     }
 
     private boolean deveDesenharBarraBoss() {
@@ -632,8 +612,6 @@ public class panel extends JPanel{
 
     public MemoryManager getMemoryManager() { return memoryManager; }
 
-    public SistemaVontade getSistemaVontade() { return sistemaVontade; }
-
     public Camera getCamera() { return camera; }
 
     public GameState criarGameState(int slot) {
@@ -646,7 +624,6 @@ public class panel extends JPanel{
         state.flechas = inventario == null ? 0 : inventario.getQuantidadeFlechas();
         state.capacidadeFlechas = inventario == null ? 20 : inventario.getCapacidadeMaximaFlechas();
         state.fragmentosCura = inventario == null ? 0 : inventario.getQuantidadeCura();
-        state.vontade = sistemaVontade == null ? SistemaVontade.VONTADE_MAXIMA : sistemaVontade.getVontade();
         state.bossDerrotado = controladorInimigos != null && controladorInimigos.bossFoiDerrotado();
         state.estadoHistoria = historia == null ? "QUARTO" : historia.getEstado().name();
         state.objetivoHistoria = historia == null ? "" : historia.getObjetivoAtual();
@@ -689,10 +666,6 @@ public class panel extends JPanel{
                     state.fragmentosCura
             );
             this.inventario.equiparArcoSePossuir();
-        }
-
-        if (this.sistemaVontade != null) {
-            this.sistemaVontade.definirVontade(state.vontade);
         }
 
         if (this.controladorInimigos != null) {

@@ -389,8 +389,8 @@ public final class RoteiroHistoria {
                 "Mara, a escutadora",
                 "Agora você pode lutar.",
                 "Mas cuidado.",
-                "As criaturas daqui não querem matar seu corpo.",
-                "Elas querem cansar sua vontade."
+                "Algumas criaturas atacam de longe.",
+                "Use o dash para desviar dos projéteis."
         };
     }
 

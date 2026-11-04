@@ -12,7 +12,6 @@ public class GameState {
     public int flechas;
     public int capacidadeFlechas;
     public int fragmentosCura;
-    public int vontade;
     public boolean bossDerrotado;
     public String estadoHistoria = "QUARTO";
     public String objetivoHistoria = "Deite-se na cama.";
