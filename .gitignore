@@ -4,4 +4,6 @@
 .metadata/.plugins/org.eclipse.m2e.logback/0.log
 .metadata/
 bin/
+build/
+save/
 *.class
