@@ -77,6 +77,7 @@ public class gameLoop implements ActionListener {
 						this.cenaDoJogo,
 						this.teclado,
 						this.cenaDoJogo.getSistemaCheckpoint())) {
+			this.controladorMovimento.suspender(this.cenaDoJogo.getJogador(), this.teclado);
 			this.controladorInteracao.resetar();
 			return;
 		}
@@ -88,6 +89,7 @@ public class gameLoop implements ActionListener {
 		atualizarSistemasDeFeedback();
 
 		if (this.cenaDoJogo.atualizarMenuPausa(this.teclado)) {
+			this.controladorMovimento.suspender(this.cenaDoJogo.getJogador(), this.teclado);
 			this.controladorInteracao.resetar();
 			return;
 		}
@@ -97,12 +99,14 @@ public class gameLoop implements ActionListener {
 			atualizarCheckpointsAutomaticos();
 
 			if (this.cenaDoJogo.getHistoria().bloqueiaControleDoJogador()) {
+				this.controladorMovimento.suspender(this.cenaDoJogo.getJogador(), this.teclado);
 				this.controladorInteracao.resetar();
 				return;
 			}
 		}
 
 		if (this.controladorQueda.atualizar(this.cenaDoJogo)) {
+			this.controladorMovimento.suspender(this.cenaDoJogo.getJogador(), this.teclado);
 			this.controladorInteracao.resetar();
 			atualizarCheckpointsAutomaticos();
 			return;
@@ -218,7 +222,9 @@ public class gameLoop implements ActionListener {
 
 		this.atualizacoesDesdeUltimoSprite++;
 
-		if (this.atualizacoesDesdeUltimoSprite < ATUALIZACOES_POR_SPRITE) {
+		int intervaloSprite = this.cenaDoJogo.getJogador().estaCorrendo()
+				? Math.max(1, ATUALIZACOES_POR_SPRITE / 2) : ATUALIZACOES_POR_SPRITE;
+		if (this.atualizacoesDesdeUltimoSprite < intervaloSprite) {
 			return;
 		}
 

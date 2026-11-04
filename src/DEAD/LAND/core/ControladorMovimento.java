@@ -3,6 +3,7 @@ package DEAD.LAND.core;
 import DEAD.LAND.entity.player;
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.ui.panel;
+import DEAD.LAND.world.tileMap;
 
 public class ControladorMovimento {
 
@@ -16,6 +17,8 @@ public class ControladorMovimento {
     private static final int JOGADOR_Y_CENARIO_6 = 48;
 
     private final verificadorDeColisao verificadorDeColisao;
+    private boolean dashPressionado;
+    private long ultimaAtualizacaoNanos;
 
     public ControladorMovimento() {
         this.verificadorDeColisao = new verificadorDeColisao();
@@ -23,8 +26,26 @@ public class ControladorMovimento {
 
     public void atualizar(panel cenaDoJogo, escutadorTeclado teclado) {
         player jogador = cenaDoJogo.getJogador();
+        long agora = System.nanoTime();
+        double segundos = ultimaAtualizacaoNanos == 0 ? 1.0 / 60
+                : Math.max(0, Math.min(0.1, (agora - ultimaAtualizacaoNanos) / 1_000_000_000.0));
+        ultimaAtualizacaoNanos = agora;
+        int movimentoY = atualizarMovimento(jogador, cenaDoJogo.getCenario(), teclado, segundos);
+        trocarCenarioAoSairPelasLaterais(cenaDoJogo);
+        trocarCenarioAoDescer(cenaDoJogo, movimentoY);
+    }
 
-        if (teclado.dash) {
+    public void suspender(player jogador, escutadorTeclado teclado) {
+        dashPressionado = teclado.dash;
+        ultimaAtualizacaoNanos = 0;
+        jogador.pararCorrida();
+    }
+
+    public int atualizarMovimento(player jogador, tileMap cenario,
+            escutadorTeclado teclado, double segundos) {
+        boolean novoDash = teclado.dash && !dashPressionado;
+        dashPressionado = teclado.dash;
+        if (novoDash) {
             jogador.iniciarDash(
                     teclado.movePraEsq,
                     teclado.movePraCima,
@@ -33,26 +54,28 @@ public class ControladorMovimento {
             );
         }
 
-        if (jogador.atualizarDash(cenaDoJogo.getCenario(), this.verificadorDeColisao)) {
-            trocarCenarioAoSairPelasLaterais(cenaDoJogo);
-            trocarCenarioAoDescer(cenaDoJogo, 1);
-            return;
+        int antesY = jogador.y;
+        boolean emDash = jogador.atualizarDash(cenario, this.verificadorDeColisao);
+        boolean temDirecao = teclado.movePraEsq != teclado.movePraDir
+                || teclado.movePraCima != teclado.movePraBaixo;
+        jogador.atualizarCorrida(teclado.dash && temDirecao && !emDash, segundos);
+        if (emDash) {
+            return Integer.signum(jogador.y - antesY);
         }
 
-        int movimentoX = obterMovimentoEixo(teclado.movePraEsq, teclado.movePraDir, jogador.passo);
-        int movimentoY = obterMovimentoEixo(teclado.movePraCima, teclado.movePraBaixo, jogador.passo);
+        int passo = jogador.getPassoMovimento();
+        int movimentoX = obterMovimentoEixo(teclado.movePraEsq, teclado.movePraDir, passo);
+        int movimentoY = obterMovimentoEixo(teclado.movePraCima, teclado.movePraBaixo, passo);
 
         if (movimentoX != 0 && movimentoY != 0) {
-            int passoDiagonal = Math.max(1, (int) Math.round(jogador.passo / Math.sqrt(2)));
+            int passoDiagonal = Math.max(1, (int) Math.round(passo / Math.sqrt(2)));
             movimentoX = Integer.signum(movimentoX) * passoDiagonal;
             movimentoY = Integer.signum(movimentoY) * passoDiagonal;
         }
 
-        moverEixoSePossivel(cenaDoJogo, movimentoX, 0);
-        moverEixoSePossivel(cenaDoJogo, 0, movimentoY);
-
-        trocarCenarioAoSairPelasLaterais(cenaDoJogo);
-        trocarCenarioAoDescer(cenaDoJogo, movimentoY);
+        moverEixoSePossivel(jogador, cenario, movimentoX, 0);
+        moverEixoSePossivel(jogador, cenario, 0, movimentoY);
+        return movimentoY;
     }
 
     private int obterMovimentoEixo(boolean negativo, boolean positivo, int passo) {
@@ -68,20 +91,20 @@ public class ControladorMovimento {
         return movimento;
     }
 
-    private void moverEixoSePossivel(panel cenaDoJogo, int movimentoX, int movimentoY) {
+    private void moverEixoSePossivel(player jogador, tileMap cenario, int movimentoX, int movimentoY) {
         if (movimentoX == 0 && movimentoY == 0) {
             return;
         }
 
         boolean bateu = this.verificadorDeColisao.ocorreuColisao(
-                cenaDoJogo.getJogador(),
-                cenaDoJogo.getCenario(),
+                jogador,
+                cenario,
                 movimentoX,
                 movimentoY
         );
 
         if (!bateu) {
-            cenaDoJogo.getJogador().mover(movimentoX, movimentoY);
+            jogador.mover(movimentoX, movimentoY);
         }
     }
 
@@ -170,7 +193,7 @@ public class ControladorMovimento {
         // Por isso, a saída deve ser reconhecida quando ele encosta na borda,
         // sem exigir que o sprite ultrapasse o tamanho total do mapa.
         boolean chegouAoFimDoMapa = jogador.y + jogador.height
-                >= cenaDoJogo.getCenario().getAlturaTotal() - jogador.passo;
+                >= cenaDoJogo.getCenario().getAlturaTotal() - jogador.getPassoMovimento();
 
         return chegouAoFimDoMapa
                 && centroJogadorX >= inicioSaidaX

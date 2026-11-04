@@ -3,6 +3,7 @@ package DEAD.LAND.core;
 import DEAD.LAND.entity.item;
 import DEAD.LAND.entity.player;
 import DEAD.LAND.ui.Inventario;
+import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.world.tileMap;
 import java.io.File;
 import java.nio.file.Files;
@@ -13,6 +14,8 @@ public class ValidacaoTecnica {
         validarColisaoETransicao();
         validarInventario();
         validarDano();
+        validarEstamina();
+        validarDashECorrida();
         validarSave();
         System.out.println("Validacoes tecnicas OK");
     }
@@ -111,4 +114,75 @@ public class ValidacaoTecnica {
             throw new AssertionError(mensagem);
         }
     }
+
+    private static void validarEstamina() {
+        SistemaEstamina estamina = new SistemaEstamina();
+        exigir(estamina.consumirDash(), "dash deve aceitar estamina cheia");
+        exigir(estamina.getValor() == 80f, "um dash deve gastar exatamente 20% da barra");
+        estamina.atualizar(0.5, false);
+        exigir(estamina.getValor() == 80f, "estamina deve aguardar antes de recarregar");
+        estamina.atualizar(0.5, false);
+        exigir(Math.abs(estamina.getValor() - 84f) < 0.01f, "estamina deve recarregar gradualmente");
+        estamina.restaurarCompleta();
+        for (int i = 0; i < 5; i++) exigir(estamina.consumirDash(), "barra cheia deve permitir cinco gastos de dash");
+        exigir(!estamina.consumirDash(), "dash sem estamina deve ser bloqueado");
+        exigir(estamina.getValor() == 0f, "estamina nao pode ficar negativa");
+        estamina.atualizar(2, false);
+        exigir(estamina.consumirDash(), "dash deve voltar a funcionar apos recarga suficiente");
+        estamina.restaurarCompleta();
+        exigir(estamina.atualizar(1, true), "corrida deve iniciar com estamina");
+        exigir(estamina.getValor() == 90f, "corrida deve gastar dez pontos por segundo");
+        estamina.atualizar(9, true);
+        exigir(estamina.getValor() == 0f, "corrida deve esgotar a barra sem valor negativo");
+        exigir(!estamina.atualizar(0.1, true), "corrida deve parar ao esgotar a estamina");
+        estamina.atualizar(10, false);
+        exigir(estamina.getValor() == SistemaEstamina.MAXIMA, "recarga deve respeitar o maximo");
+    }
+
+    private static void validarDashECorrida() {
+        long[] agora = {0};
+        player jogador = new player(() -> agora[0]);
+        tileMap mapa = new tileMap();
+        mapa.irParaCenario(1);
+        ControladorMovimento movimento = new ControladorMovimento();
+        escutadorTeclado teclado = new escutadorTeclado();
+        teclado.movePraDir = true;
+        int inicioX = jogador.x;
+        movimento.atualizarMovimento(jogador, mapa, teclado, 0.016);
+        exigir(jogador.x - inicioX == jogador.passo, "WASD sem Shift deve manter velocidade de caminhada");
+        teclado.dash = true;
+        movimento.atualizarMovimento(jogador, mapa, teclado, 0.016);
+        exigir(jogador.estaEmDash(), "primeiro toque de Shift deve iniciar dash");
+        exigir(jogador.getEstamina() == 80f, "dash deve deixar 80% de estamina");
+        agora[0] = 240;
+        inicioX = jogador.x;
+        movimento.atualizarMovimento(jogador, mapa, teclado, 0.016);
+        exigir(!jogador.estaEmDash() && jogador.estaCorrendo(), "segurar Shift apos dash deve manter corrida");
+        exigir(jogador.x - inicioX > jogador.passo, "corrida deve ser mais rapida que caminhada");
+        exigir(!jogador.iniciarDash(false, false, true, false), "cooldown deve impedir dash antes de um segundo");
+        agora[0] = 1000;
+        movimento.atualizarMovimento(jogador, mapa, teclado, 0.016);
+        exigir(!jogador.estaEmDash(), "Shift segurado nao deve disparar novos dashes automaticamente");
+        teclado.dash = false;
+        movimento.atualizarMovimento(jogador, mapa, teclado, 0.016);
+        exigir(!jogador.estaCorrendo(), "soltar Shift deve encerrar corrida");
+        float antesDash = jogador.getEstamina();
+        teclado.dash = true;
+        movimento.atualizarMovimento(jogador, mapa, teclado, 0.016);
+        exigir(jogador.estaEmDash(), "novo toque deve permitir dash apos exatamente um segundo");
+        exigir(Math.abs(antesDash - jogador.getEstamina() - 20f) < 0.01f, "segundo dash tambem deve gastar somente 20 pontos");
+        jogador.prepararRespawn();
+        exigir(jogador.getEstamina() == 100f && !jogador.estaCorrendo(), "respawn deve restaurar estamina e interromper corrida");
+        jogador.definirVida(0);
+        exigir(!jogador.iniciarDash(false, false, true, false), "personagem morto nao pode usar dash");
+
+        player pertoDaParede = new player(() -> 0);
+        mapa.definirTile(4, 18, 60);
+        pertoDaParede.posicionarEm(830, 168);
+        exigir(pertoDaParede.iniciarDash(false, false, true, false), "dash deve iniciar perto da parede");
+        pertoDaParede.atualizarDash(mapa, new verificadorDeColisao());
+        exigir(pertoDaParede.AreaColisao.x + pertoDaParede.AreaColisao.width <= 18 * 48,
+                "dash nao pode atravessar parede");
+    }
+
 }

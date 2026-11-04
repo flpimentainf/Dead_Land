@@ -2,6 +2,7 @@ package DEAD.LAND.entity;
 
 import DEAD.LAND.core.verificadorDeColisao;
 import DEAD.LAND.core.ResourceManager;
+import DEAD.LAND.core.SistemaEstamina;
 import DEAD.LAND.world.tileMap;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -9,6 +10,7 @@ import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.util.function.LongSupplier;
 
 public class player extends Rectangle{
     private static final int VELOCIDADE_QUEDA_INICIAL = 1;
@@ -25,6 +27,10 @@ public class player extends Rectangle{
     private static final long DURACAO_DASH_MS = 240;
     private static final long INVENCIBILIDADE_DASH_MS = 170;
     private static final long COOLDOWN_DASH_MS = 1000;
+    private static final double MULTIPLICADOR_CORRIDA = 1.5;
+    private final LongSupplier relogio;
+    private final SistemaEstamina estamina = new SistemaEstamina();
+    private boolean correndo;
 
     private Color CorFundo = Color.WHITE;
     public Rectangle AreaColisao;
@@ -55,6 +61,11 @@ public class player extends Rectangle{
     private int frameJogador = 0;
 
     public player() {
+        this(System::currentTimeMillis);
+    }
+
+    public player(LongSupplier relogio) {
+        this.relogio = java.util.Objects.requireNonNull(relogio);
         this.x = 745;
         this.y = 335;
         this.width = 48;
@@ -157,6 +168,8 @@ public class player extends Rectangle{
 
     public void prepararRespawn() {
         restaurarVidaCompleta();
+        estamina.restaurarCompleta();
+        ultimoDashMs = -COOLDOWN_DASH_MS;
         interromperMovimentoTemporario();
         framesFlashDano = 0;
         framesInvencivel = FRAMES_INVENCIVEL;
@@ -168,7 +181,7 @@ public class player extends Rectangle{
     }
 
     public boolean estaInvencivel() {
-        return framesInvencivel > 0 || System.currentTimeMillis() < invulneravelDashAteMs;
+        return framesInvencivel > 0 || relogio.getAsLong() < invulneravelDashAteMs;
     }
 
     public float getIntensidadeFlashDano() {
@@ -182,8 +195,11 @@ public class player extends Rectangle{
     }
 
     public boolean iniciarDash(boolean moveEsq, boolean moveCima, boolean moveDir, boolean moveBaixo) {
-        long agora = System.currentTimeMillis();
+        long agora = relogio.getAsLong();
         if (estaMorto() || caindo || dashAtivo || agora - ultimoDashMs < COOLDOWN_DASH_MS) {
+            return false;
+        }
+        if (!estamina.consumirDash()) {
             return false;
         }
 
@@ -204,6 +220,7 @@ public class player extends Rectangle{
         this.direcaoDashX = dx;
         this.direcaoDashY = dy;
         this.dashAtivo = true;
+        this.correndo = false;
         this.ultimoDashMs = agora;
         this.fimDashMs = agora + DURACAO_DASH_MS;
         this.invulneravelDashAteMs = agora + INVENCIBILIDADE_DASH_MS;
@@ -215,7 +232,7 @@ public class player extends Rectangle{
             return false;
         }
 
-        if (System.currentTimeMillis() >= fimDashMs || estaMorto()) {
+        if (relogio.getAsLong() >= fimDashMs || estaMorto()) {
             dashAtivo = false;
             return false;
         }
@@ -228,8 +245,16 @@ public class player extends Rectangle{
             movimentoY = direcaoDashY * diagonal;
         }
 
-        moverComColisao(cenario, verificador, movimentoX, 0);
-        moverComColisao(cenario, verificador, 0, movimentoY);
+        int antesX = this.x;
+        int antesY = this.y;
+        // Passos curtos evitam atravessar colisoes durante o impulso.
+        for (int i = 0; i < Math.max(Math.abs(movimentoX), Math.abs(movimentoY)); i++) {
+            if (i < Math.abs(movimentoX)) moverComColisao(cenario, verificador, Integer.signum(movimentoX), 0);
+            if (i < Math.abs(movimentoY)) moverComColisao(cenario, verificador, 0, Integer.signum(movimentoY));
+        }
+        if (this.x == antesX && this.y == antesY) {
+            dashAtivo = false;
+        }
         return true;
     }
 
@@ -238,8 +263,20 @@ public class player extends Rectangle{
     }
 
     public float getProgressoCooldownDash() {
-        long decorrido = System.currentTimeMillis() - ultimoDashMs;
+        long decorrido = relogio.getAsLong() - ultimoDashMs;
         return Math.max(0f, Math.min(1f, decorrido / (float) COOLDOWN_DASH_MS));
+    }
+
+    public void atualizarCorrida(boolean tentarCorrer, double segundos) {
+        correndo = estamina.atualizar(segundos, tentarCorrer && !dashAtivo && !caindo && estaVivo());
+    }
+
+    public void pararCorrida() { correndo = false; }
+    public boolean estaCorrendo() { return correndo; }
+    public float getEstamina() { return estamina.getValor(); }
+    public float getProporcaoEstamina() { return estamina.getProporcao(); }
+    public int getPassoMovimento() {
+        return correndo ? Math.max(passo + 1, (int) Math.round(passo * MULTIPLICADOR_CORRIDA)) : passo;
     }
 
     private void prepararKnockback(int origemX, int origemY) {
@@ -290,6 +327,7 @@ public class player extends Rectangle{
     private void interromperMovimentoTemporario() {
         this.caindo = false;
         this.dashAtivo = false;
+        this.correndo = false;
         this.invulneravelDashAteMs = 0;
         this.velocidadeQueda = 0;
         this.framesKnockback = 0;
