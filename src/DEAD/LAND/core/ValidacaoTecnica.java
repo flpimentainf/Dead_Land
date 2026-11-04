@@ -43,6 +43,14 @@ public class ValidacaoTecnica {
         tileMap mapa = new tileMap();
         exigir(mapa.getLarguraTotal() > 0, "mapa deve ter largura");
         exigir(mapa.tileTemColisao(2, 18) && mapa.tileTemColisao(3, 18), "as duas metades da cama devem bloquear");
+        Rectangle portaDupla = new Rectangle(15 * 48, 8 * 48, 96, 48);
+        var folhaEsquerda = mapa.getInteracaoPerto(new Rectangle(15 * 48 + 4, 8 * 48 - 12, 12, 12));
+        var folhaDireita = mapa.getInteracaoPerto(new Rectangle(17 * 48 - 8, 8 * 48 - 12, 12, 12));
+        exigir(folhaEsquerda != null && folhaDireita != null
+                        && folhaEsquerda.tipo == tileMap.TIPO_PORTA && folhaDireita.tipo == tileMap.TIPO_PORTA
+                        && folhaEsquerda.area.equals(portaDupla) && folhaDireita.area.equals(portaDupla),
+                "as duas folhas devem reconhecer uma unica porta de 96x48");
+
         mapa.irParaCenario(5);
         exigir(mapa.getCenarioAtualIndex() == 5, "transicao direta deve trocar cenario");
         exigir(mapa.getCenarioAtual() != null, "cenario atual deve ter metadados");

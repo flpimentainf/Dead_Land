@@ -6,7 +6,7 @@ import java.awt.Rectangle;
 public class tileMap {
 	private static final int VAZIO = -1;
 	private static final int TILE_CAMA = 0;
-	private static final int[] TILE_PORTA = {51, 31};
+	private static final int[] TILE_PORTA = {51, 31, 32};
 	public static final int TIPO_CAMA = 1;
 	public static final int TIPO_PORTA = 2;
 	private static final int ALCANCE_INTERACAO = 16;
@@ -485,16 +485,18 @@ public class tileMap {
 			for (int col = 0; col < this.camadaObjetosValida[lin].length; col++) {
 				int tileObjeto = this.camadaObjetosValida[lin][col];
 				int tileBase = this.cenarioValido[lin][col];
+				int tileInterativo = tileObjeto;
 				int tipo = getTipoInteracao(tileObjeto);
 				if (tipo == SEM_INTERACAO) {
 					tipo = getTipoInteracao(tileBase);
+					tileInterativo = tileBase;
 				}
 
 				if (tipo == SEM_INTERACAO) {
 					continue;
 				}
 
-				Rectangle areaObjeto = getAreaObjetoInterativo(lin, col, tileObjeto);
+				Rectangle areaObjeto = getAreaObjetoInterativo(lin, col, tileInterativo);
 
 				if (areaInteracao.intersects(areaObjeto)) {
 					return new InteracaoPerto(areaObjeto, tipo);
@@ -514,7 +516,9 @@ public class tileMap {
 
 	private Rectangle getAreaObjetoInterativo(int linha, int coluna, int tileObjeto) {
 		int linhaInicial = linha;
+		int colunaInicial = coluna;
 		int altura = tiles.ALTURA;
+		int largura = tiles.LARGURA;
 		if (tileObjeto == tiles.TILE_CAMA_CABECEIRA
 				&& linha + 1 < camadaObjetosValida.length
 				&& camadaObjetosValida[linha + 1][coluna] == tiles.TILE_CAMA_PESEIRA) {
@@ -524,7 +528,14 @@ public class tileMap {
 			linhaInicial--;
 			altura *= 2;
 		}
-		return new Rectangle(coluna * tiles.LARGURA, linhaInicial * tiles.ALTURA, tiles.LARGURA, altura);
+		if (tileObjeto == 31 && coluna + 1 < cenarioValido[linha].length
+				&& cenarioValido[linha][coluna + 1] == 32) {
+			largura *= 2;
+		} else if (tileObjeto == 32 && coluna > 0 && cenarioValido[linha][coluna - 1] == 31) {
+			colunaInicial--;
+			largura *= 2;
+		}
+		return new Rectangle(colunaInicial * tiles.LARGURA, linhaInicial * tiles.ALTURA, largura, altura);
 	}
 
 	public Rectangle getAreaInteracaoPerto(Rectangle areaJogador) {

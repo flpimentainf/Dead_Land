@@ -266,11 +266,45 @@ public final class RenderizadorTiles {
         textura(g, parede(cenario), variacao);
         g.setColor(new Color(28, 34, 42, 180));
         g.fillRect(0, 42, 48, 6);
-        if (id == 25 || id == 30 || id == 31 || id == 32) {
+        if (id == 31 || id == 32) {
+            desenharPortaDupla(g, id);
+        } else if (id == 25 || id == 30) {
             porta(g, id == 25);
         } else if (id == 28 || id == 29) {
             janela(g, 12, 10, 24, 24);
         }
+    }
+
+    private void desenharPortaDupla(Graphics2D g, int id) {
+        Graphics2D porta = (Graphics2D) g.create();
+        try {
+            // Os dois tiles recortam a mesma porta de 96 px, com moldura contínua.
+            porta.translate(id == 32 ? -TAMANHO : 0, 0);
+            porta.setColor(new Color(23, 19, 20));
+            porta.fillRect(4, 2, 88, 46);
+            porta.setColor(new Color(86, 58, 35));
+            porta.fillRect(6, 4, 84, 4);
+            porta.fillRect(6, 8, 4, 40);
+            porta.fillRect(86, 8, 4, 40);
+            Image madeira = materiais[Material.MADEIRA_ESCURA.ordinal()];
+            porta.drawImage(madeira, 10, 8, 38, 40, null);
+            porta.drawImage(madeira, 86, 8, -38, 40, null);
+            porta.setColor(new Color(50, 32, 24));
+            porta.drawRect(14, 12, 28, 30);
+            porta.drawRect(53, 12, 28, 30);
+            porta.setColor(new Color(159, 114, 64));
+            porta.drawRect(16, 14, 24, 26);
+            porta.drawRect(55, 14, 24, 26);
+            porta.fillRect(8, 4, 80, 2);
+            porta.setColor(new Color(27, 21, 21));
+            porta.fillRect(47, 8, 2, 40);
+            porta.setColor(new Color(70, 49, 31));
+            porta.fillRect(42, 26, 4, 8);
+            porta.fillRect(50, 26, 4, 8);
+            porta.setColor(new Color(221, 177, 83));
+            porta.fillRect(42, 28, 4, 4);
+            porta.fillRect(50, 28, 4, 4);
+        } finally { porta.dispose(); }
     }
 
     private void desenharMuralha(Graphics2D g, int id, CenarioId cenario, int variacao) {
