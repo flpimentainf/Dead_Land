@@ -352,9 +352,9 @@ public class SistemaHistoria {
             eventosHistoria.add(EVENTO_CACADOR_RECOMPENSA);
             objetivoSecundario = "Ajuda do Cacador concluida.";
             if (cenaDoJogo != null && cenaDoJogo.getInventario() != null) {
-                cenaDoJogo.getInventario().adicionarFlechas(6);
+                cenaDoJogo.getInventario().adicionarFlechas(12);
                 cenaDoJogo.getInventario().definirQuantidadeCura(
-                        cenaDoJogo.getInventario().getQuantidadeCura() + 1
+                        cenaDoJogo.getInventario().getQuantidadeCura() + 2
                 );
                 cenaDoJogo.atualizarInventario();
             }
@@ -367,7 +367,7 @@ public class SistemaHistoria {
             mostrarMensagem(
                     "Cacador",
                     "Tres lembrancas ja sao uma trilha. Pegue isto.",
-                    "Você recebeu flechas e uma Poção de Cura."
+                    "Você recebeu 12 flechas e 2 Poções de Cura."
             );
             return;
         }
@@ -376,7 +376,8 @@ public class SistemaHistoria {
             objetivoSecundario = "Encontre 3 fragmentos de memoria.";
             mostrarMensagem(
                     "Cacador",
-                    "Traga tres fragmentos de memoria e eu divido meus suprimentos.",
+                    "Traga três fragmentos de memória.",
+                    "Em troca, você recebe 12 flechas e 2 Poções de Cura.",
                     "Memorias encontradas: " + memorias + "/" + MEMORIAS_PARA_RECOMPENSA
             );
             return;

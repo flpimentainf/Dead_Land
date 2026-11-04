@@ -29,6 +29,7 @@ public class ValidacaoTecnica {
         validarViewport();
         validarFlechasDirecionais();
         SwingUtilities.invokeAndWait(ValidacaoTecnica::validarMouse);
+        SwingUtilities.invokeAndWait(ValidacaoTecnica::validarMemorias);
         validarSave();
         System.out.println("Validacoes tecnicas OK");
     }
@@ -303,6 +304,38 @@ public class ValidacaoTecnica {
         } finally {
             cena.pausarJogo();
             AudioManager.getInstancia().definirVolume(AudioManager.Canal.MASTER, volumeAnterior);
+        }
+    }
+
+    private static void validarMemorias() {
+        Inventario inventario = new Inventario();
+        panel cena = new panel("centro", inventario) {
+            @Override public void salvarAuto() {}
+            @Override public void salvarAutoForcado() {}
+        };
+        try {
+            cena.pausarJogo();
+            cena.irParaCenario(2, 600, 240);
+            cena.getHistoria().restaurarAposRespawn(null, inventario.getNomesItens(), 2, false);
+            escutadorTeclado teclado = new escutadorTeclado();
+            teclado.interagir = true;
+            cena.getControladorItens().atualizar(cena, teclado);
+            exigir(cena.getMemoryManager().foiDescoberta("memoria_01"), "orbe deve continuar coletavel");
+            exigir(cena.getMemoryManager().getTotal() == 5, "as cinco memorias devem continuar disponiveis");
+            exigir(new File(item.SPRITE_MEMORIA).isFile(), "sprite da orbe deve continuar disponivel");
+            cena.getMemoryManager().coletar("memoria_02");
+            cena.getMemoryManager().coletar("memoria_03");
+            cena.getHistoria().eventoFalarComNpc("cacador_memorias", cena);
+            exigir(inventario.getQuantidadeFlechas() == 12, "tres memorias devem render doze flechas");
+            exigir(inventario.getQuantidadeCura() == 2, "tres memorias devem render duas pocoes");
+            cena.getHistoria().eventoFalarComNpc("cacador_memorias", cena);
+            exigir(inventario.getQuantidadeFlechas() == 12 && inventario.getQuantidadeCura() == 2,
+                    "recompensa das memorias deve ser entregue uma unica vez");
+            cena.getSistemaCheckpoint().restaurar(cena);
+            exigir(cena.getMemoryManager().getQuantidadeDescoberta() == 3,
+                    "retorno ao checkpoint deve preservar as memorias coletadas");
+        } finally {
+            cena.pausarJogo();
         }
     }
 

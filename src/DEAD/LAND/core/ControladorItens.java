@@ -31,15 +31,15 @@ public class ControladorItens {
         this.itens.add(new item("repos/tiles/tile (64).png", CENARIO_CHAVE_BOSS, 1, 26, TILE_TERRA, "chave_boss_63"));
         this.itens.add(new item(item.SPRITE_POCAO_CURA, 5, 480, 144,
                 "pocao_cura", Categoria.CONSUMIVEL, 1, true));
-        this.itens.add(new item("repos/tiles/tile (64).png", 2, 600, 240,
+        this.itens.add(new item(item.SPRITE_MEMORIA, 2, 600, 240,
                 "memoria_01", Categoria.ITEM_HISTORIA, 1, false));
-        this.itens.add(new item("repos/tiles/tile (64).png", 3, 210, 245,
+        this.itens.add(new item(item.SPRITE_MEMORIA, 3, 210, 245,
                 "memoria_02", Categoria.ITEM_HISTORIA, 1, false));
-        this.itens.add(new item("repos/tiles/tile (64).png", 5, 1080, 340,
+        this.itens.add(new item(item.SPRITE_MEMORIA, 5, 1080, 340,
                 "memoria_03", Categoria.ITEM_HISTORIA, 1, false));
-        this.itens.add(new item("repos/tiles/tile (64).png", 6, 720, 250,
+        this.itens.add(new item(item.SPRITE_MEMORIA, 6, 720, 250,
                 "memoria_04", Categoria.ITEM_HISTORIA, 1, false));
-        this.itens.add(new item("repos/tiles/tile (64).png", 7, 520, 305,
+        this.itens.add(new item(item.SPRITE_MEMORIA, 7, 520, 305,
                 "memoria_05", Categoria.ITEM_HISTORIA, 1, false));
     }
 
