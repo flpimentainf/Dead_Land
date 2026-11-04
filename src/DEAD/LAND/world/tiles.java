@@ -9,7 +9,10 @@ import java.util.Set;
 public class tiles {
     public static final int LARGURA = 48;
     public static final int ALTURA = 48;
-    public static final int TOTAL_TILES = 64;
+    private static final int TILES_BASE = 64;
+    public static final int TILE_CAMA_CABECEIRA = 64;
+    public static final int TILE_CAMA_PESEIRA = 65;
+    public static final int TOTAL_TILES = 66;
 
     private static final String PASTA_TILES = "repos/tiles/";
 
@@ -30,6 +33,8 @@ public class tiles {
         // Valores da matriz que devem bloquear o jogador.
         // Para adicionar/remover blocos solidos, edite esta lista.
         this.tilesSolidos.add(0);
+        this.tilesSolidos.add(TILE_CAMA_CABECEIRA);
+        this.tilesSolidos.add(TILE_CAMA_PESEIRA);
         this.tilesSolidos.add(53);
         this.tilesSolidos.add(23);
         this.tilesSolidos.add(24);
@@ -79,9 +84,11 @@ public class tiles {
     }
 
     private void carregarTodasImagens() {
-        for (int i = 1; i <= TOTAL_TILES; i++) {
+        for (int i = 1; i <= TILES_BASE; i++) {
             this.imagensTiles[i] = carregarImagem(PASTA_TILES + "tile (" + i + ").png");
         }
+        this.imagensTiles[TILE_CAMA_CABECEIRA + AJUSTE_ID_ARQUIVO] = carregarImagem("repos/quarto/cama_cima.png");
+        this.imagensTiles[TILE_CAMA_PESEIRA + AJUSTE_ID_ARQUIVO] = carregarImagem("repos/quarto/cama_baixo.png");
     }
 
     public void carregaPecaDaMatriz(int valorDaPeca) {

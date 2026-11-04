@@ -22,6 +22,7 @@ import javax.swing.SwingUtilities;
 public class ValidacaoTecnica {
     public static void main(String[] args) throws Exception {
         validarColisaoETransicao();
+        validarCamaDoisTiles();
         validarInventario();
         validarDano();
         validarEstamina();
@@ -37,13 +38,38 @@ public class ValidacaoTecnica {
     private static void validarColisaoETransicao() {
         tileMap mapa = new tileMap();
         exigir(mapa.getLarguraTotal() > 0, "mapa deve ter largura");
-        exigir(mapa.tileTemColisao(3, 19), "objeto interativo solido deve bloquear");
-
+        exigir(mapa.tileTemColisao(2, 18) && mapa.tileTemColisao(3, 18), "as duas metades da cama devem bloquear");
         mapa.irParaCenario(5);
         exigir(mapa.getCenarioAtualIndex() == 5, "transicao direta deve trocar cenario");
         exigir(mapa.getCenarioAtual() != null, "cenario atual deve ter metadados");
         mapa.irParaProximoCenario();
         exigir(mapa.getCenarioAtualIndex() == 6, "proximo cenario deve avancar");
+    }
+
+    private static void validarCamaDoisTiles() throws Exception {
+        tileMap mapa = new tileMap();
+        Rectangle camaCompleta = new Rectangle(18 * 48, 2 * 48, 48, 96);
+        tileMap.InteracaoPerto cabeca = mapa.getInteracaoPerto(new Rectangle(18 * 48 - 20, 2 * 48 + 4, 12, 20));
+        tileMap.InteracaoPerto pes = mapa.getInteracaoPerto(new Rectangle(18 * 48 + 4, 4 * 48 + 4, 20, 12));
+        exigir(cabeca != null && cabeca.tipo == tileMap.TIPO_CAMA, "cabeceira deve reconhecer interacao de cama");
+        exigir(pes != null && pes.tipo == tileMap.TIPO_CAMA, "peseira deve reconhecer interacao de cama");
+        exigir(cabeca.area.equals(camaCompleta) && pes.area.equals(camaCompleta),
+                "as metades devem formar uma unica area de interacao 48x96");
+        exigir(!mapa.tileTemColisao(3, 19), "deve existir passagem ao lado da cama");
+        SwingUtilities.invokeAndWait(() -> {
+            panel cena = new panel("centro", new Inventario());
+            try {
+                cena.pausarJogo();
+                cena.getJogador().posicionarEm(18 * 48, 168);
+                cena.getHistoria().restaurarAposRespawn(null, java.util.Set.of(), 0, false);
+                escutadorTeclado teclado = new escutadorTeclado();
+                teclado.interagir = true;
+                ControladorInteracao interacao = new ControladorInteracao();
+                for (int i = 0; i < 20; i++) interacao.atualizar(cena, teclado);
+                exigir(cena.getCenario().getCenarioAtualIndex() == 1,
+                        "segurar E junto da peseira deve iniciar a sequencia de dormir");
+            } finally { cena.pausarJogo(); }
+        });
     }
 
     private static void validarInventario() {

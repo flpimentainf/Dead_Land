@@ -137,18 +137,7 @@ public class tileMap {
 		{60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60},
 	};
 
-	int[][] cenario1Objetos = {
-		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
-		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
-		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
-		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO,     0, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
-		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
-		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
-		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
-		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
-		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
-		{ VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO },
-	};
+	int[][] cenario1Objetos = criarObjetosQuarto();
 
 	int[][] cenario3Objetos = {
 		{56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56},
@@ -468,11 +457,15 @@ public class tileMap {
 	}
 
 	private boolean ehTileInterativo(int tile) {
-		return tile == TILE_CAMA || ehTilePorta(tile);
+		return ehTileCama(tile) || ehTilePorta(tile);
+	}
+
+	private boolean ehTileCama(int tile) {
+		return tile == TILE_CAMA || tile == tiles.TILE_CAMA_CABECEIRA || tile == tiles.TILE_CAMA_PESEIRA;
 	}
 
 	private int getTipoInteracao(int tile) {
-		if (tile == TILE_CAMA) {
+		if (ehTileCama(tile)) {
 			return TIPO_CAMA;
 		}
 
@@ -500,12 +493,7 @@ public class tileMap {
 					continue;
 				}
 
-				Rectangle areaObjeto = new Rectangle(
-						col * tiles.LARGURA,
-						lin * tiles.ALTURA,
-						tiles.LARGURA,
-						tiles.ALTURA
-				);
+				Rectangle areaObjeto = getAreaObjetoInterativo(lin, col, tileObjeto);
 
 				if (areaInteracao.intersects(areaObjeto)) {
 					return new InteracaoPerto(areaObjeto, tipo);
@@ -514,6 +502,28 @@ public class tileMap {
 		}
 
 		return null;
+	}
+
+	private int[][] criarObjetosQuarto() {
+		int[][] objetos = criarCamadaVazia(this.cenario1DoJogo);
+		objetos[2][18] = tiles.TILE_CAMA_CABECEIRA;
+		objetos[3][18] = tiles.TILE_CAMA_PESEIRA;
+		return objetos;
+	}
+
+	private Rectangle getAreaObjetoInterativo(int linha, int coluna, int tileObjeto) {
+		int linhaInicial = linha;
+		int altura = tiles.ALTURA;
+		if (tileObjeto == tiles.TILE_CAMA_CABECEIRA
+				&& linha + 1 < camadaObjetosValida.length
+				&& camadaObjetosValida[linha + 1][coluna] == tiles.TILE_CAMA_PESEIRA) {
+			altura *= 2;
+		} else if (tileObjeto == tiles.TILE_CAMA_PESEIRA && linha > 0
+				&& camadaObjetosValida[linha - 1][coluna] == tiles.TILE_CAMA_CABECEIRA) {
+			linhaInicial--;
+			altura *= 2;
+		}
+		return new Rectangle(coluna * tiles.LARGURA, linhaInicial * tiles.ALTURA, tiles.LARGURA, altura);
 	}
 
 	public Rectangle getAreaInteracaoPerto(Rectangle areaJogador) {
