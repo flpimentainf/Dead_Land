@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import DEAD.LAND.core.ResourceManager;
 import DEAD.LAND.core.verificadorDeColisao;
 import DEAD.LAND.world.tileMap;
+import DEAD.LAND.ui.IconeInteracao;
 
 public class NPC extends Rectangle {
 
@@ -231,32 +232,10 @@ public class NPC extends Rectangle {
         }
     }
 
-    public void desenharIndicadorInteracao(Graphics2D g2) {
-        int caixaLargura = 86;
-        int caixaAltura = 22;
-
-        int caixaX = x + width / 2 - caixaLargura / 2;
-        int caixaY = y - caixaAltura - 24;
-
-        if (caixaY < 4) {
-            caixaY = y + 4;
-        }
-
-        g2.setColor(new Color(30, 30, 30, 190));
-        g2.fillRoundRect(caixaX, caixaY, caixaLargura, caixaAltura, 8, 8);
-
-        g2.setColor(Color.WHITE);
-        g2.drawRoundRect(caixaX, caixaY, caixaLargura, caixaAltura, 8, 8);
-
-        g2.setFont(new Font("Arial", Font.BOLD, 12));
-
-        String texto = "E  Falar";
-        FontMetrics fm = g2.getFontMetrics();
-
-        int textoX = caixaX + (caixaLargura - fm.stringWidth(texto)) / 2;
-        int textoY = caixaY + (caixaAltura + fm.getAscent()) / 2 - 3;
-
-        g2.drawString(texto, textoX, textoY);
+    public void desenharIndicadorInteracao(Graphics2D g2, Rectangle limites, Rectangle jogador) {
+        Rectangle personagemENome = new Rectangle(x, y - 19, width, height + 19);
+        IconeInteracao.desenharIndicador(g2, personagemENome, limites, jogador,
+                "E  Falar", new Color(30, 30, 30, 190));
     }
 
     private Image getSpriteAtual() {

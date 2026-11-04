@@ -358,8 +358,7 @@ public class panel extends JPanel{
             getJogador().desenharPlayer(g2);
             if (this.controladorFlechas != null) this.controladorFlechas.desenhar(g2);
             if (this.controladorItens != null) this.controladorItens.desenhar(g2, this);
-            this.iconeInteracao.desenharArea(g2, this.cenario, getJogador());
-            if (this.controladorNPCs != null) this.controladorNPCs.desenharIndicadorInteracao(g2, this);
+            desenharIndicadorInteracao(g2);
             if (this.feedback != null) this.feedback.desenharMundo(g2);
 
             g2.setTransform(transformacaoOriginal);
@@ -377,6 +376,24 @@ public class panel extends JPanel{
 
         desenharQuadroLogicoNaTela(g2Tela, quadro);
         atualizarCursorMouse();
+    }
+
+    private void desenharIndicadorInteracao(Graphics2D g2) {
+        if (this.menuPausaAberto || getJogador().estaMorto()) return;
+        if (this.historia != null && (this.historia.isExibindoMensagem()
+                || this.historia.isExibindoEscolha() || this.historia.isTelaEscura())) return;
+
+        int topo = 8;
+        if (this.historia != null) {
+            String secundario = this.historia.getObjetivoSecundario();
+            topo = secundario != null && !secundario.isBlank() ? 82 : 60;
+        }
+        Rectangle limites = new Rectangle(this.camera.getXRender() + 8, this.camera.getYRender() + topo,
+                LARGURA_LOGICA - 16, ALTURA_LOGICA - topo - 8);
+        // A indicação acompanha a mesma prioridade da ação executada pela tecla E.
+        boolean falando = this.controladorNPCs != null
+                && this.controladorNPCs.desenharIndicadorInteracao(g2, this, limites);
+        if (!falando) this.iconeInteracao.desenharArea(g2, this.cenario, getJogador(), limites);
     }
 
     private BufferedImage getQuadroLogico() {

@@ -6,7 +6,7 @@ import java.awt.Rectangle;
 public class tileMap {
 	private static final int VAZIO = -1;
 	private static final int TILE_CAMA = 0;
-	private static final int[] TILE_PORTA = {51, 31, 32};
+	private static final int[] TILE_PORTA = {51, 52, 31, 32};
 	public static final int TIPO_CAMA = 1;
 	public static final int TIPO_PORTA = 2;
 	private static final int ALCANCE_INTERACAO = 16;
@@ -534,6 +534,17 @@ public class tileMap {
 		} else if (tileObjeto == 32 && coluna > 0 && cenarioValido[linha][coluna - 1] == 31) {
 			colunaInicial--;
 			largura *= 2;
+		}
+		if (tileObjeto == 51 || tileObjeto == 52) {
+			int inicioArco = tileObjeto == 52 ? coluna - 1 : coluna;
+			if (linha > 0 && inicioArco >= 0 && inicioArco + 1 < cenarioValido[linha].length
+					&& cenarioValido[linha][inicioArco] == 51 && cenarioValido[linha][inicioArco + 1] == 52
+					&& cenarioValido[linha - 1][inicioArco] == 43 && cenarioValido[linha - 1][inicioArco + 1] == 44) {
+				colunaInicial = inicioArco;
+				linhaInicial = linha - 1;
+				largura = tiles.LARGURA * 2;
+				altura = tiles.ALTURA * 2;
+			}
 		}
 		return new Rectangle(colunaInicial * tiles.LARGURA, linhaInicial * tiles.ALTURA, largura, altura);
 	}

@@ -5,6 +5,7 @@ import DEAD.LAND.entity.player;
 import DEAD.LAND.ui.panel;
 import DEAD.LAND.world.tiles;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,11 +57,13 @@ public class ControladorNPCs {
         }
     }
 
-    public void desenharIndicadorInteracao(Graphics2D g2, panel cenaDoJogo) {
+    public boolean desenharIndicadorInteracao(Graphics2D g2, panel cenaDoJogo, Rectangle limites) {
         NPC npc = getNpcPerto(cenaDoJogo);
         if (npc != null) {
-            npc.desenharIndicadorInteracao(g2);
+            npc.desenharIndicadorInteracao(g2, limites, cenaDoJogo.getJogador());
+            return true;
         }
+        return false;
     }
 
     public NPC getNpcPerto(panel cenaDoJogo) {
