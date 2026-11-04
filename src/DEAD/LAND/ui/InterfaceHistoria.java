@@ -67,8 +67,8 @@ public class InterfaceHistoria {
         linhas.add((historia.getOpcaoEscolhida() == 0 ? "> " : "  ") + historia.getOpcaoEscolha1());
         linhas.add((historia.getOpcaoEscolhida() == 1 ? "> " : "  ") + historia.getOpcaoEscolha2());
         String rodape = historia.isEscolhaNpc()
-                ? "↑/↓ escolhe | ENTER/E confirma"
-                : "↑/↓ escolhe | ENTER/E confirma | ESC 3x: segredo";
+                ? "W/S escolhe | ENTER/E confirma"
+                : "W/S escolhe | ENTER/E confirma | ESC 3x: segredo";
         desenharCaixaTexto(g2, largura, altura, linhas, rodape, historia.getNomeNpcFalando());
     }
 

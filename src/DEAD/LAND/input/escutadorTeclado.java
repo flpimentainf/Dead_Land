@@ -35,16 +35,16 @@ public class escutadorTeclado implements KeyListener{
 	public void keyPressed(KeyEvent e) {
 		int numTecla = e.getKeyCode();
 		switch (numTecla) {
-		case 37: //esquerda
+		case KeyEvent.VK_A:
 			this.movePraEsq = true;
 			break;
-		case 38: //cima
+		case KeyEvent.VK_W:
 			this.movePraCima = true;
 			break;
-		case 39: //direita
+		case KeyEvent.VK_D:
 			this.movePraDir = true;
 			break;
-		case 40: //baixo
+		case KeyEvent.VK_S:
 			this.movePraBaixo = true;
 			break;
 		case KeyEvent.VK_E:
@@ -76,16 +76,16 @@ public class escutadorTeclado implements KeyListener{
 	public void keyReleased(KeyEvent e) {
 		int numTecla = e.getKeyCode();
 		switch (numTecla) {
-		case 37: //esquerda
+		case KeyEvent.VK_A:
 			this.movePraEsq = false;
 			break;
-		case 38: //cima
+		case KeyEvent.VK_W:
 			this.movePraCima = false;
 			break;
-		case 39: //direita
+		case KeyEvent.VK_D:
 			this.movePraDir = false;
 			break;
-		case 40: //baixo
+		case KeyEvent.VK_S:
 			this.movePraBaixo = false;
 			break;
 		case KeyEvent.VK_E:
