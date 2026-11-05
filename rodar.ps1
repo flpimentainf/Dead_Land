@@ -15,13 +15,18 @@ if ($LASTEXITCODE -ne 0 -or $compilerVersion -notmatch 'javac\s+(\d+)' -or [int]
     throw "Instale um JDK 21 ou superior. Compilador encontrado: $compilerVersion"
 }
 
-$buildDirectory = Join-Path $PSScriptRoot 'build'
-$runName = 'run-' + [Guid]::NewGuid().ToString('N')
-$classesDirectory = Join-Path (Join-Path $buildDirectory $runName) 'classes'
-New-Item -ItemType Directory -Path $classesDirectory -Force | Out-Null
+$temporaryRoot = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath())
+$runName = 'DeadLand-' + [Guid]::NewGuid().ToString('N')
+$runDirectory = [System.IO.Path]::GetFullPath((Join-Path $temporaryRoot $runName))
+$temporaryPrefix = $temporaryRoot.TrimEnd([System.IO.Path]::DirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
+if (-not $runDirectory.StartsWith($temporaryPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw 'O diretorio de compilacao precisa ficar na pasta temporaria do sistema.'
+}
+$classesDirectory = Join-Path $runDirectory 'classes'
 
 Push-Location -LiteralPath $PSScriptRoot
 try {
+    New-Item -ItemType Directory -Path $classesDirectory -Force | Out-Null
     $sourceFiles = @(Get-ChildItem -LiteralPath 'src' -Recurse -File -Filter '*.java' | Sort-Object FullName | ForEach-Object FullName)
     if ($sourceFiles.Count -eq 0) {
         throw 'Nenhum arquivo Java encontrado na pasta src.'
@@ -40,12 +45,22 @@ try {
         }
     }
 
-    Set-Content -LiteralPath (Join-Path $buildDirectory 'ultima-compilacao.txt') -Value $classesDirectory -Encoding UTF8
-    Write-Host "Iniciando compilacao atualizada: $runName"
+    Write-Host 'Iniciando o jogo atualizado...'
     & $javaExecutable -cp $classesDirectory DEAD.LAND.main
     if ($LASTEXITCODE -ne 0) {
         throw "O jogo encerrou com o codigo $LASTEXITCODE."
     }
 } finally {
     Pop-Location
+    if (Test-Path -LiteralPath $runDirectory) {
+        $resolvedRunDirectory = [System.IO.Path]::GetFullPath((Resolve-Path -LiteralPath $runDirectory).Path)
+        if ($resolvedRunDirectory -ne $runDirectory -or -not $resolvedRunDirectory.StartsWith($temporaryPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw 'Diretorio temporario inesperado durante a limpeza.'
+        }
+        $temporaryItems = @((Get-Item -LiteralPath $resolvedRunDirectory -Force)) + @(Get-ChildItem -LiteralPath $resolvedRunDirectory -Recurse -Force)
+        if (@($temporaryItems | Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint }).Count -gt 0) {
+            throw 'A compilacao temporaria contem um link inesperado.'
+        }
+        Remove-Item -LiteralPath $resolvedRunDirectory -Recurse -Force -ErrorAction Stop
+    }
 }
