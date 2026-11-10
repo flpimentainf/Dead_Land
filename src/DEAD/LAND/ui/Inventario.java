@@ -82,7 +82,16 @@ public class Inventario {
         int indiceSlot = 0;
         boolean mostrarFlechas = arcoEquipado();
 
+        // O slot da arma fica fixo à direita, independentemente da ordem de coleta.
+        for (item arma : this.itens) {
+            if (ehArma(arma.getNome()) && arma.getNome().equals(armaEquipada)) {
+                desenharItem(g2, arma, largura, y, indiceSlot++);
+                break;
+            }
+        }
+
         for (item itemColetado : this.itens) {
+            if (ehArma(itemColetado.getNome())) continue;
             if ("flecha".equals(itemColetado.getNome()) && !mostrarFlechas) {
                 continue;
             }
@@ -237,9 +246,8 @@ public class Inventario {
 
     private void desenharDicaTecla(Graphics2D g2, item itemColetado, int x, int y) {
         String tecla = null;
-        if (ehArma(itemColetado.getNome())) {
-            tecla = itemColetado.getNome().equals(armaEquipada) ? "M1 / Q" : "Q";
-        }
+        boolean arma = ehArma(itemColetado.getNome());
+        if (arma) tecla = "Q";
         if ("pocao_cura".equals(itemColetado.getNome())) {
             tecla = "H";
         }
@@ -248,9 +256,9 @@ public class Inventario {
         g2.setFont(new Font("Arial", Font.BOLD, 10));
         FontMetrics fm = g2.getFontMetrics();
         int tw = fm.stringWidth(tecla) + 8;
-        int th = 14;
-        int tx = x + (TAMANHO_SLOT - tw) / 2;
-        int ty = y - th - 3;
+        int th = arma ? 18 : 14;
+        int tx = arma ? x + TAMANHO_SLOT - tw - 3 : x + (TAMANHO_SLOT - tw) / 2;
+        int ty = arma ? y + 3 : y - th - 3;
 
         g2.setColor(new Color(0, 0, 0, 160));
         g2.fillRoundRect(tx, ty, tw, th, 5, 5);
@@ -267,7 +275,11 @@ public class Inventario {
                 ? new Color(255, 210, 80)
                 : new Color(90, 60, 20));
         g2.drawRoundRect(x, y, TAMANHO_SLOT, TAMANHO_SLOT, 10, 10);
-        g2.drawImage(itemColetado.getSprite(), x + 6, y + 6, TAMANHO_SLOT - 12, TAMANHO_SLOT - 12, null);
+        if (ehArma(itemColetado.getNome())) {
+            g2.drawImage(itemColetado.getSprite(), x + 10, y + 16, 44, 44, null);
+        } else {
+            g2.drawImage(itemColetado.getSprite(), x + 6, y + 6, TAMANHO_SLOT - 12, TAMANHO_SLOT - 12, null);
+        }
     }
 
     private void desenharQuantidade(Graphics2D g2, item itemColetado, int x, int y) {
