@@ -1,6 +1,7 @@
 package DEAD.LAND.world;
 
 import DEAD.LAND.core.ResourceManager;
+import DEAD.LAND.entity.item;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.util.HashSet;
@@ -95,7 +96,9 @@ public class tiles {
     private void carregarTodasImagens() {
         for (int i = 1; i <= TILES_BASE; i++) {
             if (!RenderizadorTiles.temNovoVisual(i - AJUSTE_ID_ARQUIVO)) {
-                this.imagensTiles[i] = carregarImagem(PASTA_TILES + "tile (" + i + ").png");
+                String caminho = i == 47 ? item.SPRITE_ARCO : i == 48 ? item.SPRITE_FLECHA
+                        : PASTA_TILES + "tile (" + i + ").png";
+                this.imagensTiles[i] = carregarImagem(caminho);
             }
         }
         this.imagensTiles[TILE_CAMA_CABECEIRA + AJUSTE_ID_ARQUIVO] = carregarImagem("repos/quarto/cama_cima.png");

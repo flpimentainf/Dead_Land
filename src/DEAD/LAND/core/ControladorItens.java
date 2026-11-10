@@ -26,8 +26,8 @@ public class ControladorItens {
     public ControladorItens() {
         this.itens = new ArrayList<item>();
         this.itens.add(new item("repos/tiles/tile (46).png", CENARIO_DOS_ITENS, 2, 2, TILE_CHAO, "chave"));
-        this.itens.add(new item("repos/tiles/tile (47).png", CENARIO_DOS_ITENS, 1, 22, TILE_CHAO, "arco"));
-        this.itens.add(new item("repos/tiles/tile (48).png", CENARIO_DOS_ITENS, 1, 23, TILE_CHAO, "flecha"));
+        this.itens.add(new item(item.SPRITE_ARCO, CENARIO_DOS_ITENS, 1, 22, TILE_CHAO, "arco"));
+        this.itens.add(new item(item.SPRITE_FLECHA, CENARIO_DOS_ITENS, 1, 23, TILE_CHAO, "flecha"));
         this.itens.add(new item("repos/tiles/tile (64).png", CENARIO_CHAVE_BOSS, 1, 26, TILE_TERRA, "chave_boss_63"));
         this.itens.add(new item(item.SPRITE_POCAO_CURA, 5, 480, 144,
                 "pocao_cura", Categoria.CONSUMIVEL, 1, true));
@@ -159,7 +159,7 @@ public class ControladorItens {
         Categoria categoria = item.categoriaPadrao(nome);
         boolean empilhavel = item.ehEmpilhavel(nome);
         String sprite = "flecha".equals(nome)
-                ? "repos/tiles/tile (48).png"
+                ? item.SPRITE_FLECHA
                 : item.SPRITE_POCAO_CURA;
         this.itens.add(new item(sprite, cenarioIndex, x, y, nome, categoria, quantidade, empilhavel));
     }

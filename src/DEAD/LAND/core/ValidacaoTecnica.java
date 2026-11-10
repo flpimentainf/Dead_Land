@@ -119,7 +119,7 @@ public class ValidacaoTecnica {
     private static void validarInventario() {
         Inventario inventario = new Inventario();
         inventario.adicionar(new item(
-                "repos/tiles/tile (48).png",
+                item.SPRITE_FLECHA,
                 0,
                 0,
                 0,
@@ -317,8 +317,8 @@ public class ValidacaoTecnica {
 
     private static void validarMouse() {
         Inventario inventario = new Inventario();
-        inventario.adicionar(new item("repos/tiles/tile (47).png", 0, 0, 0, -1, "arco"));
-        inventario.adicionar(new item("repos/tiles/tile (48).png", 0, 0, 0, -1, "flecha"));
+        inventario.adicionar(new item(item.SPRITE_ARCO, 0, 0, 0, -1, "arco"));
+        inventario.adicionar(new item(item.SPRITE_FLECHA, 0, 0, 0, -1, "flecha"));
         panel cena = new panel("centro", inventario);
         float volumeAnterior = AudioManager.getInstancia().getVolume(AudioManager.Canal.MASTER);
         try {

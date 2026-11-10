@@ -25,7 +25,7 @@ public class Inventario {
     private int capacidadeMaximaFlechas = 20;
     private int fragmentosCura;
     private String armaEquipada = "";
-    private final item iconeFlechas = new item("repos/tiles/tile (48).png", 0, 0, 0, -1, "flecha");
+    private final item iconeFlechas = new item(item.SPRITE_FLECHA, 0, 0, 0, -1, "flecha");
     private final item iconePocaoCura = new item(item.SPRITE_POCAO_CURA, 0, 0, 0, -1, "pocao_cura");
 
     public void adicionar(item itemColetado) {

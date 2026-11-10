@@ -50,7 +50,7 @@ public class Flecha extends Rectangle {
         this.alcanceMaximo = alcanceMaximo;
         this.origemX = this.mundoX = x;
         this.origemY = this.mundoY = y;
-        this.sprite = ResourceManager.getInstancia().carregarImagem("repos/tiles/tile (48).png");
+        this.sprite = ResourceManager.getInstancia().carregarImagem(item.SPRITE_FLECHA);
         atualizarArea();
     }
 

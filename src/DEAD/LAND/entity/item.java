@@ -6,6 +6,8 @@ import java.awt.Image;
 import java.awt.Rectangle;
 
 public class item extends Rectangle {
+    public static final String SPRITE_ARCO = "repos/armas/arco.png";
+    public static final String SPRITE_FLECHA = "repos/armas/flecha.png";
     public static final String SPRITE_POCAO_CURA = "repos/itens/pocao_cura.png";
     public static final String SPRITE_MEMORIA = "repos/itens/orbe_memoria.png";
     public enum Categoria {
