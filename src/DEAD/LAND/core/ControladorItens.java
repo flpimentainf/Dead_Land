@@ -29,6 +29,8 @@ public class ControladorItens {
         this.itens.add(new item(item.SPRITE_ARCO, CENARIO_DOS_ITENS, 1, 22, TILE_CHAO, "arco"));
         this.itens.add(new item(item.SPRITE_FLECHA, CENARIO_DOS_ITENS, 1, 23, TILE_CHAO, "flecha"));
         this.itens.add(new item("repos/tiles/tile (64).png", CENARIO_CHAVE_BOSS, 1, 26, TILE_TERRA, "chave_boss_63"));
+        this.itens.add(new item(item.SPRITE_ESPADA, CENARIO_CHAVE_BOSS, 24 * 48, 2 * 48,
+                "espada", Categoria.ARMA, 1, false));
         this.itens.add(new item(item.SPRITE_POCAO_CURA, 5, 480, 144,
                 "pocao_cura", Categoria.CONSUMIVEL, 1, true));
         this.itens.add(new item(item.SPRITE_MEMORIA, 2, 600, 240,

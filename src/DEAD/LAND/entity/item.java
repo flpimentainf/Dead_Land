@@ -8,6 +8,7 @@ import java.awt.Rectangle;
 public class item extends Rectangle {
     public static final String SPRITE_ARCO = "repos/armas/arco.png";
     public static final String SPRITE_FLECHA = "repos/armas/flecha.png";
+    public static final String SPRITE_ESPADA = "repos/armas/espada.png";
     public static final String SPRITE_POCAO_CURA = "repos/itens/pocao_cura.png";
     public static final String SPRITE_MEMORIA = "repos/itens/orbe_memoria.png";
     public enum Categoria {
@@ -130,6 +131,7 @@ public class item extends Rectangle {
         if ("chave".equals(nome)) return "Chave Prata";
         if ("chave_boss_63".equals(nome)) return "Chave Vermelha";
         if ("arco".equals(nome)) return "Arco";
+        if ("espada".equals(nome)) return "Espada";
         if ("flecha".equals(nome)) return "Flecha";
         if ("pocao_cura".equals(nome)) return "Poção de Cura";
         if (nome != null && nome.startsWith("memoria_")) return "Memoria";
@@ -137,7 +139,7 @@ public class item extends Rectangle {
     }
 
     public static Categoria categoriaPadrao(String nome) {
-        if ("arco".equals(nome)) return Categoria.ARMA;
+        if ("arco".equals(nome) || "espada".equals(nome)) return Categoria.ARMA;
         if ("flecha".equals(nome)) return Categoria.MUNICAO;
         if ("pocao_cura".equals(nome)) return Categoria.CONSUMIVEL;
         if (nome != null && nome.startsWith("memoria_")) return Categoria.ITEM_HISTORIA;

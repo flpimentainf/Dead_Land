@@ -26,6 +26,7 @@ public class gameLoop implements ActionListener {
 
 	private int atualizacoesDesdeUltimoSprite;
 	private boolean usarItemPressionado;
+	private boolean trocarArmaPressionado;
 	private int vidaJogadorAnterior = -1;
 	private String musicaAtual = "";
 
@@ -78,7 +79,7 @@ public class gameLoop implements ActionListener {
 						this.teclado,
 						this.cenaDoJogo.getSistemaCheckpoint())) {
 			this.controladorMovimento.suspender(this.cenaDoJogo.getJogador(), this.teclado);
-			this.controladorFlechas.cancelarCarga();
+			suspenderCombate();
 			this.controladorInteracao.resetar();
 			return;
 		}
@@ -91,7 +92,7 @@ public class gameLoop implements ActionListener {
 
 		if (this.cenaDoJogo.atualizarMenuPausa(this.teclado)) {
 			this.controladorMovimento.suspender(this.cenaDoJogo.getJogador(), this.teclado);
-			this.controladorFlechas.cancelarCarga();
+			suspenderCombate();
 			this.controladorInteracao.resetar();
 			return;
 		}
@@ -102,7 +103,7 @@ public class gameLoop implements ActionListener {
 
 			if (this.cenaDoJogo.getHistoria().bloqueiaControleDoJogador()) {
 				this.controladorMovimento.suspender(this.cenaDoJogo.getJogador(), this.teclado);
-				this.controladorFlechas.cancelarCarga();
+				suspenderCombate();
 				this.controladorInteracao.resetar();
 				return;
 			}
@@ -110,7 +111,7 @@ public class gameLoop implements ActionListener {
 
 		if (this.controladorQueda.atualizar(this.cenaDoJogo)) {
 			this.controladorMovimento.suspender(this.cenaDoJogo.getJogador(), this.teclado);
-			this.controladorFlechas.cancelarCarga();
+			suspenderCombate();
 			this.controladorInteracao.resetar();
 			atualizarCheckpointsAutomaticos();
 			return;
@@ -121,6 +122,8 @@ public class gameLoop implements ActionListener {
 		this.controladorInteracao.atualizar(this.cenaDoJogo, this.teclado);
 		atualizarUsoDeConsumivel();
 		this.controladorItens.atualizar(this.cenaDoJogo, this.teclado);
+		atualizarTrocaDeArma();
+		this.cenaDoJogo.getControladorEspada().atualizar(this.cenaDoJogo, this.teclado);
 
 		if (this.controladorFlechas != null) {
 			this.controladorFlechas.atualizar(this.cenaDoJogo, this.teclado);
@@ -140,6 +143,20 @@ public class gameLoop implements ActionListener {
 		if (this.cenaDoJogo.getFeedback() != null) {
 			this.cenaDoJogo.getFeedback().atualizar();
 		}
+	}
+
+	private void suspenderCombate() {
+		this.controladorFlechas.cancelarCarga();
+		this.cenaDoJogo.getControladorEspada().suspender(this.teclado.atirar);
+		this.trocarArmaPressionado = this.teclado.trocarArma;
+	}
+
+	private void atualizarTrocaDeArma() {
+		if (this.teclado.trocarArma && !this.trocarArmaPressionado && this.cenaDoJogo.getInventario().alternarArma()) {
+			suspenderCombate();
+			this.cenaDoJogo.atualizarInventario();
+		}
+		this.trocarArmaPressionado = this.teclado.trocarArma;
 	}
 
 	private void atualizarUsoDeConsumivel() {

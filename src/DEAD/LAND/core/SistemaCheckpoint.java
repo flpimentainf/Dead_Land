@@ -62,6 +62,7 @@ public class SistemaCheckpoint {
         }
 
         Set<String> itensPreservados = new LinkedHashSet<String>(checkpointAtual.itensImportantes);
+        String armaPreservada = cenaDoJogo.getInventario() == null ? "" : cenaDoJogo.getInventario().getArmaEquipada();
         Set<String> coletasPreservadas = new LinkedHashSet<String>(checkpointAtual.itensImportantes);
         coletasPreservadas.addAll(checkpointAtual.memoriasDescobertas);
         if (cenaDoJogo.getInventario() != null) {
@@ -98,6 +99,7 @@ public class SistemaCheckpoint {
                     checkpointAtual.flechas,
                     checkpointAtual.fragmentosCura
             );
+            cenaDoJogo.getInventario().restaurarArmaEquipada(armaPreservada);
             cenaDoJogo.atualizarInventario();
         }
 

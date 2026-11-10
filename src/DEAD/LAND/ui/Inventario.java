@@ -52,8 +52,8 @@ public class Inventario {
 
         this.itens.add(itemColetado);
 
-        if ("arco".equals(nome)) {
-            armaEquipada = "arco";
+        if (ehArma(nome)) {
+            armaEquipada = nome;
         }
     }
 
@@ -80,7 +80,7 @@ public class Inventario {
     public void desenhar(Graphics2D g2, int largura, int altura) {
         int y = (altura - TAMANHO_SLOT) / 2;
         int indiceSlot = 0;
-        boolean mostrarFlechas = temArco();
+        boolean mostrarFlechas = arcoEquipado();
 
         for (item itemColetado : this.itens) {
             if ("flecha".equals(itemColetado.getNome()) && !mostrarFlechas) {
@@ -101,7 +101,25 @@ public class Inventario {
     }
 
    public boolean temArco() {
-        return temItem("arco") || "arco".equals(armaEquipada);
+        return temItem("arco");
+    }
+
+    public boolean temEspada() { return temItem("espada"); }
+    public boolean arcoEquipado() { return temArco() && "arco".equals(armaEquipada); }
+    public boolean espadaEquipada() { return temEspada() && "espada".equals(armaEquipada); }
+    private static boolean ehArma(String nome) { return "arco".equals(nome) || "espada".equals(nome); }
+
+    public boolean alternarArma() {
+        if (!temArco() || !temEspada()) return false;
+        armaEquipada = arcoEquipado() ? "espada" : "arco";
+        return true;
+    }
+
+    public void restaurarArmaEquipada(String nome) {
+        if (ehArma(nome) && temItem(nome)) armaEquipada = nome;
+        else if (temArco()) armaEquipada = "arco";
+        else if (temEspada()) armaEquipada = "espada";
+        else armaEquipada = "";
     }
 
     public boolean temChave() {
@@ -219,11 +237,11 @@ public class Inventario {
 
     private void desenharDicaTecla(Graphics2D g2, item itemColetado, int x, int y) {
         String tecla = null;
-        if ("arco".equals(itemColetado.getNome())) {
-            tecla = "M1";
+        if (ehArma(itemColetado.getNome())) {
+            tecla = itemColetado.getNome().equals(armaEquipada) ? "M1 / Q" : "Q";
         }
         if ("pocao_cura".equals(itemColetado.getNome())) {
-            tecla = "Q";
+            tecla = "H";
         }
         if (tecla == null) return;
 
@@ -245,7 +263,7 @@ public class Inventario {
     private void desenharSlot(Graphics2D g2, item itemColetado, int x, int y) {
         g2.setColor(new Color(0, 0, 0, 70));
         g2.fillRoundRect(x, y, TAMANHO_SLOT, TAMANHO_SLOT, 10, 10);
-        g2.setColor("arco".equals(itemColetado.getNome()) && "arco".equals(armaEquipada)
+        g2.setColor(ehArma(itemColetado.getNome()) && itemColetado.getNome().equals(armaEquipada)
                 ? new Color(255, 210, 80)
                 : new Color(90, 60, 20));
         g2.drawRoundRect(x, y, TAMANHO_SLOT, TAMANHO_SLOT, 10, 10);

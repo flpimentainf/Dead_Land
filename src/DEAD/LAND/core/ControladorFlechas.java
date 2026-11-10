@@ -44,7 +44,7 @@ public class ControladorFlechas {
     }
 
     public void atualizar(panel cenaDoJogo, escutadorTeclado teclado) {
-        if (!cenaDoJogo.getInventario().temArco()) {
+        if (!cenaDoJogo.getInventario().arcoEquipado()) {
             carregando = false;
             atirarPressionado = teclado.atirar;
             atualizarFlechas(cenaDoJogo);

@@ -1,6 +1,7 @@
 package DEAD.LAND.ui;
 
 import DEAD.LAND.core.ControladorFlechas;
+import DEAD.LAND.core.ControladorEspada;
 import DEAD.LAND.core.ControladorInimigos;
 import DEAD.LAND.core.ControladorItens;
 import DEAD.LAND.core.ControladorNPCs;
@@ -107,6 +108,7 @@ public class panel extends JPanel{
     private boolean teclaConfirmarPausaPressionada;
     private final ViewportJogo viewport = new ViewportJogo(LARGURA_LOGICA, ALTURA_LOGICA);
     private Point posicaoMouse;
+    private final ControladorEspada controladorEspada = new ControladorEspada();
     private int volumeArrastando = -1;
 
 
@@ -226,6 +228,8 @@ public class panel extends JPanel{
                     clicarMenuPausa(ponto);
                 } else if (ponto != null && podeUsarArco()) {
                     controladorFlechas.dispararMouse(panel.this, getMiraMundo());
+                } else if (ponto != null && podeUsarEspada()) {
+                    controladorEspada.atacar(panel.this, getMiraMundo());
                 }
                 atualizarCursorMouse();
                 repaint();
@@ -238,6 +242,7 @@ public class panel extends JPanel{
                 ET.resetar();
                 volumeArrastando = -1;
                 controladorFlechas.cancelarCarga();
+                controladorEspada.suspender(false);
             }
         });
     }
@@ -255,8 +260,16 @@ public class panel extends JPanel{
     }
 
     public boolean podeUsarArco() {
+        return podeAtacar() && inventario.arcoEquipado();
+    }
+
+    public boolean podeUsarEspada() {
+        return podeAtacar() && inventario.espadaEquipada();
+    }
+
+    private boolean podeAtacar() {
         return !menuPausaAberto && jogador != null && jogador.estaVivo() && !jogador.estaCaindo()
-                && inventario != null && inventario.temArco()
+                && inventario != null
                 && (historia == null || !historia.bloqueiaControleDoJogador())
                 && (sistemaMorte == null || !sistemaMorte.bloqueiaControle());
     }
@@ -315,7 +328,7 @@ public class panel extends JPanel{
                     : telaPausa == TelaPausa.CONFIGURACOES ? LayoutMenuPausa.indiceConfiguracao(ponto) >= 0
                     : LayoutMenuPausa.voltarMemorias().contains(ponto);
             if (clicavel) tipo = Cursor.HAND_CURSOR;
-        } else if (ponto != null && podeUsarArco()) {
+        } else if (ponto != null && (podeUsarArco() || podeUsarEspada())) {
             tipo = Cursor.CROSSHAIR_CURSOR;
         }
         if (getCursor().getType() != tipo) setCursor(Cursor.getPredefinedCursor(tipo));
@@ -355,7 +368,11 @@ public class panel extends JPanel{
             this.cenario.desenhar(g2);
             if (this.controladorNPCs != null) this.controladorNPCs.desenhar(g2, this);
             if (this.controladorInimigos != null) this.controladorInimigos.desenhar(g2, this.cenario.getCenarioAtualIndex());
-            getJogador().desenharPlayer(g2);
+            if (this.inventario.espadaEquipada() && !getJogador().estaCaindo() && getJogador().estaVivo()) {
+                this.controladorEspada.desenharJogador(g2, getJogador());
+            } else {
+                getJogador().desenharPlayer(g2);
+            }
             if (this.controladorFlechas != null) this.controladorFlechas.desenhar(g2);
             if (this.controladorItens != null) this.controladorItens.desenhar(g2, this);
             desenharIndicadorInteracao(g2);
@@ -493,6 +510,7 @@ public class panel extends JPanel{
 
     private void abrirMenuPausa() {
         this.controladorFlechas.cancelarCarga();
+        this.controladorEspada.suspender(ET.atirar);
         this.volumeArrastando = -1;
         this.menuPausaAberto = true;
         this.telaPausa = TelaPausa.PRINCIPAL;
@@ -743,6 +761,7 @@ public class panel extends JPanel{
 
 
     public ControladorFlechas getControladorFlechas() { return controladorFlechas; }
+    public ControladorEspada getControladorEspada() { return controladorEspada; }
 
     public ControladorItens getControladorItens() { return controladorItens; }
 
@@ -773,6 +792,7 @@ public class panel extends JPanel{
         state.flechas = inventario == null ? 0 : inventario.getQuantidadeFlechas();
         state.capacidadeFlechas = inventario == null ? 20 : inventario.getCapacidadeMaximaFlechas();
         state.fragmentosCura = inventario == null ? 0 : inventario.getQuantidadeCura();
+        state.armaEquipada = inventario == null ? "" : inventario.getArmaEquipada();
         state.bossDerrotado = controladorInimigos != null && controladorInimigos.bossFoiDerrotado();
         state.estadoHistoria = historia == null ? "QUARTO" : historia.getEstado().name();
         state.objetivoHistoria = historia == null ? "" : historia.getObjetivoAtual();
@@ -792,6 +812,8 @@ public class panel extends JPanel{
         }
 
         this.slotAtual = Math.max(1, Math.min(3, state.slot));
+        this.controladorEspada.cancelar();
+        this.controladorFlechas.limpar();
         this.inicioJogoMs = System.currentTimeMillis() - Math.max(0, state.tempoJogoMs);
         this.cenario.irParaCenario(state.cenarioIndex);
         getJogador().posicionarEm(state.jogadorX, state.jogadorY);
@@ -814,7 +836,7 @@ public class panel extends JPanel{
                     state.flechas,
                     state.fragmentosCura
             );
-            this.inventario.equiparArcoSePossuir();
+            this.inventario.restaurarArmaEquipada(state.armaEquipada);
         }
 
         if (this.controladorInimigos != null) {
@@ -931,6 +953,8 @@ public class panel extends JPanel{
     }
 
     private void posicionarJogador(int x, int y) {
+        this.controladorEspada.cancelar();
+        this.controladorFlechas.cancelarCarga();
         getJogador().posicionarEm(x, y);
     }
 

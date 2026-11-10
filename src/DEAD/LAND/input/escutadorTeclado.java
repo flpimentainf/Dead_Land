@@ -9,6 +9,7 @@ public class escutadorTeclado implements KeyListener{
 	public boolean atirar;
 	public boolean dash;
 	public boolean usarItem;
+	public boolean trocarArma;
 	public boolean confirmar;
 	public boolean abrirMenu;
 
@@ -21,6 +22,7 @@ public class escutadorTeclado implements KeyListener{
 		atirar = false;
 		dash = false;
 		usarItem = false;
+		trocarArma = false;
 		confirmar = false;
 		abrirMenu = false;
 	}
@@ -64,6 +66,9 @@ public class escutadorTeclado implements KeyListener{
 			this.dash = true;
 			break;
 		case KeyEvent.VK_Q:
+			this.trocarArma = true;
+			break;
+		case KeyEvent.VK_H:
 			this.usarItem = true;
 			break;
 		default:
@@ -105,6 +110,9 @@ public class escutadorTeclado implements KeyListener{
 			this.dash = false;
 			break;
 		case KeyEvent.VK_Q:
+			this.trocarArma = false;
+			break;
+		case KeyEvent.VK_H:
 			this.usarItem = false;
 			break;
 		default:

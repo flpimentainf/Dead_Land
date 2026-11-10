@@ -35,6 +35,7 @@ public class ValidacaoTecnica {
         validarFlechasDirecionais();
         SwingUtilities.invokeAndWait(ValidacaoTecnica::validarMouse);
         SwingUtilities.invokeAndWait(ValidacaoTecnica::validarMemorias);
+        SwingUtilities.invokeAndWait(ValidacaoArmas::validar);
         validarSave();
         System.out.println("Validacoes tecnicas OK");
     }
@@ -167,35 +168,44 @@ public class ValidacaoTecnica {
     private static void validarSave() throws Exception {
         File pasta = Files.createTempDirectory("dead-land-save").toFile();
         SaveManager saves = new SaveManager(pasta);
+        try {
 
-        GameState state = new GameState();
-        state.slot = 1;
-        state.cenarioIndex = 5;
-        state.jogadorX = 100;
-        state.jogadorY = 200;
-        state.vida = 77;
-        state.flechas = 4;
-        state.capacidadeFlechas = 20;
-        state.fragmentosCura = 1;
-        state.checkpoint = "regiao_principal";
-        state.itens.add("chave");
-        state.itens.add("fragmento_cura");
-        state.memorias.add("memoria_01");
+            GameState state = new GameState();
+            state.slot = 1;
+            state.cenarioIndex = 5;
+            state.jogadorX = 100;
+            state.jogadorY = 200;
+            state.vida = 77;
+            state.flechas = 4;
+            state.capacidadeFlechas = 20;
+            state.fragmentosCura = 1;
+            state.armaEquipada = "espada";
+            state.itens.add("espada");
+            state.checkpoint = "regiao_principal";
+            state.itens.add("chave");
+            state.itens.add("fragmento_cura");
+            state.memorias.add("memoria_01");
 
-        exigir(saves.salvar(state), "save deve ser gravado");
-        Files.writeString(new File(pasta, "slot1.properties").toPath(), "\nvontade=0\n",
-                java.nio.file.StandardOpenOption.APPEND);
-        Optional<GameState> carregado = saves.carregar(1);
-        exigir(carregado.isPresent(), "save deve carregar");
-        exigir(carregado.get().cenarioIndex == 5, "cenario salvo deve voltar");
-        exigir("regiao_principal".equals(carregado.get().checkpoint), "checkpoint deve persistir");
-        exigir(carregado.get().itens.contains("chave"), "itens devem persistir");
-        exigir(carregado.get().itens.contains("pocao_cura"), "cura de save antigo deve virar pocao");
-        exigir(!carregado.get().itens.contains("fragmento_cura"), "identificador antigo deve ser migrado");
-        exigir(carregado.get().fragmentosCura == 1, "migracao deve preservar quantidade de pocoes");
-        exigir(carregado.get().memorias.contains("memoria_01"), "save antigo deve preservar memorias coletadas");
-        exigir(carregado.get().jogadorX == 100 && carregado.get().jogadorY == 200,
-                "propriedade antiga removida nao deve alterar a posicao salva");
+            exigir(saves.salvar(state), "save deve ser gravado");
+            Files.writeString(new File(pasta, "slot1.properties").toPath(), "\nvontade=0\n",
+                    java.nio.file.StandardOpenOption.APPEND);
+            Optional<GameState> carregado = saves.carregar(1);
+            exigir(carregado.isPresent(), "save deve carregar");
+            exigir(carregado.get().cenarioIndex == 5, "cenario salvo deve voltar");
+            exigir("regiao_principal".equals(carregado.get().checkpoint), "checkpoint deve persistir");
+            exigir(carregado.get().itens.contains("chave"), "itens devem persistir");
+            exigir(carregado.get().itens.contains("espada") && "espada".equals(carregado.get().armaEquipada),
+                    "save deve persistir a espada e a arma equipada");
+            exigir(carregado.get().itens.contains("pocao_cura"), "cura de save antigo deve virar pocao");
+            exigir(!carregado.get().itens.contains("fragmento_cura"), "identificador antigo deve ser migrado");
+            exigir(carregado.get().fragmentosCura == 1, "migracao deve preservar quantidade de pocoes");
+            exigir(carregado.get().memorias.contains("memoria_01"), "save antigo deve preservar memorias coletadas");
+            exigir(carregado.get().jogadorX == 100 && carregado.get().jogadorY == 200,
+                    "propriedade antiga removida nao deve alterar a posicao salva");
+        } finally {
+            Files.deleteIfExists(new File(pasta, "slot1.properties").toPath());
+            Files.deleteIfExists(pasta.toPath());
+        }
     }
 
     private static void validarEstamina() {

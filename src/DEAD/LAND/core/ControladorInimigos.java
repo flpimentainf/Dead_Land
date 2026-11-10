@@ -71,6 +71,7 @@ public class ControladorInimigos {
 
             inimigo.atualizar(jogador, cenaDoJogo.getCenario(), verificadorColisao, controladorProjeteis);
             verificarColisaoComFlechas(cenaDoJogo, controladorFlechas, inimigo);
+            cenaDoJogo.getControladorEspada().tentarAtingir(cenaDoJogo, inimigo);
             processarDropSeNecessario(cenaDoJogo, inimigo, cenarioAtual);
         }
 

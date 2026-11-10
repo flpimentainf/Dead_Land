@@ -116,6 +116,24 @@ public class player extends Rectangle{
             g.drawRect(x - 2, y - 2, width + 4, height + 4);
         }
     }
+
+    public void desenharPlayer(Graphics2D g, double inclinacao) {
+        Graphics2D pose = (Graphics2D) g.create();
+        try {
+            pose.rotate(inclinacao, x + width / 2.0, y + height - 6);
+            desenharPlayer(pose);
+        } finally { pose.dispose(); }
+    }
+
+    public void olharPara(double angulo) {
+        if (Math.abs(Math.cos(angulo)) > Math.abs(Math.sin(angulo))) {
+            direcao = Math.cos(angulo) < 0 ? "esquerda" : "direita";
+            imagemPlayer = (Math.cos(angulo) < 0 ? imgPlayerLeft : imgPlayerRight)[frameJogador % 3];
+        } else {
+            direcao = Math.sin(angulo) < 0 ? "cima" : "baixo";
+            imagemPlayer = (Math.sin(angulo) < 0 ? imgPlayerUp : imgPlayerDown)[frameJogador % 3];
+        }
+    }
     
     public void mover(int movimentoX, int movimentoY) {
         this.x += movimentoX;
