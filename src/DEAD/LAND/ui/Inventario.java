@@ -268,6 +268,12 @@ public class Inventario {
         return true;
     }
 
+    public String getMotivoCuraIndisponivel(player jogador) {
+        if (fragmentosCura <= 0) return "Sem poções de cura.";
+        if (jogador == null || jogador.getVida() >= player.VIDA_MAXIMA) return "Vida já está cheia.";
+        return "";
+    }
+
     public String getArmaEquipada() {
         return armaEquipada;
     }
@@ -293,7 +299,7 @@ public class Inventario {
         }
         if (tecla == null) return;
 
-        g2.setFont(new Font("Arial", Font.BOLD, 10));
+        g2.setFont(new Font("SansSerif", Font.BOLD, 10));
         FontMetrics fm = g2.getFontMetrics();
         int tw = fm.stringWidth(tecla) + 8;
         int th = arma ? 18 : 14;
@@ -309,12 +315,16 @@ public class Inventario {
     }
 
     private void desenharSlot(Graphics2D g2, item itemColetado, int x, int y) {
-        g2.setColor(new Color(0, 0, 0, 70));
-        g2.fillRoundRect(x, y, TAMANHO_SLOT, TAMANHO_SLOT, 10, 10);
-        g2.setColor(ehArma(itemColetado.getNome()) && itemColetado.getNome().equals(armaEquipada)
-                ? new Color(255, 210, 80)
-                : new Color(90, 60, 20));
-        g2.drawRoundRect(x, y, TAMANHO_SLOT, TAMANHO_SLOT, 10, 10);
+        boolean equipada = ehArma(itemColetado.getNome()) && itemColetado.getNome().equals(armaEquipada);
+        g2.setColor(EstiloHUD.FUNDO);
+        g2.fillRect(x, y, TAMANHO_SLOT, TAMANHO_SLOT);
+        g2.setColor(equipada ? EstiloHUD.DESTAQUE : EstiloHUD.BORDA);
+        g2.drawRect(x, y, TAMANHO_SLOT - 1, TAMANHO_SLOT - 1);
+        if (equipada) {
+            g2.drawRect(x + 2, y + 2, TAMANHO_SLOT - 5, TAMANHO_SLOT - 5);
+            g2.setFont(EstiloHUD.TITULO.deriveFont(9f));
+            g2.drawString("ATIVA", x + 5, y + 13);
+        }
         if (ehArma(itemColetado.getNome())) {
             g2.drawImage(itemColetado.getSprite(), x + 10, y + 16, 44, 44, null);
         } else {
@@ -334,7 +344,8 @@ public class Inventario {
             return;
         }
 
-        g2.setFont(new Font("Arial", Font.BOLD, 13));
+        if (texto.length() > 4) texto = "999+";
+        g2.setFont(EstiloHUD.TITULO);
         FontMetrics fm = g2.getFontMetrics();
         int larguraTexto = fm.stringWidth(texto) + 10;
         int alturaTexto = 18;

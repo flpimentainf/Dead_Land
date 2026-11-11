@@ -116,6 +116,13 @@ public final class ValidacaoHUD {
             BufferedImage pausado = new BufferedImage(768, 104, BufferedImage.TYPE_INT_RGB);
             g = pausado.createGraphics(); hud.paint(g); g.dispose();
             exigir(new Color(pausado.getRGB(195, 50)).getRed() < new Color(normal.getRGB(195, 50)).getRed(), "pausa escurece faixa inferior");
+            tecla.abrirMenu = false; cena.atualizarMenuPausa(tecla);
+            tecla.abrirMenu = true; cena.atualizarMenuPausa(tecla);
+            tecla.resetar(); tecla.usarItem = true;
+            gameLoop loop = new gameLoop(cena, tecla);
+            loop.actionPerformed(null);
+            exigir("Sem poções de cura.".equals(cena.getFeedback().getMensagemCentro()), "H sem poção oferece feedback");
+            exigir(inventario.getQuantidadeCura() == 0, "ação indisponível não altera inventário");
         } finally { cena.pausarJogo(); }
     }
 }

@@ -152,12 +152,15 @@ public class Boss extends Inimigo {
 
         g2.setColor(new Color(0, 0, 0, 190));
         g2.fillRect(area.x, area.y, area.width, area.height);
-        g2.setFont(new Font("Serif", Font.BOLD, 16));
+        g2.setFont(DEAD.LAND.ui.EstiloHUD.TITULO.deriveFont(16f));
         g2.setColor(new Color(240, 220, 190));
         g2.drawString("O ESQUECIDO", x, y - 3);
+        g2.setFont(DEAD.LAND.ui.EstiloHUD.DICA);
+        String valor = Math.max(0, vida) + "/" + vidaMaxima;
+        g2.drawString(valor, x + largura - g2.getFontMetrics().stringWidth(valor), y - 3);
         g2.setColor(new Color(55, 35, 55));
         g2.fillRect(x, y + 4, largura, altura);
-        g2.setColor(prop > 0.6f ? new Color(160, 50, 200)
+        g2.setColor(prop > 0.6f ? DEAD.LAND.ui.EstiloHUD.CHEFE
                 : prop > 0.25f ? new Color(210, 65, 120)
                         : new Color(245, 80, 70));
         g2.fillRect(x, y + 4, Math.round(largura * prop), altura);

@@ -40,13 +40,16 @@ public final class NotificacoesObjetivos {
         if (fila.isEmpty()) return;
         Graphics2D g = (Graphics2D) destino.create();
         try {
+            float entrada = Math.min(1f, (DURACAO_MS - restante) / 150f);
+            float saida = Math.min(1f, restante / 250f);
+            g.setComposite(AlphaComposite.SrcOver.derive(Math.max(0f, Math.min(entrada, saida))));
             int w = 320, x = largura - w - 20;
             g.setFont(new Font("SansSerif", Font.PLAIN, 13));
             java.util.List<String> linhas = TextoHUD.quebrar(fila.peekFirst().descricao(), g.getFontMetrics(), w - 24);
             int quantidade = Math.min(3, linhas.size()), h = 46 + quantidade * 18, y = altura - h - 18;
-            g.setColor(new Color(12, 14, 20, 235)); g.fillRect(x, y, w, h);
-            g.setColor(new Color(182, 160, 100)); g.drawRect(x, y, w, h);
-            g.setFont(new Font("SansSerif", Font.BOLD, 13));
+            g.setColor(EstiloHUD.FUNDO); g.fillRect(x, y, w, h);
+            g.setColor(EstiloHUD.DESTAQUE); g.drawRect(x, y, w, h);
+            g.setFont(EstiloHUD.TITULO);
             g.drawString(fila.peekFirst().titulo(), x + 12, y + 20);
             g.setFont(new Font("SansSerif", Font.PLAIN, 13)); g.setColor(Color.WHITE);
             for (int i = 0; i < quantidade; i++) {

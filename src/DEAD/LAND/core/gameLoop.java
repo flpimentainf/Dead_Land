@@ -177,6 +177,9 @@ public class gameLoop implements ActionListener {
 				this.cenaDoJogo.getFeedback().mostrarMensagemCentro("Poção de Cura usada");
 			}
 			AudioManager.getInstancia().tocarEfeito("cura");
+		} else if (this.cenaDoJogo.getFeedback() != null) {
+			this.cenaDoJogo.getFeedback().mostrarMensagemCentro(
+					this.cenaDoJogo.getInventario().getMotivoCuraIndisponivel(this.cenaDoJogo.getJogador()));
 		}
 	}
 

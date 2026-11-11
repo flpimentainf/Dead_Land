@@ -12,6 +12,8 @@ import java.util.List;
 import javax.swing.ImageIcon;
 
 public class InterfaceHistoria {
+    private boolean painelEstavaVisivel;
+    private long inicioPainelNs;
     public void desenhar(Graphics2D g2, int largura, int altura, SistemaHistoria historia) {
         desenhar(g2, largura, altura, historia, true);
     }
@@ -24,7 +26,16 @@ public class InterfaceHistoria {
             desenharEscurecimento(g2, largura, altura);
         }
 
-        if (objetivos) desenharObjetivo(g2, largura, historia);
+        if (objetivos) {
+            if (!painelEstavaVisivel) inicioPainelNs = System.nanoTime();
+            Graphics2D painel = (Graphics2D) g2.create();
+            try {
+                float progresso = Math.min(1f, (System.nanoTime() - inicioPainelNs) / 150_000_000f);
+                painel.setComposite(java.awt.AlphaComposite.SrcOver.derive(0.35f + 0.65f * progresso));
+                desenharObjetivo(painel, largura, historia);
+            } finally { painel.dispose(); }
+        }
+        painelEstavaVisivel = objetivos;
 
         if (historia.isExibindoEscolha()) {
             desenharEscolha(g2, largura, altura, historia);
@@ -56,11 +67,11 @@ public class InterfaceHistoria {
 
     private void desenharObjetivo(Graphics2D g2, int largura, SistemaHistoria historia) {
         int w = Math.min(304, largura - 40), h = alturaObjetivos(g2, historia);
-        g2.setColor(new Color(12, 14, 20, 210));
+        g2.setColor(EstiloHUD.FUNDO);
         g2.fillRect(20, 18, w, h);
-        g2.setColor(new Color(116, 112, 102)); g2.drawRect(20, 18, w, h);
-        g2.setFont(new Font("SansSerif", Font.BOLD, 12));
-        g2.setColor(new Color(220, 206, 164));
+        g2.setColor(EstiloHUD.BORDA); g2.drawRect(20, 18, w, h);
+        g2.setFont(EstiloHUD.TITULO);
+        g2.setColor(EstiloHUD.DESTAQUE);
         g2.drawString(historia.isObjetivoPrincipalConcluido() ? "[OK] OBJETIVO CONCLUÍDO" : "OBJETIVO ATUAL", 34, 40);
         g2.setFont(new Font("SansSerif", Font.PLAIN, 14));
         g2.setColor(Color.WHITE);

@@ -66,6 +66,8 @@ public class SistemaFeedback {
         this.framesMensagemCentro = 90;
     }
 
+    public String getMensagemCentro() { return mensagemCentro; }
+
     public void desenharMundo(Graphics2D g2) {
         Composite composicaoOriginal = g2.getComposite();
 
@@ -95,16 +97,19 @@ public class SistemaFeedback {
         Composite composicaoOriginal = g2.getComposite();
         float alpha = Math.min(1f, framesMensagemCentro / 20f);
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-        g2.setFont(new Font("Serif", Font.BOLD, 22));
-        FontMetrics metricas = g2.getFontMetrics();
-        int textoLargura = metricas.stringWidth(mensagemCentro);
-        int x = (largura - textoLargura) / 2;
-        int y = altura / 2 - 70;
-
-        g2.setColor(new Color(0, 0, 0, 160));
-        g2.fillRoundRect(x - 18, y - 28, textoLargura + 36, 40, 10, 10);
-        g2.setColor(new Color(255, 235, 190));
-        g2.drawString(mensagemCentro, x, y);
+        g2.setFont(DEAD.LAND.ui.EstiloHUD.CORPO);
+        int w = Math.min(320, largura - 40);
+        java.util.List<String> linhas = DEAD.LAND.ui.TextoHUD.quebrar(mensagemCentro, g2.getFontMetrics(), w - 24);
+        int n = Math.min(4, linhas.size()), h = 20 + n * 19, x = 20, y = altura - h - 18;
+        g2.setColor(DEAD.LAND.ui.EstiloHUD.FUNDO);
+        g2.fillRect(x, y, w, h);
+        g2.setColor(DEAD.LAND.ui.EstiloHUD.BORDA); g2.drawRect(x, y, w, h);
+        g2.setColor(DEAD.LAND.ui.EstiloHUD.TEXTO);
+        for (int i = 0; i < n; i++) {
+            String linha = linhas.get(i);
+            if (i == n - 1 && linhas.size() > n) linha = DEAD.LAND.ui.TextoHUD.resumir(linha, g2.getFontMetrics(), w - 24);
+            g2.drawString(linha, x + 12, y + 23 + i * 19);
+        }
         g2.setComposite(composicaoOriginal);
     }
 

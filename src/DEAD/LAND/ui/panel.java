@@ -366,7 +366,8 @@ public class panel extends JPanel{
         int x = status.x, y = status.y + 10;
         this.painelJogo.barradeVida.desenhar(g2, this.painelJogo.getJogador(), x, y, status.width);
         EstiloHUD.desenharBarra(g2, "ESTAMINA", x, y + 32, status.width, 12,
-                this.painelJogo.getJogador().getProporcaoEstamina(), new Color(230, 175, 50));
+                this.painelJogo.getJogador().getProporcaoEstamina(), EstiloHUD.ESTAMINA,
+                Math.round(this.painelJogo.getJogador().getEstamina()) + "/100");
     }
 
     private void configurarMouseHUD() {
@@ -784,7 +785,7 @@ public class panel extends JPanel{
 
         int x = 92;
         int y = 128;
-        g2.setFont(new Font("Arial", Font.PLAIN, 13));
+        g2.setFont(new Font("SansSerif", Font.PLAIN, 13));
         if (this.memoryManager != null) {
             for (MemoryManager.Memoria memoria : this.memoryManager.getMemorias()) {
                 boolean descoberta = this.memoryManager.foiDescoberta(memoria.getId());
@@ -827,7 +828,7 @@ public class panel extends JPanel{
     private void desenharVolume(Graphics2D g2, String texto, float valor, int y, boolean selecionado) {
         int x = 220;
         int largura = 320;
-        g2.setFont(new Font("Arial", Font.BOLD, 17));
+        g2.setFont(new Font("SansSerif", Font.BOLD, 17));
         g2.setColor(selecionado ? new Color(245, 226, 166) : Color.WHITE);
         g2.drawString((selecionado ? "> " : "  ") + texto, x, y);
 
@@ -857,7 +858,7 @@ public class panel extends JPanel{
 
     private void desenharTextoCentralizado(Graphics2D g2, String texto, int y,
             int tamanho, int estilo, Color cor) {
-        g2.setFont(new Font("Arial", estilo, tamanho));
+        g2.setFont(new Font("SansSerif", estilo, tamanho));
         FontMetrics fm = g2.getFontMetrics();
         g2.setColor(cor);
         g2.drawString(texto, (LARGURA_LOGICA - fm.stringWidth(texto)) / 2, y);
