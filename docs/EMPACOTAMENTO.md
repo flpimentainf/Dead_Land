@@ -1,48 +1,54 @@
 # Executável Windows
 
-O pacote portátil fica em `dist/Dead_Land/`. Abra `Dead_Land.exe`.
-O Java x64 necessário já está em `runtime/`, e os recursos ficam em `app/repos/`.
-Mantenha essas duas pastas junto do executável. O ZIP deve ser extraído por inteiro.
+As distribuições ficam somente em `dist/vX.Y.Z/`, com `Dead_Land.exe` diretamente
+dentro de cada pasta. Hoje estão mantidas `dist/v1.0.0/` e `dist/v1.1.0/`.
+O Java está em `runtime/`, os recursos em `app/repos/` e os três slots em `save/`.
+Mantenha essas pastas junto do executável. Para transportar o jogo, copie a pasta
+da versão inteira. Não são gerados ZIPs.
 
-Os slots do executável ficam em `dist/Dead_Land/save/`. Eles são independentes dos
-slots usados ao executar os fontes. O pacote pessoal foi gerado com uma cópia dos
-saves existentes, sem modificar os originais.
-
-## Gerar novamente
+## Próximas atualizações
 
 Em Windows com JDK 21 ou superior, x64:
 
 ```powershell
 .\rodar.ps1 -SomenteValidar
-.\empacotar.ps1 -Destino dist\nova-versao -IncluirSaves
+.\empacotar.ps1 -Versao 1.2.0
 ```
 
-Omita `-IncluirSaves` para gerar uma distribuição sem progresso pessoal.
-Para levar os slots de um executável anterior, use `-PastaSaves dist\Dead_Land\save`.
-`-Versao 1.1.0` define a versão do novo executável. A versão 1.1.0 foi gerada em
-`dist/Versao-1.1.0/`, incluindo os slots do pacote anterior.
-O script recusa substituir uma pasta de jogo ou ZIP já existente para preservar os
-slots do pacote anterior. Ao atualizar, copie a pasta `save` do pacote que estava
-usando para o novo pacote.
+O empacotador aplica estas regras:
 
-O empacotamento compila os fontes, cria o JAR, inclui `repos`, gera um launcher
-nativo com `jpackage --type app-image` e um runtime com `java.desktop`, e compacta
-a pasta inteira em `Dead_Land-Windows-x64.zip`. Não exige instalação nem Java no
-computador de destino. A arquitetura de destino é Windows x64.
+- A versão é obrigatória e deve ser maior que a última publicada.
+- A pasta é criada automaticamente como `dist/v1.2.0/`.
+- O pacote é montado em `build/` e só depois publicado em `dist/`.
+- Cada slot leva a cópia mais recente encontrada nas versões mantidas, mesmo que
+  a última jogatina tenha acontecido na versão anterior.
+- Depois da publicação, permanecem somente as duas versões mais recentes,
+  ordenadas numericamente. Ao publicar `v1.2.0`, ficam `v1.1.0` e `v1.2.0`.
+- Não são criadas pastas `Atualizado`, `Versao-X.Y.Z`, pastas extras `Dead_Land`
+  dentro da pasta da versão, nem arquivos ZIP.
 
-`CaminhosJogo` resolve os recursos e os saves pelas propriedades configuradas no
-launcher, usando o `$APPDIR` do pacote. Isso permite abrir por atalho ou com outra
-pasta de trabalho. Executar pelos fontes mantém os diretórios locais `repos` e
-`save`.
+A limpeza verifica o diretório, os marcadores do jogo e a versão do executável
+antes de remover uma versão antiga. Versões já existentes não são sobrescritas.
+Os saves usados ao executar os fontes continuam separados, em `save/` na raiz.
+Na primeira distribuição, essa pasta serve como origem quando ainda não existem
+versões anteriores.
 
-Referência do empacotador e do `$APPDIR`:
-[Documentação do jpackage no JDK 21](https://docs.oracle.com/en/java/javase/21/jpackage/support-application-features.html).
+Para indicar outra origem dos slots, use `-PastaSaves caminho\save`.
+Para gerar deliberadamente um pacote sem progresso, use `-IncluirSaves:$false`.
+`-Destino` muda a raiz de distribuição; o padrão permanece `dist`.
 
-## Verificação realizada
+## Testar a organização
 
-- Suítes `ValidacaoTecnica`, `ValidacaoSlots` e `ValidacaoHUD` aprovadas.
-- Java incluído carregou as 170 imagens do pacote, com verificação dos pixels.
-- Renderização e gravação/leitura de save temporário usando o runtime incluído.
-- Teste em uma pasta de trabalho externa com espaços no caminho.
-- Launcher nativo abriu a janela `DEAD LAND`, respondeu e encerrou normalmente.
-- Hash do save original e da cópia preservado após os testes.
+```powershell
+.\ferramentas\validar-distribuicao.ps1
+.\ferramentas\validar-distribuicao.ps1 -Empacotar
+```
+
+O primeiro comando testa a retenção numérica, a preservação dos slots e a recusa de
+apagar pastas sem os marcadores do jogo. O segundo também gera um executável real
+em uma distribuição temporária de teste, verifica que restaram apenas duas versões
+e limpa o teste. Nenhum deles modifica as versões reais de `dist/`.
+
+O launcher usa os caminhos relativos ao próprio pacote por meio de `$APPDIR`,
+portanto renomear a pasta da versão não muda a localização dos recursos ou saves.
+Referência: [jpackage no JDK 21](https://docs.oracle.com/en/java/javase/21/jpackage/support-application-features.html).
