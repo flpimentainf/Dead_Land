@@ -55,7 +55,8 @@ public class panel extends JPanel{
             "MEMORIAS",
             "CONFIGURACOES",
             "MENU PRINCIPAL",
-            "MISSÕES"
+            "MISSÕES",
+            "CONQUISTAS"
     };
     private static final String[] OPCOES_CONFIGURACOES = {
             "MASTER",
@@ -69,6 +70,7 @@ public class panel extends JPanel{
         PRINCIPAL,
         MEMORIAS,
         OBJETIVOS,
+        CONQUISTAS,
         CONFIGURACOES
     }
 
@@ -118,6 +120,9 @@ public class panel extends JPanel{
     private int volumeArrastando = -1;
     private int rolagemObjetivos;
     private final NotificacoesObjetivos notificacoesObjetivos = new NotificacoesObjetivos();
+    private final InterfaceConquistas interfaceConquistas = new InterfaceConquistas();
+    private int conquistaSelecionada;
+    private final NotificacoesConquistas notificacoesConquistas = new NotificacoesConquistas();
 
 
     public panel(String posicao, Inventario inventario) {
@@ -260,6 +265,9 @@ public class panel extends JPanel{
             if (menuPausaAberto && telaPausa == TelaPausa.OBJETIVOS) {
                 rolagemObjetivos = Math.max(0, rolagemObjetivos + e.getWheelRotation());
                 repaint();
+            } else if (menuPausaAberto && telaPausa == TelaPausa.CONQUISTAS) {
+                conquistaSelecionada = Math.floorMod(conquistaSelecionada + e.getWheelRotation(), SistemaConquistas.Conquista.values().length);
+                repaint();
             }
         });
         addFocusListener(new FocusAdapter() {
@@ -311,6 +319,9 @@ public class panel extends JPanel{
             } else if (telaPausa == TelaPausa.CONFIGURACOES) {
                 int indice = LayoutMenuPausa.indiceConfiguracao(ponto);
                 if (indice >= 0) opcaoConfiguracao = indice;
+            } else if (telaPausa == TelaPausa.CONQUISTAS) {
+                int indice = LayoutConquistas.indice(ponto);
+                if (indice >= 0) conquistaSelecionada = indice;
             }
         }
         atualizarCursorMouse();
@@ -325,6 +336,10 @@ public class panel extends JPanel{
                 opcaoMenuPausa = indice;
                 executarOpcaoPausa();
             }
+        } else if (telaPausa == TelaPausa.CONQUISTAS) {
+            int indice = LayoutConquistas.indice(ponto);
+            if (indice >= 0) conquistaSelecionada = indice;
+            if (LayoutConquistas.voltar().contains(ponto)) voltarOuFecharMenuPausa();
         } else if (telaPausa == TelaPausa.MEMORIAS || telaPausa == TelaPausa.OBJETIVOS) {
             if (LayoutMenuPausa.voltarMemorias().contains(ponto)) voltarOuFecharMenuPausa();
         } else {
@@ -350,6 +365,7 @@ public class panel extends JPanel{
         int tipo = Cursor.DEFAULT_CURSOR;
         if (menuPausaAberto && ponto != null) {
             boolean clicavel = telaPausa == TelaPausa.PRINCIPAL ? LayoutMenuPausa.indicePrincipal(ponto) >= 0
+                    : telaPausa == TelaPausa.CONQUISTAS ? LayoutConquistas.indice(ponto) >= 0 || LayoutConquistas.voltar().contains(ponto)
                     : telaPausa == TelaPausa.CONFIGURACOES ? LayoutMenuPausa.indiceConfiguracao(ponto) >= 0
                     : LayoutMenuPausa.voltarMemorias().contains(ponto);
             if (clicavel) tipo = Cursor.HAND_CURSOR;
@@ -454,8 +470,10 @@ public class panel extends JPanel{
                 this.interfaceHistoria.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA, this.historia,
                         LayoutHUD.mostrarObjetivos(estadoHUD), !dialogoSobreHUD());
             }
-            if (LayoutHUD.mostrarAvisos(estadoHUD)) notificacoesObjetivos.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA,
-                    estadoHUD == LayoutHUD.Estado.CHEFE);
+            if (LayoutHUD.mostrarAvisos(estadoHUD)) {
+                if (notificacoesConquistas.visivel()) notificacoesConquistas.desenhar(g2, LARGURA_LOGICA, estadoHUD == LayoutHUD.Estado.CHEFE);
+                else notificacoesObjetivos.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA, estadoHUD == LayoutHUD.Estado.CHEFE);
+            }
             if (deveDesenharBarraBoss() && (estadoHUD == LayoutHUD.Estado.CHEFE || estadoHUD == LayoutHUD.Estado.DIALOGO)) {
                 this.controladorInimigos.getChefe().desenharBarraBoss(g2, LARGURA_LOGICA);
             }
@@ -478,7 +496,7 @@ public class panel extends JPanel{
         if (this.historia != null && !deveDesenharBarraBoss()) {
             topo = 26 + InterfaceHistoria.alturaObjetivos(g2, historia);
         }
-        if (notificacoesObjetivos.getAtual() != null) {
+        if (notificacoesObjetivos.getAtual() != null || notificacoesConquistas.visivel()) {
             Rectangle aviso = LayoutHUD.avisoMissao(LARGURA_LOGICA, deveDesenharBarraBoss());
             topo = Math.max(topo, aviso.y + aviso.height + 8);
         }
@@ -583,10 +601,14 @@ public class panel extends JPanel{
     public void avancarPaginaDialogo() { if (interfaceHistoria != null) interfaceHistoria.avancarPagina(historia); }
     public void atualizarInterface() {
         atualizarConquistas();
-        if (historia != null) notificacoesObjetivos.atualizar(historia, LayoutHUD.mostrarAvisos(getEstadoHUD()));
+        boolean permitirAvisos = LayoutHUD.mostrarAvisos(getEstadoHUD());
+        notificacoesConquistas.atualizar(conquistas, permitirAvisos);
+        if (historia != null) notificacoesObjetivos.atualizar(historia, permitirAvisos && !notificacoesConquistas.visivel());
     }
 
     public SistemaConquistas getConquistas() { return conquistas; }
+    public boolean isTelaConquistasAberta() { return menuPausaAberto && telaPausa == TelaPausa.CONQUISTAS; }
+    public SistemaConquistas.Conquista getConquistaEmDestaque() { return SistemaConquistas.Conquista.values()[conquistaSelecionada]; }
     public void atualizarConquistas() { conquistas.atualizar(inventario, memoryManager, true); }
 
     public void sincronizarInterface() {
@@ -638,6 +660,14 @@ public class panel extends JPanel{
     }
 
     private void atualizarNavegacaoMenuPausa(escutadorTeclado teclado) {
+        if (this.telaPausa == TelaPausa.CONQUISTAS) {
+            if (teclado.movePraCima && !teclaCimaPausaPressionada) conquistaSelecionada = LayoutConquistas.navegar(conquistaSelecionada, 0, -1);
+            if (teclado.movePraBaixo && !teclaBaixoPausaPressionada) conquistaSelecionada = LayoutConquistas.navegar(conquistaSelecionada, 0, 1);
+            if (teclado.movePraEsq && !teclaEsquerdaPausaPressionada) conquistaSelecionada = LayoutConquistas.navegar(conquistaSelecionada, -1, 0);
+            if (teclado.movePraDir && !teclaDireitaPausaPressionada) conquistaSelecionada = LayoutConquistas.navegar(conquistaSelecionada, 1, 0);
+            if (teclado.confirmar && !teclaConfirmarPausaPressionada) voltarOuFecharMenuPausa();
+            return;
+        }
         if (this.telaPausa == TelaPausa.OBJETIVOS) {
             if (teclado.movePraCima && !teclaCimaPausaPressionada) rolagemObjetivos = Math.max(0, rolagemObjetivos - 1);
             if (teclado.movePraBaixo && !teclaBaixoPausaPressionada) rolagemObjetivos++;
@@ -740,6 +770,11 @@ public class panel extends JPanel{
                 this.telaPausa = TelaPausa.OBJETIVOS;
                 this.rolagemObjetivos = 0;
                 break;
+            case 6:
+                atualizarConquistas();
+                this.telaPausa = TelaPausa.CONQUISTAS;
+                this.conquistaSelecionada = 0;
+                break;
             default:
                 break;
         }
@@ -758,7 +793,9 @@ public class panel extends JPanel{
         g2.setColor(new Color(0, 0, 0, 190));
         g2.fillRect(0, 0, LARGURA_LOGICA, ALTURA_LOGICA);
 
-        if (this.telaPausa == TelaPausa.OBJETIVOS) {
+        if (this.telaPausa == TelaPausa.CONQUISTAS) {
+            interfaceConquistas.desenhar(g2, conquistas, conquistaSelecionada);
+        } else if (this.telaPausa == TelaPausa.OBJETIVOS) {
             desenharTelaObjetivos(g2);
         } else if (this.telaPausa == TelaPausa.MEMORIAS) {
             desenharTelaMemorias(g2);
@@ -1003,6 +1040,7 @@ public class panel extends JPanel{
 
         conquistas.restaurar(state.conquistas);
         conquistas.atualizar(inventario, memoryManager, false);
+        notificacoesConquistas.limpar();
 
         if (this.sistemaCheckpoint != null) {
             this.sistemaCheckpoint.registrarCheckpointInicial(this);

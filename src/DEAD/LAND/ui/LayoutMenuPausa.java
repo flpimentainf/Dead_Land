@@ -21,7 +21,7 @@ public final class LayoutMenuPausa {
     public static Rectangle voltarMemorias() { return new Rectangle(264, 420, 240, 38); }
 
     public static int indicePrincipal(Point2D ponto) {
-        for (int i = 0; i < 6; i++) if (ponto != null && opcaoPrincipal(i).contains(ponto)) return i;
+        for (int i = 0; i < 7; i++) if (ponto != null && opcaoPrincipal(i).contains(ponto)) return i;
         return -1;
     }
 

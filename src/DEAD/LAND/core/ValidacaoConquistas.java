@@ -17,6 +17,7 @@ public final class ValidacaoConquistas {
         Path pasta = Files.createTempDirectory("deadland-conquistas-");
         try {
             SwingUtilities.invokeAndWait(() -> validarColetaESave(pasta));
+            SwingUtilities.invokeAndWait(() -> ValidacaoInterfaceConquistas.validar(pasta));
         } finally {
             for (int slot = 1; slot <= 3; slot++) Files.deleteIfExists(pasta.resolve("slot" + slot + ".properties"));
             Files.delete(pasta);

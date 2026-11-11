@@ -46,6 +46,7 @@ public class ValidacaoSlots {
     private static void validarMenus(SaveManager saves, File pasta, byte[] original) {
         moldura janela = new moldura(saves);
         try {
+            exigir(botoes(janela, "CONQUISTAS").isEmpty(), "painel de conquistas não deve estar disponível fora da partida");
             clicarBotao(janela, "NOVO JOGO", 0);
             exigir(botoes(janela, "NOVO JOGO").size() == 2, "dois slots livres disponíveis");
             clicarBotao(janela, "NOVO JOGO", 0); // Slot 2.

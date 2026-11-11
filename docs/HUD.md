@@ -28,6 +28,8 @@ Carregar uma partida ou restaurar um checkpoint descarta avisos anteriores.
 ## Controles
 
 - **ESC > MISSÕES**: consultar missão principal e secundária, com estado textual.
+- **ESC > CONQUISTAS**: árvore de marcos da partida, com requisitos, progresso e ícones
+  pretos/coloridos. Disponível exclusivamente no menu de pausa durante o jogo.
 - **W/S** ou roda do mouse: rolar objetivos extensos; **ENTER/ESC** ou **VOLTAR**: sair.
 - **Roda do mouse sobre o rodapé** ou botões **< / >**: mudar a página de itens.
 - A arma equipada fica fixa à direita, com borda dupla e marcador **ATIVA**.
