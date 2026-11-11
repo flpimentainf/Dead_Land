@@ -163,7 +163,8 @@ public class InterfaceHistoria {
         for (int i = 0; i < escolhas.size(); i++) g2.drawString(escolhas.get(i), textoX, caixaY + 24 + (quantidade + i) * passo);
         g2.setFont(EstiloHUD.DICA);
         g2.setColor(Color.LIGHT_GRAY);
-        String dica = paginaDialogo + 1 < totalPaginas ? "ENTER/E: próxima página" : rodape;
+        String dica = paginaDialogo + 1 < totalPaginas
+                ? (opcoes.isEmpty() ? "" : "W/S escolhe | ") + "ENTER/E: próxima página" : rodape;
         List<String> dicas = TextoHUD.quebrar(dica + (totalPaginas > 1 ? " | " + (paginaDialogo + 1) + "/" + totalPaginas : ""),
                 g2.getFontMetrics(), caixaLargura - 40);
         for (int i = 0; i < dicas.size(); i++) g2.drawString(dicas.get(i), caixaX + 16, caixaY + caixaAltura - 12 + i * 13);

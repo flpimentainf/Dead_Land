@@ -33,6 +33,8 @@ Carregar uma partida ou restaurar um checkpoint descarta avisos anteriores.
 - A arma equipada fica fixa à direita, com borda dupla e marcador **ATIVA**.
 - **Q** continua alternando armas; **H** continua usando cura.
 - **ENTER/E** avança as páginas de diálogos antes de encerrar ou confirmar a escolha.
+- **W/S** seleciona a resposta em qualquer página em que as escolhas estejam visíveis;
+  avançar o texto mantém a seleção. Segurar **ENTER/E** não confirma duas vezes.
 
 ## Validação
 

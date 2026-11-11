@@ -132,16 +132,16 @@ public class SistemaHistoria {
     public void atualizar(panel cenaDoJogo, escutadorTeclado teclado) {
         tratarMenu(teclado);
 
-        if (cenaDoJogo != null && cenaDoJogo.temProximaPaginaDialogo()) {
+        if (exibindoEscolha) {
+            tratarEscolha(teclado, cenaDoJogo);
+            return;
+        }
+
+        if (exibindoMensagem && cenaDoJogo != null && cenaDoJogo.temProximaPaginaDialogo()) {
             if (teclado.confirmar && !teclaConfirmarPressionada) cenaDoJogo.avancarPaginaDialogo();
             teclaConfirmarPressionada = teclado.confirmar;
             teclaCimaPressionada = teclado.movePraCima;
             teclaBaixoPressionada = teclado.movePraBaixo;
-            return;
-        }
-
-        if (exibindoEscolha) {
-            tratarEscolha(teclado, cenaDoJogo);
             return;
         }
 
@@ -176,7 +176,9 @@ public class SistemaHistoria {
         }
 
         if (teclado.confirmar && !teclaConfirmarPressionada) {
-            if (tipoEscolha == TipoEscolha.NPC) {
+            if (cenaDoJogo != null && cenaDoJogo.temProximaPaginaDialogo()) {
+                cenaDoJogo.avancarPaginaDialogo();
+            } else if (tipoEscolha == TipoEscolha.NPC) {
                 concluirEscolhaNpc(cenaDoJogo);
             } else {
                 if (opcaoEscolhida == 0) {
