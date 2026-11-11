@@ -1,0 +1,561 @@
+﻿DEAD LAND — HISTÓRIA EXTRAÍDA DO JOGO
+=====================================
+
+Extração do roteiro atual. As falas preservam o texto dos fontes, inclusive diferenças de acentuação. As alternativas são identificadas conforme as chaves e o progresso. Textos escritos, mas ainda sem evento ativo, estão separados no apêndice.
+
+1. PREMISSA E CAMINHO DA HISTÓRIA
+=================================
+
+Após um acidente em uma noite de chuva, você desperta em um lugar estranho. A floresta de Dead Land aprisiona pessoas que estão entre acordar e desistir. Para sair, você precisa encontrar as chaves, recuperar suas lembranças e escolher se deseja voltar.
+
+A jornada começa em um quarto. Ao dormir, o chão desaparece e você cai em uma floresta sem sol. Ari explica que quase ninguém se lembra da primeira vez e que sua memória está trancada atrás de duas fechaduras.
+
+A chave prata abre a porta inferior do salão de pedra. Além dela está a chave vermelha, a verdadeira Chave da Memória. Ao obtê-la, você recorda chuva, faróis, vidro quebrado e um carro fora da estrada: sofreu um acidente.
+
+O caminho leva até O Esquecido. Ele tem seus olhos, sua postura e sua sombra, e oferece o esquecimento como refúgio da dor. Depois de derrotá-lo, você pode falar com o Porteiro, que aparece após o confronto, e decidir entre acordar ou ficar em Dead Land.
+
+As cinco orbes revelam lembranças adicionais. Três delas permitem receber uma recompensa do Caçador. Recuperar todas altera uma frase do final Acordar. Insistir em abrir o menu durante a escolha final pode revelar o final secreto.
+
+2. ROTEIRO PRINCIPAL
+====================
+
+O quarto
+
+  Você está no seu quarto.
+  O silêncio está estranho.
+  A chuva bate na janela como se tentasse avisar algo.
+  Sua cabeça dói. Suas mãos tremem.
+  Talvez dormir seja a única forma de escapar disso.
+
+Ao deitar na cama
+
+  Você fecha os olhos.
+  Por um segundo, tudo fica calmo.
+  Então o chão desaparece.
+  Você está caindo.
+  Uma voz distante sussurra: você ainda não terminou.
+
+A chegada à floresta
+
+  Você desperta antes do impacto.
+  O céu não tem sol.
+  As árvores parecem observar você.
+  Uma frase aparece em sua mente:
+  Bem-vindo a Dead Land.
+
+Ari: a primeira orientação
+
+  Ari, o que lembra
+  Você caiu aqui de novo?
+  Não se assuste. Quase ninguém lembra da primeira vez.
+  Dead Land prende quem está entre acordar e desistir.
+  Sua memória foi trancada atrás de duas fechaduras.
+  Primeiro procure a chave prata.
+
+O chamado da ruína
+
+  Eco da floresta
+  A Chave da Memória está selada em outra parte da ruína.
+  Uma chave prata abre o caminho até ela.
+  Explore esta área, encontre a CHAVE PRATA
+  e volte para a porta inferior do salão.
+
+A chave prata
+
+  Item obtido: Chave Prata
+  O metal está frio e sem marcas.
+  Ela não carrega nenhuma lembrança.
+  Mas combina com a fechadura da porta inferior do salão.
+  Atrás dela está a chave vermelha.
+
+O Arco do Eco
+
+  Item obtido: Arco do Eco
+  A madeira é fria.
+  Mesmo assim, sua mão sabe como segurá-lo.
+  Mire com o mouse e clique com o botão esquerdo para atirar.
+  Você já lutou antes.
+  Só não lembra contra o quê.
+
+As flechas
+
+  Item obtido: Flechas quebradas
+  Cada flecha carrega uma pequena luz.
+  Use bem.
+  A floresta odeia luz.
+
+A chave vermelha: lembrança do acidente
+
+  Memória recuperada: Chave Vermelha
+  Chuva. Faróis. Um carro fora da estrada.
+  Vidro quebrado. Alguém chamando seu nome.
+  Agora você lembra: sofreu um acidente.
+  Esta é a Chave da Memória.
+  Leve-a até a porta do confronto final.
+
+A entrada no confronto
+
+  O selo se quebra.
+  Do outro lado, uma figura aparece.
+  Ela tem seus olhos.
+  Sua postura.
+  Sua sombra.
+  O Esquecido sorri: você demorou.
+
+A proposta do Esquecido
+
+  O Esquecido
+  Por que quer voltar?
+  Lá fora existe dor.
+  Aqui existe silêncio.
+  Lá fora, você vai lembrar de tudo.
+  Aqui, eu posso apagar para você.
+  Fique. Pare de lutar.
+
+Depois da derrota do chefe — texto utilizado atualmente
+
+  O Esquecido se desfaz em silêncio.
+  O Porteiro agora pode ouvir seus passos.
+
+A escolha diante do portão
+
+  O portão se abre.
+  Do outro lado existe uma luz branca.
+  Você ouve máquinas apitando.
+  Você ouve uma voz chorando.
+  Alguém está chamando seu nome.
+  Dead Land oferece descanso.
+  O mundo real oferece dor.
+  Escolha.
+
+Opções finais
+
+  Acordar
+  Ficar em Dead Land
+
+Ao tentar abrir o menu durante a escolha
+
+  Sistema
+  Menu bloqueado.
+  O botão de logout pisca, mas não responde.
+  Dead Land não deixa ninguém sair no meio da escolha.
+  A floresta exige uma decisão.
+
+3. PERSONAGENS E DIÁLOGOS
+=========================
+
+Os oito personagens são Ari, Mara, Guardião da memória, Porteiro morto, Sobrevivente perdido, Eco, Caçador e Alma esquecida. O Porteiro só fica visível depois da derrota do chefe; o Guardião deixa de aparecer quando a chave vermelha já está no inventário.
+
+ARI — primeiro encontro
+
+  Ari, o que lembra
+  Você caiu aqui de novo?
+  Não se assuste. Quase ninguém lembra da primeira vez.
+  Este lugar se chama Dead Land.
+  Ele aparece para quem está preso entre dois mundos.
+  Sua memória está presa na chave vermelha.
+  Mas ela foi trancada atrás de uma porta prateada.
+  Encontre primeiro a chave prata.
+
+ARI — Quem é você?
+
+  Ari
+  Eu sou uma lembrança que aprendeu a caminhar.
+  Ajudo quem ainda tem vontade de acordar.
+
+ARI — O que devo fazer? — com a chave vermelha
+
+  Ari
+  Você já recuperou a memória.
+  Siga para o confronto final.
+
+ARI — O que devo fazer? — sem a chave vermelha
+
+  Ari
+  Encontre a chave prata primeiro.
+  Ela leva até a chave vermelha.
+
+MARA — sem as chaves
+
+  Mara, a escutadora
+  Eu ouvi sua queda antes de você chegar.
+  A porta inferior deste salão protege uma câmara.
+  Lá dentro está a chave vermelha.
+  Não tente forçar a fechadura.
+  Procure a chave prata na área à esquerda.
+
+MARA — com a chave prata
+
+  Mara, a escutadora
+  Você encontrou a chave prata.
+  Agora volte à porta inferior deste salão.
+  Ela abre o caminho até a chave vermelha.
+  Não confunda as duas: somente a vermelha guarda sua memória.
+
+MARA — com a chave vermelha
+
+  Mara, a escutadora
+  A chave vermelha está com você.
+  Eu consigo ouvir a lembrança presa nela.
+  O caminho do confronto final agora pode ser aberto.
+
+MARA — O que você ouve?
+
+  Mara
+  Eu ouço as memórias presas nas paredes.
+  A sua faz o som de chuva sobre vidro.
+
+MARA — Onde estão as chaves? — com a chave vermelha
+
+  Mara
+  A chave vermelha está com você.
+  A porta final vai reconhecê-la.
+
+MARA — Onde estão as chaves? — com a chave prata
+
+  Mara
+  Use a chave prata na porta inferior.
+  A chave vermelha está além dela.
+
+MARA — Onde estão as chaves? — sem as chaves
+
+  Mara
+  A chave prata está na área à esquerda.
+  Volte com ela para este salão.
+
+GUARDIÃO — primeiro encontro
+
+  Guardião da memória
+  Você encontrou o caminho da chave prata.
+  Leve-a de volta ao salão de pedra.
+  Ela abre a porta inferior.
+  Depois dessa porta está a chave vermelha.
+  Essa, sim, guarda sua memória.
+
+GUARDIÃO — com a chave prata
+
+  Guardião da memória
+  A chave prata escolheu sua mão.
+  Volte ao salão e abra a porta inferior.
+  A chave vermelha espera do outro lado.
+
+GUARDIÃO — fala prevista para a chave vermelha; personagem oculto nessa etapa
+
+  Guardião da memória
+  Você encontrou a verdadeira chave.
+  O vermelho dela carrega aquilo que tentou esquecer.
+  Vá até a porta do confronto e termine o caminho.
+
+GUARDIÃO — O que você guarda?
+
+  Guardião
+  Eu protejo o caminho entre a chave prata e a memória.
+  Quando a chave vermelha for encontrada, minha tarefa termina.
+
+GUARDIÃO — Qual é minha missão? — com a chave vermelha
+
+  Guardião
+  Sua memória voltou.
+  Não há mais nada para eu guardar.
+
+GUARDIÃO — Qual é minha missão? — com a chave prata
+
+  Guardião
+  Leve a prata à porta inferior.
+  Encontre a chave vermelha.
+
+GUARDIÃO — Qual é minha missão? — sem as chaves
+
+  Guardião
+  Explore esta área.
+  A chave prata está próxima.
+
+PORTEIRO — sem a chave vermelha
+
+  Porteiro morto
+  Você chegou cedo demais.
+  A chave prata abre apenas o caminho.
+  Ela não pode abrir o portão final.
+  Volte e encontre a CHAVE VERMELHA.
+  Traga a verdadeira Chave da Memória.
+
+PORTEIRO — com a chave vermelha; conduz à escolha final
+
+  Porteiro morto
+  A chave vermelha reconheceu você.
+  Agora você lembra.
+  O acidente.
+  A chuva.
+  A sirene.
+  A mão de alguém segurando a sua.
+  Posso abrir o caminho, mas não posso escolher por você.
+
+PORTEIRO — O que existe além?
+
+  Porteiro
+  Além do portão existe a escolha.
+  Acordar e enfrentar a dor, ou permanecer em Dead Land.
+
+PORTEIRO — O que ainda falta? — com a chave vermelha
+
+  Porteiro
+  Nada mais falta.
+  A chave vermelha completou sua memória.
+
+PORTEIRO — O que ainda falta? — sem a chave vermelha
+
+  Porteiro
+  Falta a chave vermelha.
+  A chave prata não abre este caminho.
+
+Introdução comum das conversas seguintes
+
+  Você já falou comigo.
+  O que deseja perguntar?
+
+As falas alternativas dos quatro personagens abaixo estão reunidas por personagem; nem todas aparecem na mesma visita.
+
+SOBREVIVENTE PERDIDO
+
+  Sobrevivente perdido
+  Os esqueletos carregam flechas quebradas. As vezes ainda servem.
+  Se ficar sem flechas, recue e procure restos depois das lutas.
+  Algumas criaturas podem deixar municao ou cura.
+
+ECO
+
+  Eco
+  Dead Land repete o medo ate voce acreditar que ele e seu.
+  Respire. Nem toda voz aqui e sua.
+  Eco
+  Cada memória guarda um pedaço da sua história.
+  Você pode revê-las no menu Memórias.
+
+CAÇADOR
+
+  Cacador
+  Tres lembrancas ja sao uma trilha. Pegue isto.
+  Você recebeu 12 flechas e 2 Poções de Cura.
+  Cacador
+  Traga três fragmentos de memória.
+  Em troca, você recebe 12 flechas e 2 Poções de Cura.
+  Memorias encontradas: [quantidade]/3
+  Cacador
+  Use o dash antes de atirar. O Esquecido odeia alvo que se move.
+  Nao gaste suas ultimas flechas sem carga.
+
+ALMA ESQUECIDA
+
+  Alma esquecida
+  Algumas saidas so aparecem quando voce insiste no impossivel.
+  Tres tentativas diante da escolha final podem abrir outro caminho.
+  A floresta observa ate o que voce tenta evitar.
+
+4. AS CINCO MEMÓRIAS
+====================
+
+A queda
+
+  O primeiro som foi chuva. O segundo, seu proprio nome se desfazendo.
+
+A estrada
+
+  Alguem chamou por voce antes da luz tomar a pista.
+
+A promessa
+
+  Mara lembra de uma promessa que voce ainda nao decidiu cumprir.
+
+O Porteiro
+
+  Nem toda saida devolve a mesma pessoa que entrou.
+
+O Esquecido
+
+  O guardiao final ja tentou acordar. Falhou por medo de lembrar.
+
+5. MISSÕES
+==========
+
+Caminho principal, com pequenas variações de orientação nas conversas
+
+  Deite-se na cama.
+  Sobreviva à queda.
+  Explore a floresta e procure uma saída.
+  Fale com alguém que ainda lembra.
+  Encontre a chave prata.
+  Abra a porta inferior e encontre a chave vermelha.
+  Abra a porta do confronto com a chave vermelha.
+  Derrote o chefe.
+  Fale com o Porteiro.
+  Escolha o final.
+
+Missões secundárias e seus estados
+
+  Encontre 3 fragmentos de memoria.
+  Volte ao Cacador.
+  Ajuda do Cacador concluida.
+  Descubra por que o menu reage ao medo.
+
+Ao reunir três memórias e voltar ao Caçador, você recebe 12 flechas e duas poções de cura.
+
+6. OS TRÊS FINAIS
+=================
+
+FINAL: ACORDAR
+
+  Final: ACORDAR
+  Você atravessa a luz.
+  A floresta se desfaz atrás de você.
+  Bip... bip... bip...
+  Seus olhos abrem devagar.
+  O teto de um hospital aparece.
+  Uma mão segura a sua.
+  Alguém sussurra: você voltou.
+
+Complemento de Acordar — nenhuma ou uma orbe
+
+  Voce acorda, mas Dead Land ainda guarda quase tudo que era seu.
+
+Complemento de Acordar — de duas a quatro orbes
+
+  Voce acorda com partes suficientes de si para continuar.
+
+Complemento de Acordar — todas as cinco orbes
+
+  Com todas as memorias, voce acorda lembrando quem precisou deixar para tras.
+
+FINAL: FICAR
+
+  Final: FICAR
+  Você se afasta da luz.
+  O portão se fecha.
+  A floresta fica mais bonita.
+  Os NPCs sorriem, mas nenhum deles pisca.
+  Lá fora, uma máquina continua apitando sozinha.
+  Você escolheu esquecer.
+
+FINAL SECRETO: LOOP
+
+  Final secreto: LOOP
+  A escolha desaparece.
+  O céu começa a rachar.
+  As árvores voltam para o mesmo lugar.
+  Ari observa você de longe.
+  Ele parece triste.
+  Você pergunta se já esteve ali antes.
+  Ari responde: mais vezes do que consegue lembrar.
+
+O final secreto é acionado ao insistir em abrir o menu durante a escolha final. O código usa um contador de pelo menos três tentativas. Depois de Ficar ou Loop, o jogo permite continuar explorando a floresta.
+
+7. PORTAS E PASSAGENS
+=====================
+
+A porta do quarto
+
+  Porta
+  A maçaneta está gelada.
+  Não há nada atrás desta porta.
+  Hoje, a saída não é acordado.
+  Volte para a cama.
+
+O portão e a memória incompleta
+
+  Portão morto
+  O portão respira lentamente.
+  Ele sabe que você está incompleto.
+  A chave prata não é suficiente.
+  Encontre a chave vermelha
+  e recupere sua memória antes de atravessar.
+
+A porta da câmara vermelha
+
+  Porta da câmara vermelha
+  Uma fechadura prateada impede a passagem.
+  A Chave da Memória está além desta porta.
+  Encontre a CHAVE PRATA.
+
+A porta do confronto
+
+  Porta do confronto
+  O selo pulsa em vermelho.
+  Somente a CHAVE VERMELHA pode rompê-lo.
+  Ela é a Chave da Memória.
+
+O portão final sem a chave vermelha
+
+  Portão final
+  A fechadura não se move.
+  O portão sente que algo está faltando.
+  Você precisa da CHAVE VERMELHA.
+  a verdadeira Chave da Memória.
+
+8. APÊNDICE — TEXTOS ESCRITOS, AINDA SEM EVENTO ATIVO
+=====================================================
+
+Os trechos abaixo existem no roteiro, mas não possuem chamada nos eventos atuais. Não foram tratados como acontecimentos já apresentados no jogo.
+
+Dica adicional de Ari
+
+  Ari, o que lembra
+  Primeiro encontre a chave prata.
+  Ela abre a câmara da chave vermelha.
+  A vermelha é a verdadeira Chave da Memória.
+
+Dica adicional de Mara com o arco
+
+  Mara, a escutadora
+  Agora você pode lutar.
+  Mas cuidado.
+  Algumas criaturas atacam de longe.
+  Use o dash para desviar dos projéteis.
+
+Ao avistar uma criatura
+
+  Algo se move entre as árvores.
+  Não é vivo.
+  Não é morto.
+  É o que sobra quando alguém desiste de acordar.
+
+Ao derrotar uma criatura
+
+  A criatura cai em silêncio.
+  Por um instante, você sente pena.
+  Talvez ela também tenha procurado uma saída.
+
+Versão alternativa da derrota do Esquecido
+
+  O Esquecido cai de joelhos.
+  Pela primeira vez, a floresta fica em silêncio de verdade.
+  Ele olha para você e sussurra:
+  Então você ainda quer acordar...
+
+Placa da floresta — 1
+
+  Placa antiga
+  Nem todo caminho leva para frente.
+  A floresta lembra de você.
+
+Placa da floresta — 2
+
+  Placa antiga
+  Quem esquece demais vira parte do lugar.
+  Não siga as vozes depois da meia-noite.
+
+Placa do portão final
+
+  Placa quebrada
+  Dead Land não prende corpos.
+  Prende vontades.
+
+9. FALA GENÉRICA
+================
+
+Resposta de segurança para um personagem que não corresponda aos oito encontros específicos.
+
+Personagem não identificado
+
+  NPC
+  A figura observa você em silêncio.
+  Por algum motivo, parece estar esperando outra versão sua.
+
