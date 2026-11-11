@@ -13,6 +13,35 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public class SistemaHistoria {
+    public record AvisoObjetivo(String titulo, String descricao) {}
+    private final java.util.ArrayDeque<AvisoObjetivo> avisosObjetivos = new java.util.ArrayDeque<>();
+
+    private void definirObjetivoAtual(String texto, boolean concluiuAnterior) {
+        if (java.util.Objects.equals(objetivoAtual, texto)) return;
+        if (concluiuAnterior && !objetivoAtual.isBlank()) avisarObjetivo("Objetivo concluído", objetivoAtual);
+        objetivoAtual = texto;
+        if (!historiaFinalizada()) avisarObjetivo("Novo objetivo", texto);
+    }
+
+    private void definirObjetivoSecundario(String texto) {
+        if (java.util.Objects.equals(objetivoSecundario, texto)) return;
+        boolean nova = objetivoSecundario.isBlank();
+        objetivoSecundario = texto;
+        avisarObjetivo(isObjetivoSecundarioConcluido() ? "Objetivo concluído" : nova ? "Nova missão secundária" : "Novo objetivo", texto);
+    }
+
+    private void avisarObjetivo(String titulo, String texto) {
+        if (avisosObjetivos.size() == 32) avisosObjetivos.removeFirst();
+        avisosObjetivos.addLast(new AvisoObjetivo(titulo, texto));
+    }
+
+    public AvisoObjetivo consumirAvisoObjetivo() { return avisosObjetivos.pollFirst(); }
+    public void limparAvisosObjetivos() { avisosObjetivos.clear(); }
+    public boolean isObjetivoPrincipalConcluido() { return historiaFinalizada(); }
+    public boolean isObjetivoSecundarioConcluido() {
+        return objetivoSecundario.equals("Ajuda do Cacador concluida.") && eventosHistoria.contains(EVENTO_CACADOR_RECOMPENSA)
+                || objetivoSecundario.equals("Descubra por que o menu reage ao medo.") && estado == Estado.FINAL_SECRETO;
+    }
     private static final String EVENTO_CACADOR_RECOMPENSA = "cacador_recompensa";
     private static final int MEMORIAS_PARA_RECOMPENSA = 3;
 
@@ -96,11 +125,20 @@ public class SistemaHistoria {
 
     public SistemaHistoria(Consumer<Estado> aoFinalizar) {
         this.aoFinalizar = aoFinalizar;
+        avisarObjetivo("Novo objetivo", objetivoAtual);
         mostrarMensagem(RoteiroHistoria.abertura());
     }
 
     public void atualizar(panel cenaDoJogo, escutadorTeclado teclado) {
         tratarMenu(teclado);
+
+        if (cenaDoJogo != null && cenaDoJogo.temProximaPaginaDialogo()) {
+            if (teclado.confirmar && !teclaConfirmarPressionada) cenaDoJogo.avancarPaginaDialogo();
+            teclaConfirmarPressionada = teclado.confirmar;
+            teclaCimaPressionada = teclado.movePraCima;
+            teclaBaixoPressionada = teclado.movePraBaixo;
+            return;
+        }
 
         if (exibindoEscolha) {
             tratarEscolha(teclado, cenaDoJogo);
@@ -166,7 +204,7 @@ public class SistemaHistoria {
 
     public void eventoDormir() {
         estado = Estado.QUEDA;
-        objetivoAtual = "Sobreviva à queda.";
+        definirObjetivoAtual("Sobreviva à queda.", true);
         telaEscura = true;
         tocarSomEstranhoBasico();
         mostrarMensagem(RoteiroHistoria.dormir());
@@ -176,7 +214,7 @@ public class SistemaHistoria {
         if (estado != Estado.QUEDA) return;
 
         estado = Estado.FLORESTA;
-        objetivoAtual = "Explore a floresta e procure uma saída.";
+        definirObjetivoAtual("Explore a floresta e procure uma saída.", true);
         telaEscura = false;
         mostrarMensagem(RoteiroHistoria.quedaConcluida());
     }
@@ -186,27 +224,27 @@ public class SistemaHistoria {
 
         if (indiceCenario == 3 && estado == Estado.FLORESTA) {
             estado = Estado.FALHA;
-            objetivoAtual = "Fale com alguém que ainda lembra.";
+            definirObjetivoAtual("Fale com alguém que ainda lembra.", false);
             mostrarMensagem(RoteiroHistoria.npcLembra());
             return;
         }
 
         if (indiceCenario == 6 && estado != Estado.BUSCA_MEMORIA && estado != Estado.MEMORIAS) {
             estado = Estado.BUSCA_MEMORIA;
-            objetivoAtual = "Encontre a chave prata.";
+            definirObjetivoAtual("Encontre a chave prata.", false);
             mostrarMensagem(RoteiroHistoria.missaoMemoria());
             return;
         }
 
         if (indiceCenario == 7) {
             if (cenaDoJogo.getInventario().temChaveBoss63()) {
-                objetivoAtual = "Derrote o chefe.";
+                definirObjetivoAtual("Derrote o chefe.", false);
                 if (!confrontoBossApresentado) {
                     confrontoBossApresentado = true;
                     mostrarMensagem(RoteiroHistoria.antesDoBoss());
                 }
             } else {
-                objetivoAtual = "Encontre a chave vermelha.";
+                definirObjetivoAtual("Encontre a chave vermelha.", false);
                 mostrarMensagem(RoteiroHistoria.portaoSemMemoria());
             }
         }
@@ -249,7 +287,7 @@ public class SistemaHistoria {
             if (estado == Estado.FLORESTA) {
                 estado = Estado.FALHA;
             }
-            objetivoAtual = "Procure primeiro a chave prata.";
+            definirObjetivoAtual("Procure primeiro a chave prata.", false);
             mostrarMensagem(RoteiroHistoria.npcAri());
             return;
         }
@@ -262,14 +300,14 @@ public class SistemaHistoria {
 
             if (cenaDoJogo.getInventario().temChave()) {
                 estado = Estado.BUSCA_MEMORIA;
-                objetivoAtual = "Use a chave prata na porta inferior.";
+                definirObjetivoAtual("Use a chave prata na porta inferior.", false);
                 mostrarMensagem(RoteiroHistoria.npcMaraComChavePrata());
                 return;
             }
 
             if (estado != Estado.MEMORIAS) {
                 estado = Estado.BUSCA_MEMORIA;
-                objetivoAtual = "Encontre a chave prata na área à esquerda.";
+                definirObjetivoAtual("Encontre a chave prata na área à esquerda.", false);
             }
             mostrarMensagem(RoteiroHistoria.npcMara());
             return;
@@ -283,14 +321,14 @@ public class SistemaHistoria {
 
             if (cenaDoJogo.getInventario().temChave()) {
                 estado = Estado.BUSCA_MEMORIA;
-                objetivoAtual = "Volte e abra a porta inferior com a chave prata.";
+                definirObjetivoAtual("Volte e abra a porta inferior com a chave prata.", false);
                 mostrarMensagem(RoteiroHistoria.npcGuardiaoComChavePrata());
                 return;
             }
 
             if (estado != Estado.MEMORIAS) {
                 estado = Estado.BUSCA_MEMORIA;
-                objetivoAtual = "Encontre a chave prata nesta área.";
+                definirObjetivoAtual("Encontre a chave prata nesta área.", false);
             }
             mostrarMensagem(RoteiroHistoria.npcGuardiaoMemoria());
             return;
@@ -300,7 +338,7 @@ public class SistemaHistoria {
             if (cenaDoJogo != null && cenaDoJogo.getInventario().temChaveBoss63()) {
                 iniciarEscolhaFinal(RoteiroHistoria.npcPorteiroComChave());
             } else {
-                objetivoAtual = "Encontre a chave vermelha.";
+                definirObjetivoAtual("Encontre a chave vermelha.", false);
                 mostrarMensagem(RoteiroHistoria.npcPorteiroSemChave());
             }
             return;
@@ -312,7 +350,7 @@ public class SistemaHistoria {
     private void conversarComSobrevivente(String npcId) {
         boolean primeiraConversa = npcsConhecidos.add(npcId);
         if (primeiraConversa && objetivoSecundario.trim().isEmpty()) {
-            objetivoSecundario = "Encontre 3 fragmentos de memoria.";
+            definirObjetivoSecundario("Encontre 3 fragmentos de memoria.");
         }
 
         mostrarMensagem(
@@ -350,7 +388,7 @@ public class SistemaHistoria {
         if (memorias >= MEMORIAS_PARA_RECOMPENSA
                 && !eventosHistoria.contains(EVENTO_CACADOR_RECOMPENSA)) {
             eventosHistoria.add(EVENTO_CACADOR_RECOMPENSA);
-            objetivoSecundario = "Ajuda do Cacador concluida.";
+            definirObjetivoSecundario("Ajuda do Cacador concluida.");
             if (cenaDoJogo != null && cenaDoJogo.getInventario() != null) {
                 cenaDoJogo.getInventario().adicionarFlechas(12);
                 cenaDoJogo.getInventario().definirQuantidadeCura(
@@ -373,7 +411,7 @@ public class SistemaHistoria {
         }
 
         if (!eventosHistoria.contains(EVENTO_CACADOR_RECOMPENSA)) {
-            objetivoSecundario = "Encontre 3 fragmentos de memoria.";
+            definirObjetivoSecundario("Encontre 3 fragmentos de memoria.");
             mostrarMensagem(
                     "Cacador",
                     "Traga três fragmentos de memória.",
@@ -393,7 +431,7 @@ public class SistemaHistoria {
     private void conversarComAlma(String npcId) {
         boolean primeiraConversa = npcsConhecidos.add(npcId);
         if (primeiraConversa && objetivoSecundario.trim().isEmpty()) {
-            objetivoSecundario = "Descubra por que o menu reage ao medo.";
+            definirObjetivoSecundario("Descubra por que o menu reage ao medo.");
         }
 
         mostrarMensagem(
@@ -470,7 +508,7 @@ public class SistemaHistoria {
 
         if ("chave".equals(nome)) {
             estado = Estado.BUSCA_MEMORIA;
-            objetivoAtual = "Abra a porta inferior e encontre a chave vermelha.";
+            definirObjetivoAtual("Abra a porta inferior e encontre a chave vermelha.", true);
             mostrarMensagem(RoteiroHistoria.chaveColetada());
             return;
         }
@@ -491,7 +529,7 @@ public class SistemaHistoria {
 
         if ("chave_boss_63".equals(nome)) {
             estado = Estado.MEMORIAS;
-            objetivoAtual = "Abra a porta do confronto com a chave vermelha.";
+            definirObjetivoAtual("Abra a porta do confronto com a chave vermelha.", true);
             mostrarMensagem(RoteiroHistoria.chaveBossColetada());
         }
     }
@@ -533,7 +571,7 @@ public class SistemaHistoria {
 
     private void iniciarEscolhaFinal(String[] linhas) {
         estado = Estado.ESCOLHA_FINAL;
-        objetivoAtual = "Escolha o final.";
+        definirObjetivoAtual("Escolha o final.", true);
         tipoEscolha = TipoEscolha.FINAL;
         nomeNpcFalando = null;
         exibindoEscolha = true;
@@ -546,7 +584,7 @@ public class SistemaHistoria {
         exibindoEscolha = false;
         tipoEscolha = TipoEscolha.NENHUMA;
         estado = Estado.FINAL_ACORDAR;
-        objetivoAtual = "Fim.";
+        definirObjetivoAtual("Fim.", true);
         mostrarMensagem(comComplementoDeMemoria(
                 RoteiroHistoria.finalAcordar(),
                 complementoFinalPorMemorias(cenaDoJogo)
@@ -557,7 +595,7 @@ public class SistemaHistoria {
         exibindoEscolha = false;
         tipoEscolha = TipoEscolha.NENHUMA;
         estado = Estado.FINAL_FICAR;
-        objetivoAtual = "Fim.";
+        definirObjetivoAtual("Fim.", true);
         cenaDoJogo.irParaCenario(2, 745, 335);
         mostrarMensagem(RoteiroHistoria.finalFicar());
     }
@@ -566,7 +604,7 @@ public class SistemaHistoria {
         exibindoEscolha = false;
         tipoEscolha = TipoEscolha.NENHUMA;
         estado = Estado.FINAL_SECRETO;
-        objetivoAtual = "Loop reiniciado.";
+        definirObjetivoAtual("Loop reiniciado.", true);
         mostrarMensagem(RoteiroHistoria.finalSecreto());
     }
 
@@ -613,7 +651,7 @@ public class SistemaHistoria {
 
     public void continuarNaFlorestaAposFinal() {
         estado = Estado.FLORESTA;
-        objetivoAtual = "Explore a floresta.";
+        definirObjetivoAtual("Explore a floresta.", false);
         exibindoMensagem = false;
         exibindoEscolha = false;
         tipoEscolha = TipoEscolha.NENHUMA;
@@ -712,7 +750,7 @@ public class SistemaHistoria {
             return;
         }
 
-        objetivoAtual = "Fale com o Porteiro.";
+        definirObjetivoAtual("Fale com o Porteiro.", true);
         mostrarMensagem(
                 "O Esquecido se desfaz em silêncio.",
                 "O Porteiro agora pode ouvir seus passos."
@@ -725,9 +763,9 @@ public class SistemaHistoria {
         }
 
         if (!eventosHistoria.contains(EVENTO_CACADOR_RECOMPENSA)) {
-            objetivoSecundario = encontradas >= MEMORIAS_PARA_RECOMPENSA
+            definirObjetivoSecundario(encontradas >= MEMORIAS_PARA_RECOMPENSA
                     ? "Volte ao Cacador."
-                    : "Encontre 3 fragmentos de memoria.";
+                    : "Encontre 3 fragmentos de memoria.");
         }
 
         mostrarMensagem(

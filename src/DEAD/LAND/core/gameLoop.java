@@ -62,6 +62,7 @@ public class gameLoop implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		atualizarJogo();
+		this.cenaDoJogo.atualizarInterface();
 		registrarFeedbackDanoJogador();
 		atualizarSpriteQuandoNecessario();
 		this.cenaDoJogo.repaint();

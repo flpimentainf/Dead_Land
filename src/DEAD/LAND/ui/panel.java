@@ -113,6 +113,7 @@ public class panel extends JPanel{
     private final ControladorEspada controladorEspada = new ControladorEspada();
     private int volumeArrastando = -1;
     private int rolagemObjetivos;
+    private final NotificacoesObjetivos notificacoesObjetivos = new NotificacoesObjetivos();
 
 
     public panel(String posicao, Inventario inventario) {
@@ -255,6 +256,12 @@ public class panel extends JPanel{
         };
         addMouseListener(mouse);
         addMouseMotionListener(mouse);
+        addMouseWheelListener(e -> {
+            if (menuPausaAberto && telaPausa == TelaPausa.OBJETIVOS) {
+                rolagemObjetivos = Math.max(0, rolagemObjetivos + e.getWheelRotation());
+                repaint();
+            }
+        });
         addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
                 ET.resetar();
@@ -404,6 +411,7 @@ public class panel extends JPanel{
                 this.interfaceHistoria.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA, this.historia,
                         LayoutHUD.mostrarObjetivos(estadoHUD));
             }
+            if (LayoutHUD.mostrarAvisos(estadoHUD)) notificacoesObjetivos.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA);
             if (deveDesenharBarraBoss() && (estadoHUD == LayoutHUD.Estado.CHEFE || estadoHUD == LayoutHUD.Estado.DIALOGO)) {
                 this.controladorInimigos.getChefe().desenharBarraBoss(g2, LARGURA_LOGICA);
             }
@@ -424,8 +432,7 @@ public class panel extends JPanel{
 
         int topo = deveDesenharBarraBoss() ? LayoutHUD.chefe(LARGURA_LOGICA).y + LayoutHUD.chefe(LARGURA_LOGICA).height + 8 : 8;
         if (this.historia != null && !deveDesenharBarraBoss()) {
-            String secundario = this.historia.getObjetivoSecundario();
-            topo = secundario != null && !secundario.isBlank() ? 82 : 60;
+            topo = 26 + InterfaceHistoria.alturaObjetivos(g2, historia);
         }
         Rectangle limites = new Rectangle(this.camera.getXRender() + 8, this.camera.getYRender() + topo,
                 LARGURA_LOGICA - 16, ALTURA_LOGICA - topo - 8);
@@ -512,6 +519,12 @@ public class panel extends JPanel{
                 historia != null && historia.historiaFinalizada(),
                 historia != null && (historia.isExibindoMensagem() || historia.isExibindoEscolha() || historia.isTelaEscura()),
                 deveDesenharBarraBoss());
+    }
+
+    public boolean temProximaPaginaDialogo() { return interfaceHistoria != null && interfaceHistoria.temProximaPagina(historia); }
+    public void avancarPaginaDialogo() { if (interfaceHistoria != null) interfaceHistoria.avancarPagina(historia); }
+    public void atualizarInterface() {
+        if (historia != null) notificacoesObjetivos.atualizar(historia, LayoutHUD.mostrarAvisos(getEstadoHUD()));
     }
 
     public boolean atualizarMenuPausa(escutadorTeclado teclado) {
@@ -702,10 +715,10 @@ public class panel extends JPanel{
         desenharTextoCentralizado(g2, "OBJETIVOS", 58, 28, Font.BOLD, Color.WHITE);
         g2.setFont(new Font("SansSerif", Font.PLAIN, 16));
         java.util.List<String> linhas = new java.util.ArrayList<>();
-        linhas.add("PRINCIPAL");
+        linhas.add(historia.isObjetivoPrincipalConcluido() ? "[OK] PRINCIPAL — CONCLUÍDO" : "[>] PRINCIPAL — EM ANDAMENTO");
         linhas.addAll(TextoHUD.quebrar(historia.getObjetivoAtual(), g2.getFontMetrics(), 560));
         linhas.add("");
-        linhas.add("SECUNDÁRIA");
+        linhas.add(historia.isObjetivoSecundarioConcluido() ? "[OK] SECUNDÁRIA — CONCLUÍDA" : "[>] SECUNDÁRIA");
         String secundario = historia.getObjetivoSecundario();
         linhas.addAll(TextoHUD.quebrar(secundario.isBlank() ? "Nenhuma missão secundária ativa." : secundario,
                 g2.getFontMetrics(), 560));
@@ -925,6 +938,7 @@ public class panel extends JPanel{
 
         atualizarInventario();
         sincronizarCameraImediatamente();
+        notificacoesObjetivos.limpar(historia);
         requestFocusInWindow();
     }
 

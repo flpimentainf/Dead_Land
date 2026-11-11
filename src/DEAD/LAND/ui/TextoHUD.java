@@ -7,6 +7,12 @@ import java.util.List;
 public final class TextoHUD {
     private TextoHUD() {}
 
+    public static String resumir(String texto, FontMetrics fm, int largura) {
+        String trecho = texto;
+        while (!trecho.isEmpty() && fm.stringWidth(trecho + "…") > largura) trecho = trecho.substring(0, trecho.length() - 1);
+        return trecho + "…";
+    }
+
     /** Quebra inclusive palavras maiores que a caixa, sem descartar conteúdo. */
     public static List<String> quebrar(String texto, FontMetrics fm, int largura) {
         List<String> linhas = new ArrayList<>();
