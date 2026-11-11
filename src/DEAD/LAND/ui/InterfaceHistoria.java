@@ -60,35 +60,35 @@ public class InterfaceHistoria {
     }
 
     public static int alturaObjetivos(Graphics2D g, SistemaHistoria historia) {
-        g.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        int linhas = Math.min(4, TextoHUD.quebrar(historia.getObjetivoAtual(), g.getFontMetrics(), 276).size());
-        return 54 + linhas * 18 + (historia.getObjetivoSecundario().isBlank() ? 0 : 20);
+        g.setFont(EstiloHUD.CORPO.deriveFont(12f));
+        int linhas = Math.min(2, TextoHUD.quebrar(historia.getObjetivoAtual(), g.getFontMetrics(), 256).size());
+        return 44 + linhas * 14;
     }
 
     private void desenharObjetivo(Graphics2D g2, int largura, SistemaHistoria historia) {
-        int w = Math.min(304, largura - 40), h = alturaObjetivos(g2, historia);
+        int w = Math.min(280, largura - 40), h = alturaObjetivos(g2, historia);
         g2.setColor(EstiloHUD.FUNDO);
         g2.fillRect(20, 18, w, h);
         g2.setColor(EstiloHUD.BORDA); g2.drawRect(20, 18, w, h);
-        g2.setFont(EstiloHUD.TITULO);
+        g2.setFont(EstiloHUD.TITULO.deriveFont(10f));
         g2.setColor(EstiloHUD.DESTAQUE);
-        g2.drawString(historia.isObjetivoPrincipalConcluido() ? "[OK] MISSÃO CONCLUÍDA" : "MISSÃO ATUAL", 34, 40);
-        g2.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        g2.drawString(historia.isObjetivoPrincipalConcluido() ? "[OK] MISSÃO CONCLUÍDA" : "MISSÃO ATUAL", 32, 32);
+        g2.setFont(EstiloHUD.CORPO.deriveFont(12f));
         g2.setColor(Color.WHITE);
-        List<String> linhas = TextoHUD.quebrar(historia.getObjetivoAtual(), g2.getFontMetrics(), w - 28);
-        int n = Math.min(4, linhas.size());
+        List<String> linhas = TextoHUD.quebrar(historia.getObjetivoAtual(), g2.getFontMetrics(), w - 24);
+        int n = Math.min(2, linhas.size());
         for (int i = 0; i < n; i++) {
             String linha = linhas.get(i);
-            if (i == n - 1 && linhas.size() > n) linha = TextoHUD.resumir(linha, g2.getFontMetrics(), w - 28);
-            g2.drawString(linha, 34, 62 + i * 18);
+            if (i == n - 1 && linhas.size() > n) linha = TextoHUD.resumir(linha, g2.getFontMetrics(), w - 24);
+            g2.drawString(linha, 32, 48 + i * 14);
         }
-        g2.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        g2.setFont(EstiloHUD.DICA.deriveFont(9f));
         g2.setColor(Color.LIGHT_GRAY);
-        int y = 18 + h - 12;
+        String dica = "ESC · Missões";
         if (!historia.getObjetivoSecundario().isBlank()) {
-            g2.drawString(historia.isObjetivoSecundarioConcluido() ? "[OK] Secundária concluída" : "+ Missão secundária disponível", 34, y - 18);
+            dica += historia.isObjetivoSecundarioConcluido() ? "  |  [OK] Secundária" : "  |  + Secundária";
         }
-        g2.drawString("ESC > MISSÕES: detalhes", 34, y);
+        g2.drawString(dica, 32, 18 + h - 8);
     }
     private void desenharEscolha(Graphics2D g2, int largura, int altura, SistemaHistoria historia) {
         List<String> linhas = new ArrayList<String>(historia.getMensagem());

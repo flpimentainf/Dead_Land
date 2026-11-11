@@ -67,7 +67,7 @@ public final class ValidacaoHUD {
             historia.restaurarEstadoPersistido("MEMORIAS", extenso, "Ajuda do Cacador concluida.",
                     java.util.Set.of(), java.util.Set.of("cacador_recompensa"), false);
             exigir(historia.isObjetivoSecundarioConcluido(), "estado secundário usa evento existente");
-            exigir(InterfaceHistoria.alturaObjetivos(g, historia) <= 146, "objetivo compacto tem altura máxima");
+            exigir(InterfaceHistoria.alturaObjetivos(g, historia) <= 72, "card minimalista de missão tem no máximo 72 pixels");
             var longa = new DEAD.LAND.story.SistemaHistoria() {
                 @Override public java.util.List<String> getMensagem() { return java.util.List.of(extenso.repeat(4)); }
             };
