@@ -33,9 +33,9 @@ public class ResourceManager {
         }
 
         Image imagem = imagemFallback;
-        File arquivo = new File(caminho);
+        File arquivo = CaminhosJogo.recurso(caminho);
         if (arquivo.exists()) {
-            ImageIcon icon = new ImageIcon(caminho);
+            ImageIcon icon = new ImageIcon(arquivo.getAbsolutePath());
             if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
                 imagem = icon.getImage();
             }

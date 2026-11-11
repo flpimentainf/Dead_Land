@@ -16,7 +16,6 @@ import java.util.Properties;
 import java.util.Set;
 
 public class SaveManager {
-    private static final String PASTA_SAVE = "save";
     public static final int TOTAL_SLOTS = 3;
     private static final DateTimeFormatter DATA_FORMATO = DateTimeFormatter
             .ofPattern("dd/MM/yyyy HH:mm")
@@ -25,11 +24,11 @@ public class SaveManager {
     private final File pastaSave;
 
     public SaveManager() {
-        this(new File(PASTA_SAVE));
+        this(CaminhosJogo.pastaSave());
     }
 
     public SaveManager(File pastaSave) {
-        this.pastaSave = pastaSave == null ? new File(PASTA_SAVE) : pastaSave;
+        this.pastaSave = pastaSave == null ? CaminhosJogo.pastaSave() : pastaSave;
     }
 
     public boolean salvar(GameState state) {

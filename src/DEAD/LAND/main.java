@@ -12,7 +12,7 @@ public class main {
 
 	public static void main(String[] args) {
 		System.out.println("DEAD LAND");
-		new moldura();
+		javax.swing.SwingUtilities.invokeLater(moldura::new);
 	}
 
 }

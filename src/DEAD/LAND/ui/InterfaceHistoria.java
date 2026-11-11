@@ -161,7 +161,7 @@ public class InterfaceHistoria {
     private void desenharRetratoNpc(Graphics2D g2, int x, int y, String nomeNpc) {
         String arquivo = getArquivoRetrato(nomeNpc);
         ImageIcon icone = new ImageIcon(
-                "repos/NPCs e Inimigos/NPC/retratos/" + arquivo
+                DEAD.LAND.core.CaminhosJogo.recurso("repos/NPCs e Inimigos/NPC/retratos/" + arquivo).getAbsolutePath()
         );
 
         if (icone.getIconWidth() > 0) {

@@ -104,13 +104,12 @@ public class AudioManager {
             return null;
         }
 
-        File arquivo = new File(PASTA_AUDIO + id + ".wav");
+        File arquivo = CaminhosJogo.recurso(PASTA_AUDIO + id + ".wav");
         if (!arquivo.exists()) {
             return null;
         }
 
-        try {
-            AudioInputStream stream = AudioSystem.getAudioInputStream(arquivo);
+        try (AudioInputStream stream = AudioSystem.getAudioInputStream(arquivo)) {
             Clip clip = AudioSystem.getClip();
             clip.open(stream);
             return clip;
