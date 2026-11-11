@@ -285,7 +285,7 @@ public class moldura extends JFrame {
 
         String[] slide = SLIDES_CONTEXTO[slideAtual];
         JLabel titulo = criarTitulo(slide[0], 42);
-        JLabel texto = criarTextoCentralizado(slide[1], 24);
+        JLabel texto = criarTextoCentralizado(slide[1], 22, 460);
         JButton continuar = criarBotao(
                 slideAtual == SLIDES_CONTEXTO.length - 1 ? "COMEÇAR" : "CONTINUAR"
         );
@@ -509,8 +509,12 @@ public class moldura extends JFrame {
     }
 
     private JLabel criarTextoCentralizado(String texto, int tamanho) {
+        return criarTextoCentralizado(texto, tamanho, 650);
+    }
+
+    private JLabel criarTextoCentralizado(String texto, int tamanho, int larguraTexto) {
         JLabel label = new JLabel(
-                "<html><div style='text-align:center; width:650px'>" + texto + "</div></html>",
+                "<html><div style='text-align:center; width:" + larguraTexto + "px'>" + texto + "</div></html>",
                 SwingConstants.CENTER
         );
         label.setForeground(new Color(225, 225, 225));
