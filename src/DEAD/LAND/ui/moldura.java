@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.Optional;
@@ -150,7 +151,7 @@ public class moldura extends JFrame {
     private JPanel criarTelaContexto() {
         JPanel tela = criarPainelBase();
         tela.setLayout(new BorderLayout(30, 30));
-        tela.setBorder(BorderFactory.createEmptyBorder(80, 100, 60, 100));
+        tela.setBorder(BorderFactory.createEmptyBorder(64, 48, 36, 48));
         atualizarSlide(tela);
         return tela;
     }
@@ -187,7 +188,7 @@ public class moldura extends JFrame {
             resumo.setFont(new Font("SansSerif", Font.PLAIN, 16));
             linha.add(resumo, BorderLayout.NORTH);
 
-            JPanel acoes = new JPanel();
+            JPanel acoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 0));
             acoes.setOpaque(false);
             if (!escolhendoNovoJogo) {
                 JButton carregar = criarBotao("CARREGAR", 180);
@@ -301,7 +302,7 @@ public class moldura extends JFrame {
         tela.add(titulo, BorderLayout.NORTH);
         tela.add(texto, BorderLayout.CENTER);
 
-        JPanel rodape = new JPanel();
+        JPanel rodape = new JPanel(new FlowLayout(FlowLayout.CENTER, 32, 0));
         rodape.setOpaque(false);
         JButton voltar = criarBotao("VOLTAR");
         voltar.addActionListener(e -> atualizarTelaSlots());
