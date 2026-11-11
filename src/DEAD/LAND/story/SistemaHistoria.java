@@ -18,16 +18,16 @@ public class SistemaHistoria {
 
     private void definirObjetivoAtual(String texto, boolean concluiuAnterior) {
         if (java.util.Objects.equals(objetivoAtual, texto)) return;
-        if (concluiuAnterior && !objetivoAtual.isBlank()) avisarObjetivo("Objetivo concluído", objetivoAtual);
+        if (concluiuAnterior && !objetivoAtual.isBlank()) avisarObjetivo("Missão concluída", objetivoAtual);
         objetivoAtual = texto;
-        if (!historiaFinalizada()) avisarObjetivo("Novo objetivo", texto);
+        if (!historiaFinalizada()) avisarObjetivo("Nova missão", texto);
     }
 
     private void definirObjetivoSecundario(String texto) {
         if (java.util.Objects.equals(objetivoSecundario, texto)) return;
         boolean nova = objetivoSecundario.isBlank();
         objetivoSecundario = texto;
-        avisarObjetivo(isObjetivoSecundarioConcluido() ? "Objetivo concluído" : nova ? "Nova missão secundária" : "Novo objetivo", texto);
+        avisarObjetivo(isObjetivoSecundarioConcluido() ? "Missão concluída" : nova ? "Nova missão secundária" : "Nova missão", texto);
     }
 
     private void avisarObjetivo(String titulo, String texto) {
@@ -125,7 +125,7 @@ public class SistemaHistoria {
 
     public SistemaHistoria(Consumer<Estado> aoFinalizar) {
         this.aoFinalizar = aoFinalizar;
-        avisarObjetivo("Novo objetivo", objetivoAtual);
+        avisarObjetivo("Nova missão", objetivoAtual);
         mostrarMensagem(RoteiroHistoria.abertura());
     }
 

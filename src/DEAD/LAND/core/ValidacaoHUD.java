@@ -54,16 +54,16 @@ public final class ValidacaoHUD {
             long[] agora = {0};
             NotificacoesObjetivos avisos = new NotificacoesObjetivos(() -> agora[0]);
             avisos.atualizar(historia, true);
-            exigir("Novo objetivo".equals(avisos.getAtual().titulo()), "objetivo inicial deve notificar");
+            exigir("Nova missão".equals(avisos.getAtual().titulo()), "objetivo inicial deve notificar");
             agora[0] = 1000;
             avisos.atualizar(historia, false);
             exigir(avisos.getRestanteMs() == 3500, "diálogo não deve consumir aviso");
             avisos.limpar(historia);
             historia.eventoDormir();
             avisos.atualizar(historia, false);
-            exigir("Objetivo concluído".equals(avisos.getAtual().titulo()), "concluir etapa notifica");
+            exigir("Missão concluída".equals(avisos.getAtual().titulo()), "concluir etapa notifica");
             for (int i = 0; i < 14; i++) { agora[0] += 250; avisos.atualizar(historia, true); }
-            exigir("Novo objetivo".equals(avisos.getAtual().titulo()), "novo objetivo segue conclusão");
+            exigir("Nova missão".equals(avisos.getAtual().titulo()), "novo objetivo segue conclusão");
             historia.restaurarEstadoPersistido("MEMORIAS", extenso, "Ajuda do Cacador concluida.",
                     java.util.Set.of(), java.util.Set.of("cacador_recompensa"), false);
             exigir(historia.isObjetivoSecundarioConcluido(), "estado secundário usa evento existente");

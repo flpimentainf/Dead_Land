@@ -54,7 +54,7 @@ public class panel extends JPanel{
             "MEMORIAS",
             "CONFIGURACOES",
             "MENU PRINCIPAL",
-            "OBJETIVOS"
+            "MISSÕES"
     };
     private static final String[] OPCOES_CONFIGURACOES = {
             "MASTER",
@@ -764,10 +764,10 @@ public class panel extends JPanel{
     }
 
     private void desenharTelaObjetivos(Graphics2D g2) {
-        desenharTextoCentralizado(g2, "OBJETIVOS", 58, 28, Font.BOLD, Color.WHITE);
+        desenharTextoCentralizado(g2, "MISSÕES", 58, 28, Font.BOLD, Color.WHITE);
         g2.setFont(new Font("SansSerif", Font.PLAIN, 16));
         java.util.List<String> linhas = new java.util.ArrayList<>();
-        linhas.add(historia.isObjetivoPrincipalConcluido() ? "[OK] PRINCIPAL — CONCLUÍDO" : "[>] PRINCIPAL — EM ANDAMENTO");
+        linhas.add(historia.isObjetivoPrincipalConcluido() ? "[OK] PRINCIPAL — CONCLUÍDA" : "[>] PRINCIPAL — EM ANDAMENTO");
         linhas.addAll(TextoHUD.quebrar(historia.getObjetivoAtual(), g2.getFontMetrics(), 560));
         linhas.add("");
         linhas.add(historia.isObjetivoSecundarioConcluido() ? "[OK] SECUNDÁRIA — CONCLUÍDA" : "[>] SECUNDÁRIA");

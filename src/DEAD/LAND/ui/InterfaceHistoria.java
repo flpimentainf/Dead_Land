@@ -72,7 +72,7 @@ public class InterfaceHistoria {
         g2.setColor(EstiloHUD.BORDA); g2.drawRect(20, 18, w, h);
         g2.setFont(EstiloHUD.TITULO);
         g2.setColor(EstiloHUD.DESTAQUE);
-        g2.drawString(historia.isObjetivoPrincipalConcluido() ? "[OK] OBJETIVO CONCLUÍDO" : "OBJETIVO ATUAL", 34, 40);
+        g2.drawString(historia.isObjetivoPrincipalConcluido() ? "[OK] MISSÃO CONCLUÍDA" : "MISSÃO ATUAL", 34, 40);
         g2.setFont(new Font("SansSerif", Font.PLAIN, 14));
         g2.setColor(Color.WHITE);
         List<String> linhas = TextoHUD.quebrar(historia.getObjetivoAtual(), g2.getFontMetrics(), w - 28);
@@ -88,7 +88,7 @@ public class InterfaceHistoria {
         if (!historia.getObjetivoSecundario().isBlank()) {
             g2.drawString(historia.isObjetivoSecundarioConcluido() ? "[OK] Secundária concluída" : "+ Missão secundária disponível", 34, y - 18);
         }
-        g2.drawString("ESC > OBJETIVOS: detalhes", 34, y);
+        g2.drawString("ESC > MISSÕES: detalhes", 34, y);
     }
     private void desenharEscolha(Graphics2D g2, int largura, int altura, SistemaHistoria historia) {
         List<String> linhas = new ArrayList<String>(historia.getMensagem());
