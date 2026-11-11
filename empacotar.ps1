@@ -1,6 +1,9 @@
 param(
     [string]$Destino = 'dist',
-    [switch]$IncluirSaves
+    [switch]$IncluirSaves,
+    [string]$PastaSaves = 'save',
+    [ValidatePattern('^\d+\.\d+\.\d+$')]
+    [string]$Versao = '1.0.0'
 )
 
 Set-StrictMode -Version Latest
@@ -13,6 +16,10 @@ if (-not $pastaDestino.StartsWith($prefixoProjeto, [StringComparison]::OrdinalIg
 }
 $pastaApp = Join-Path $pastaDestino 'Dead_Land'
 $arquivoZip = Join-Path $pastaDestino 'Dead_Land-Windows-x64.zip'
+$origemSaves = [IO.Path]::GetFullPath((Join-Path $raizProjeto $PastaSaves))
+if ($IncluirSaves -and -not (Test-Path -LiteralPath $origemSaves -PathType Container)) {
+    throw "A pasta de saves informada nao existe: $origemSaves"
+}
 if ((Test-Path -LiteralPath $pastaApp) -or (Test-Path -LiteralPath $arquivoZip)) {
     throw 'O pacote ja existe. Use -Destino com outra pasta para preservar o pacote e seus saves.'
 }
@@ -20,8 +27,8 @@ $jdkPasta = Split-Path -Parent (Get-Command javac.exe -CommandType Application |
 foreach ($ferramenta in @('javac.exe', 'java.exe', 'jar.exe', 'jpackage.exe')) {
     if (-not (Test-Path -LiteralPath (Join-Path $jdkPasta $ferramenta))) { throw "Ferramenta ausente: $ferramenta" }
 }
-$versao = (& (Join-Path $jdkPasta 'javac.exe') -version 2>&1 | Out-String).Trim()
-if ($LASTEXITCODE -ne 0 -or $versao -notmatch 'javac\s+(\d+)' -or [int]$Matches[1] -lt 21) {
+$versaoCompilador = (& (Join-Path $jdkPasta 'javac.exe') -version 2>&1 | Out-String).Trim()
+if ($LASTEXITCODE -ne 0 -or $versaoCompilador -notmatch 'javac\s+(\d+)' -or [int]$Matches[1] -lt 21) {
     throw 'E necessario um JDK 21 ou superior.'
 }
 $arquitetura = & (Join-Path $jdkPasta 'java.exe') -XshowSettings:properties -version 2>&1 | Out-String
@@ -33,7 +40,7 @@ $entrada = Join-Path $pastaBuild 'entrada'
 New-Item -ItemType Directory -Path $classes, $entrada, $pastaDestino -Force | Out-Null
 Push-Location -LiteralPath $raizProjeto
 try {
-    Write-Host "Compilando com $versao..."
+    Write-Host "Compilando com $versaoCompilador..."
     $fontes = @(Get-ChildItem -LiteralPath 'src' -Recurse -Filter '*.java' -File | Sort-Object FullName | ForEach-Object FullName)
     & (Join-Path $jdkPasta 'javac.exe') --release 21 -encoding UTF-8 -d $classes @fontes
     if ($LASTEXITCODE -ne 0) { throw 'A compilacao falhou.' }
@@ -43,14 +50,14 @@ try {
 
     Write-Host 'Gerando Dead_Land.exe e o Java incluido...'
     & (Join-Path $jdkPasta 'jpackage.exe') --type app-image --name Dead_Land `
-        --app-version 1.0.0 --vendor 'Dead Land' --description 'Dead Land' `
+        --app-version $Versao --vendor 'Dead Land' --description 'Dead Land' `
         --input $entrada --dest $pastaDestino --main-jar Dead_Land.jar --main-class DEAD.LAND.main `
         --add-modules java.desktop --jlink-options '--strip-debug --no-header-files --no-man-pages --compress=2' `
         --java-options '-Ddeadland.recursos=$APPDIR' --java-options '-Ddeadland.save=$APPDIR/../save' `
         --java-options '-Dfile.encoding=UTF-8'
     if ($LASTEXITCODE -ne 0) { throw 'O empacotamento falhou.' }
-    if ($IncluirSaves -and (Test-Path -LiteralPath (Join-Path $raizProjeto 'save'))) {
-        Copy-Item -LiteralPath (Join-Path $raizProjeto 'save') -Destination $pastaApp -Recurse
+    if ($IncluirSaves) {
+        Copy-Item -LiteralPath $origemSaves -Destination (Join-Path $pastaApp 'save') -Recurse
     }
     @'
 DEAD LAND - Windows x64

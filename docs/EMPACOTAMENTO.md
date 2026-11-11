@@ -18,6 +18,9 @@ Em Windows com JDK 21 ou superior, x64:
 ```
 
 Omita `-IncluirSaves` para gerar uma distribuição sem progresso pessoal.
+Para levar os slots de um executável anterior, use `-PastaSaves dist\Dead_Land\save`.
+`-Versao 1.1.0` define a versão do novo executável. A versão 1.1.0 foi gerada em
+`dist/Versao-1.1.0/`, incluindo os slots do pacote anterior.
 O script recusa substituir uma pasta de jogo ou ZIP já existente para preservar os
 slots do pacote anterior. Ao atualizar, copie a pasta `save` do pacote que estava
 usando para o novo pacote.

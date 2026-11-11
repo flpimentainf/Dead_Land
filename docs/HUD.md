@@ -10,14 +10,15 @@ mais próximo; a janela não estica os eixos independentemente.
 - `LayoutHUD`: regiões do rodapé, limites do chefe, viewport e prioridade visual.
 - `EstiloHUD`: cores, fontes e barras de status.
 - `TextoHUD`: quebra de texto por `FontMetrics`, incluindo palavras extensas.
-- `InterfaceHistoria`: objetivo compacto, diálogos e paginação.
+- `InterfaceHistoria`: card de missão de até 280 × 72, diálogos baixos e paginação.
 - `NotificacoesObjetivos`: fila de avisos, 3,5 segundos de tempo visível e transições.
 - `LayoutMenuPausa`: áreas de clique do menu, incluindo a consulta de objetivos.
 
 Morte, pausa e encerramento têm prioridade sobre os componentes de exploração.
 Diálogos ocultam objetivos e avisos; a arena reserva o topo para o chefe. Durante o
-combate, os objetivos continuam disponíveis em **ESC > OBJETIVOS**. O painel retorna
-após o confronto. As notificações ficam no canto inferior direito e o feedback de
+combate, as missões continuam disponíveis em **ESC > MISSÕES**. O painel retorna
+após o confronto. As notificações compactas de 224 × 52 ficam no canto superior direito
+(abaixo da barra durante o chefe), e o feedback de
 ações no canto inferior esquerdo.
 
 As informações e conclusões vêm de `SistemaHistoria`, seus estados e eventos
@@ -26,7 +27,7 @@ Carregar uma partida ou restaurar um checkpoint descarta avisos anteriores.
 
 ## Controles
 
-- **ESC > OBJETIVOS**: consultar missão principal e secundária, com estado textual.
+- **ESC > MISSÕES**: consultar missão principal e secundária, com estado textual.
 - **W/S** ou roda do mouse: rolar objetivos extensos; **ENTER/ESC** ou **VOLTAR**: sair.
 - **Roda do mouse sobre o rodapé** ou botões **< / >**: mudar a página de itens.
 - A arma equipada fica fixa à direita, com borda dupla e marcador **ATIVA**.
@@ -58,7 +59,8 @@ abre o jogo. Os testes de slots usam diretórios temporários.
 - Feedback ao tentar usar uma poção inexistente sem alterar o inventário.
 
 A validação visual renderiza os componentes reais em **1280×720**, **1366×768** e
-**1920×1080**. São geradas 24 capturas em `build/hud/`: exploração, chefe, pausa,
-objetivos, diálogo, inventário cheio, interação com a cama e morte em cada resolução.
+**1920×1080**. São geradas 27 capturas em `build/hud/`: exploração, segunda área do
+castelo, chefe, pausa, missões, diálogo, inventário cheio, interação com a cama e morte
+em cada resolução, além de uma prévia do aviso compacto de missão.
 Essa pasta é ignorada pelo Git. Os cenários são preparados sem gravar no diretório
 de saves da partida.
