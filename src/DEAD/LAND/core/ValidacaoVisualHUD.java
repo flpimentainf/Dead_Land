@@ -36,10 +36,12 @@ final class ValidacaoVisualHUD {
                 state.objetivoHistoria = "Explore a floresta, encontre a chave prata e descubra o caminho que leva à porta inferior sem perder suas lembranças.";
                 state.objetivoSecundario = "Encontre os fragmentos de memória e retorne ao Caçador para receber sua recompensa.";
                 cena.aplicarGameState(state);
-                for (String estado : new String[]{"exploracao", "chefe", "pausa", "objetivos", "dialogo", "inventario", "interacao", "morte"}) {
+                capturarAviso(cena, saida);
+                for (String estado : new String[]{"exploracao", "castelo2", "chefe", "pausa", "objetivos", "dialogo", "inventario", "interacao", "morte"}) {
                     cena.aplicarGameState(state);
                     while (cena.isMenuPausaAberto()) alternarPausa(cena);
                     switch (estado) {
+                        case "castelo2" -> cena.irParaCenario(6, 745, 335);
                         case "chefe" -> {
                             cena.irParaCenario(7, 745, 335);
                         }
@@ -103,6 +105,19 @@ final class ValidacaoVisualHUD {
                 ValidacaoHUD.exigir(real.getRGB(x, y) == esperado.getRGB(x, y), "barra do chefe não pode ter elementos sobrepostos");
             }
         }
+    }
+
+    private static void capturarAviso(panel cena, File saida) throws Exception {
+        long[] agora = {0};
+        var historia = new DEAD.LAND.story.SistemaHistoria();
+        var aviso = new NotificacoesObjetivos(() -> agora[0]);
+        aviso.atualizar(historia, true);
+        agora[0] = 200; aviso.atualizar(historia, true);
+        BufferedImage imagem = new BufferedImage(768, 480, BufferedImage.TYPE_INT_RGB);
+        cena.setSize(768, 480);
+        Graphics2D g = imagem.createGraphics(); cena.paint(g);
+        aviso.desenhar(g, 768, 480); g.dispose();
+        ImageIO.write(imagem, "png", new File(saida, "aviso-missao-768x480.png"));
     }
 
     private static void alternarPausa(panel cena) {

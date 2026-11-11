@@ -27,6 +27,7 @@ public class ValidacaoTecnica {
         validarColisaoETransicao();
         validarCamaDoisTiles();
         validarTilesDosCenarios();
+        validarMateriaisCastelo();
         validarInventario();
         validarDano();
         validarEstamina();
@@ -114,6 +115,29 @@ public class ValidacaoTecnica {
             try { mapa.desenhar(g); } finally { g.dispose(); }
             exigir((imagem.getRGB(imagem.getWidth() / 2, imagem.getHeight() / 2) >>> 24) == 255,
                     "o terreno deve renderizar sem buracos em " + id);
+        }
+    }
+
+    private static void validarMateriaisCastelo() {
+        RenderizadorTiles render = new RenderizadorTiles();
+        java.awt.image.BufferedImage pisoAnterior = null;
+        for (CenarioId cenario : new CenarioId[]{CenarioId.REGIAO_PRINCIPAL, CenarioId.AREA_MEMORIA, CenarioId.ARENA_BOSS}) {
+            var piso = new java.awt.image.BufferedImage(48, 48, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+            var g = piso.createGraphics(); render.desenhar(g, 41, 0, 0, cenario, false); g.dispose();
+            if (pisoAnterior != null) for (int y = 0; y < 48; y++) for (int x = 0; x < 48; x++) {
+                exigir(piso.getRGB(x, y) == pisoAnterior.getRGB(x, y), "pedra com musgo deve ser uniforme no castelo");
+            }
+            pisoAnterior = piso;
+            if (cenario == CenarioId.ARENA_BOSS) continue;
+            var tapete = new java.awt.image.BufferedImage(96, 48, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+            g = tapete.createGraphics();
+            render.desenharFundo(g, cenario, new int[][]{{61, 61}});
+            render.desenhar(g, 61, 0, 0, cenario, false);
+            render.desenhar(g, 61, 0, 1, cenario, false); g.dispose();
+            for (int x : new int[]{24, 47, 48, 72}) {
+                var cor = new java.awt.Color(tapete.getRGB(x, 24));
+                exigir(cor.getRed() > cor.getGreen() * 3, "tapete vermelho deve ser contínuo entre os tiles");
+            }
         }
     }
 

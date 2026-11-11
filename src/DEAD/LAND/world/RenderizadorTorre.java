@@ -15,8 +15,8 @@ import java.awt.image.BufferedImage;
 /** Terraço aberto do castelo: chão, parapeitos e fachada abaixo da arena. */
 final class RenderizadorTorre {
     private static final int TILE = tiles.LARGURA;
-    private final Image pedra = ResourceManager.getInstancia().carregarImagem("repos/tileset/parede_pedra.png");
-    private final Image piso = ResourceManager.getInstancia().carregarImagem("repos/tileset/piso_pedra.png");
+    private final Image pedra = ResourceManager.getInstancia().carregarImagem("repos/tileset/parede_musgo.png");
+    private final Image piso = ResourceManager.getInstancia().carregarImagem("repos/tileset/piso_musgo.png");
     private BufferedImage fundo;
     private int[][] mapaAtual;
 
@@ -56,21 +56,10 @@ final class RenderizadorTorre {
     }
 
     private void desenharPiso(Graphics2D g, int variacao) {
-        g.drawImage(piso, 0, 0, TILE, TILE, null);
-        g.setColor(new Color(130, 134, 133, 170));
+        boolean x = (variacao & 1) != 0, y = (variacao & 2) != 0;
+        g.drawImage(piso, x ? TILE : 0, y ? TILE : 0, x ? -TILE : TILE, y ? -TILE : TILE, null);
+        g.setColor(new Color(128, 132, 111, 90));
         g.fillRect(0, 0, TILE, TILE);
-        g.setColor(new Color(77, 83, 86));
-        g.fillRect(0, 0, TILE, 2);
-        g.fillRect(0, 24, TILE, 2);
-        g.fillRect(0, 0, 2, 24);
-        g.fillRect(24, 24, 2, 24);
-        g.setColor(new Color(173, 175, 162));
-        g.fillRect(2, 2, 46, 2);
-        g.fillRect(0, 26, 48, 2);
-        if (variacao == 3 || variacao == 6) {
-            g.setColor(new Color(92, 97, 95));
-            g.drawPolyline(new int[]{12, 16, 16, 20}, new int[]{8, 12, 16, 20}, 4);
-        }
     }
 
     private void muralha(Graphics2D g, int quartosDeVolta) {

@@ -31,6 +31,8 @@ public final class RenderizadorTiles {
     private final Image[] materiais = new Image[Material.values().length];
     private final Map<Integer, BufferedImage> cache = new HashMap<>();
     private final RenderizadorTorre torre = new RenderizadorTorre();
+    private int[][] mapaAtual;
+    private CenarioId cenarioAtual;
 
     public RenderizadorTiles() {
         for (Material material : Material.values()) {
@@ -45,6 +47,13 @@ public final class RenderizadorTiles {
         int chave = (cenario.indice() << 16) | (idVisual << 4) | variacao | (objeto ? 1 << 24 : 0);
         BufferedImage imagem = cache.computeIfAbsent(chave, k -> criarTile(idVisual, cenario, variacao, objeto));
         g.drawImage(imagem, coluna * TAMANHO, linha * TAMANHO, null);
+        if (!objeto && id == 61 && (cenario == CenarioId.REGIAO_PRINCIPAL || cenario == CenarioId.AREA_MEMORIA)) {
+            Graphics2D acabamento = (Graphics2D) g.create();
+            try {
+                acabamento.translate(coluna * TAMANHO, linha * TAMANHO);
+                bordasTapete(acabamento, linha, coluna, cenario);
+            } finally { acabamento.dispose(); }
+        }
         return true;
     }
 
@@ -53,6 +62,8 @@ public final class RenderizadorTiles {
     }
 
     public void desenharFundo(Graphics2D g, CenarioId cenario, int[][] mapa) {
+        mapaAtual = mapa;
+        cenarioAtual = cenario;
         if (cenario == CenarioId.ARENA_BOSS) torre.desenharFundo(g, mapa);
     }
 
@@ -82,9 +93,11 @@ public final class RenderizadorTiles {
                 textura(g, piso(cenario), variacao);
                 if (cenario == CenarioId.TRILHA_LATERAL) detalhesVegetacao(g, variacao);
             } else if (id == 61) {
+                if (cenario == CenarioId.REGIAO_PRINCIPAL || cenario == CenarioId.AREA_MEMORIA) {
+                    desenharTapete(g);
+                    return tile;
+                }
                 Material material = switch (cenario) {
-                    case REGIAO_PRINCIPAL -> Material.TAPETE;
-                    case AREA_MEMORIA -> Material.MADEIRA_CLARA;
                     case TRILHA_LATERAL -> Material.PISO_MUSGO;
                     default -> piso(cenario);
                 };
@@ -117,7 +130,7 @@ public final class RenderizadorTiles {
     private Material piso(CenarioId cenario) {
         return switch (cenario) {
             case QUARTO -> Material.MADEIRA_CLARA;
-            case AREA_MEMORIA -> Material.PISO_MUSGO;
+            case REGIAO_PRINCIPAL, AREA_MEMORIA, ARENA_BOSS -> Material.PISO_MUSGO;
             case TRILHA_LATERAL -> Material.TERRA;
             default -> Material.PISO_PEDRA;
         };
@@ -125,9 +138,44 @@ public final class RenderizadorTiles {
 
     private Material parede(CenarioId cenario) {
         return switch (cenario) {
-            case RUINAS, AREA_MEMORIA -> Material.PAREDE_MUSGO;
+            case RUINAS, REGIAO_PRINCIPAL, AREA_MEMORIA, ARENA_BOSS -> Material.PAREDE_MUSGO;
             default -> Material.PAREDE_PEDRA;
         };
+    }
+
+    private void desenharTapete(Graphics2D g) {
+        g.setColor(new Color(116, 24, 38));
+        g.fillRect(0, 0, TAMANHO, TAMANHO);
+        g.setColor(new Color(128, 31, 43));
+        for (int y = 2; y < TAMANHO; y += 6) {
+            for (int x = 2 + (y % 4); x < TAMANHO; x += 8) g.fillRect(x, y, 4, 2);
+        }
+        g.setColor(new Color(103, 22, 34));
+        for (int y = 0; y < TAMANHO; y += 6) g.fillRect(0, y, TAMANHO, 1);
+    }
+
+    private boolean continuaTapete(int linha, int coluna, CenarioId cenario) {
+        if (mapaAtual == null || cenarioAtual != cenario) return false;
+        // Não fecha o tapete nas saídas que continuam no cenário vizinho.
+        if (linha < 0 || linha >= mapaAtual.length || coluna < 0 || coluna >= mapaAtual[linha].length) return true;
+        return mapaAtual[linha][coluna] == 61;
+    }
+
+    private void bordasTapete(Graphics2D g, int linha, int coluna, CenarioId cenario) {
+        boolean cima = !continuaTapete(linha - 1, coluna, cenario);
+        boolean baixo = !continuaTapete(linha + 1, coluna, cenario);
+        boolean esquerda = !continuaTapete(linha, coluna - 1, cenario);
+        boolean direita = !continuaTapete(linha, coluna + 1, cenario);
+        g.setColor(new Color(69, 17, 27));
+        if (cima) g.fillRect(0, 0, 48, 8);
+        if (baixo) g.fillRect(0, 40, 48, 8);
+        if (esquerda) g.fillRect(0, 0, 8, 48);
+        if (direita) g.fillRect(40, 0, 8, 48);
+        g.setColor(new Color(175, 130, 66));
+        if (cima) g.fillRect(0, 4, 48, 2);
+        if (baixo) g.fillRect(0, 42, 48, 2);
+        if (esquerda) g.fillRect(4, 0, 2, 48);
+        if (direita) g.fillRect(42, 0, 2, 48);
     }
 
     private void textura(Graphics2D g, Material material, int variacao) {
