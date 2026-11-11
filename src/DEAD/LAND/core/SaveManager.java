@@ -2,7 +2,11 @@ package DEAD.LAND.core;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -13,7 +17,7 @@ import java.util.Set;
 
 public class SaveManager {
     private static final String PASTA_SAVE = "save";
-    private static final int TOTAL_SLOTS = 3;
+    public static final int TOTAL_SLOTS = 3;
     private static final DateTimeFormatter DATA_FORMATO = DateTimeFormatter
             .ofPattern("dd/MM/yyyy HH:mm")
             .withZone(ZoneId.systemDefault());
@@ -60,11 +64,29 @@ public class SaveManager {
         props.setProperty("eventosHistoria", juntar(state.eventosHistoria));
         props.setProperty("memorias", juntar(state.memorias));
 
-        try (FileOutputStream out = new FileOutputStream(arquivoSlot(state.slot))) {
-            props.store(out, "Dead Land save");
+        Path temporario = null;
+        try {
+            temporario = Files.createTempFile(pastaSave.toPath(), "slot" + state.slot + "-", ".tmp");
+            try (OutputStream out = Files.newOutputStream(temporario)) {
+                props.store(out, "Dead Land save");
+            }
+            Path destino = arquivoSlot(state.slot).toPath();
+            try {
+                Files.move(temporario, destino, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(temporario, destino, StandardCopyOption.REPLACE_EXISTING);
+            }
             return true;
         } catch (Exception e) {
             return false;
+        } finally {
+            if (temporario != null) {
+                try {
+                    Files.deleteIfExists(temporario);
+                } catch (java.io.IOException e) {
+                    // Um temporário restante não altera o slot anterior.
+                }
+            }
         }
     }
 
@@ -77,7 +99,7 @@ public class SaveManager {
         try (FileInputStream in = new FileInputStream(arquivoSlot(slot))) {
             props.load(in);
             GameState state = new GameState();
-            state.slot = lerInt(props, "slot", slot);
+            state.slot = slot;
             state.cenarioIndex = lerInt(props, "cenarioIndex", 0);
             state.jogadorX = lerInt(props, "jogadorX", 745);
             state.jogadorY = lerInt(props, "jogadorY", 335);
@@ -107,7 +129,7 @@ public class SaveManager {
     }
 
     public boolean existeSave(int slot) {
-        return arquivoSlot(slot).exists();
+        return slot >= 1 && slot <= TOTAL_SLOTS && arquivoSlot(slot).exists();
     }
 
     public boolean existeAlgumSave() {
@@ -135,7 +157,7 @@ public class SaveManager {
     public String getResumoSlot(int slot) {
         Optional<GameState> state = carregar(slot);
         if (!state.isPresent()) {
-            return "SLOT " + slot + " - vazio";
+            return "SLOT " + slot + (existeSave(slot) ? " - save inválido" : " - vazio");
         }
 
         GameState s = state.get();
@@ -145,13 +167,12 @@ public class SaveManager {
         return "SLOT " + slot + " - " + s.getResumoProgresso() + " - " + data;
     }
 
-    public void apagarTodos() {
-        for (int i = 1; i <= TOTAL_SLOTS; i++) {
-            File arquivo = arquivoSlot(i);
-            if (arquivo.exists()) {
-                arquivo.delete();
-            }
+    public boolean apagarSlot(int slot) {
+        if (slot < 1 || slot > TOTAL_SLOTS) {
+            return false;
         }
+        File arquivo = arquivoSlot(slot);
+        return !arquivo.exists() || arquivo.delete();
     }
 
     private File arquivoSlot(int slot) {

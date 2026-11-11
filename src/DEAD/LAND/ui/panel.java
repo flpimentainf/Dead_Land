@@ -50,7 +50,7 @@ public class panel extends JPanel{
     private static final int ALTURA_LOGICA = 480;
     private static final String[] OPCOES_PAUSA = {
             "CONTINUAR",
-            "SALVAR SLOT 1",
+            "SALVAR",
             "MEMORIAS",
             "CONFIGURACOES",
             "MENU PRINCIPAL"
@@ -130,6 +130,22 @@ public class panel extends JPanel{
             Consumer<SistemaHistoria.Estado> aoFinalizar,
             Runnable aoVoltarMenuPrincipal
     ) {
+        this(posicao, inventario, aoFinalizar, aoVoltarMenuPrincipal, new SaveManager(), 1);
+    }
+
+    public panel(
+            String posicao,
+            Inventario inventario,
+            Consumer<SistemaHistoria.Estado> aoFinalizar,
+            Runnable aoVoltarMenuPrincipal,
+            SaveManager saveManager,
+            int slot
+    ) {
+        if (slot < 1 || slot > SaveManager.TOTAL_SLOTS) {
+            throw new IllegalArgumentException("Slot inválido: " + slot);
+        }
+        this.saveManager = saveManager == null ? new SaveManager() : saveManager;
+        this.slotAtual = slot;
         this.posicao = posicao.toLowerCase();
         this.inventario = inventario;
         this.aoVoltarMenuPrincipal = aoVoltarMenuPrincipal;
@@ -150,7 +166,6 @@ public class panel extends JPanel{
                 this.feedback = new SistemaFeedback();
                 this.memoryManager = new MemoryManager();
                 this.camera = new Camera(LARGURA_LOGICA, ALTURA_LOGICA);
-                this.saveManager = new SaveManager();
                 this.inicioJogoMs = System.currentTimeMillis();
 
                 
@@ -605,7 +620,7 @@ public class panel extends JPanel{
                 this.menuPausaAberto = false;
                 break;
             case 1:
-                salvarSlot(1);
+                salvarSlot(this.slotAtual);
                 break;
             case 2:
                 this.telaPausa = TelaPausa.MEMORIAS;
@@ -652,7 +667,8 @@ public class panel extends JPanel{
         desenharTextoCentralizado(g2, "PAUSA", 96, 34, Font.BOLD, new Color(235, 235, 235));
         int y = 158;
         for (int i = 0; i < OPCOES_PAUSA.length; i++) {
-            desenharOpcao(g2, OPCOES_PAUSA[i], y + i * 44, i == this.opcaoMenuPausa);
+            String texto = i == 1 ? "SALVAR SLOT " + this.slotAtual : OPCOES_PAUSA[i];
+            desenharOpcao(g2, texto, y + i * 44, i == this.opcaoMenuPausa);
         }
     }
 
@@ -784,7 +800,7 @@ public class panel extends JPanel{
 
     public GameState criarGameState(int slot) {
         GameState state = new GameState();
-        state.slot = Math.max(1, Math.min(3, slot));
+        state.slot = Math.max(1, Math.min(SaveManager.TOTAL_SLOTS, slot));
         state.cenarioIndex = this.cenario == null ? 0 : this.cenario.getCenarioAtualIndex();
         state.jogadorX = getJogador() == null ? 745 : getJogador().x;
         state.jogadorY = getJogador() == null ? 335 : getJogador().y;
@@ -811,7 +827,7 @@ public class panel extends JPanel{
             return;
         }
 
-        this.slotAtual = Math.max(1, Math.min(3, state.slot));
+        this.slotAtual = Math.max(1, Math.min(SaveManager.TOTAL_SLOTS, state.slot));
         this.controladorEspada.cancelar();
         this.controladorFlechas.limpar();
         this.inicioJogoMs = System.currentTimeMillis() - Math.max(0, state.tempoJogoMs);
@@ -868,10 +884,17 @@ public class panel extends JPanel{
             this.saveManager = new SaveManager();
         }
 
-        this.slotAtual = Math.max(1, Math.min(3, slot));
-        boolean salvou = this.saveManager.salvar(criarGameState(this.slotAtual));
+        if (slot < 1 || slot > SaveManager.TOTAL_SLOTS) {
+            return false;
+        }
+        boolean salvou = this.saveManager.salvar(criarGameState(slot));
+        if (salvou) {
+            this.slotAtual = slot;
+        }
         if (salvou && this.feedback != null) {
             this.feedback.mostrarMensagemCentro("Jogo salvo no slot " + this.slotAtual);
+        } else if (!salvou && this.feedback != null) {
+            this.feedback.mostrarMensagemCentro("Não foi possível salvar o jogo.");
         }
         return salvou;
     }

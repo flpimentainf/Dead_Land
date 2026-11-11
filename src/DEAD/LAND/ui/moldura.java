@@ -50,7 +50,7 @@ public class moldura extends JFrame {
 
     private final CardLayout navegacao = new CardLayout();
     private final JPanel telas = new JPanel(navegacao);
-    private final SaveManager saveManager = new SaveManager();
+    private final SaveManager saveManager;
     private JPanel telaMenu;
     private JPanel telaContexto;
     private JPanel telaCarregar;
@@ -59,8 +59,15 @@ public class moldura extends JFrame {
     private JPanel telaJogo;
     private panel painelCentro;
     private int slideAtual;
+    private int slotNovoJogo = 1;
+    private boolean escolhendoNovoJogo;
 
     public moldura() {
+        this(new SaveManager());
+    }
+
+    public moldura(SaveManager saveManager) {
+        this.saveManager = java.util.Objects.requireNonNull(saveManager);
         setTitle("DEAD LAND");
         setResizable(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -106,12 +113,11 @@ public class moldura extends JFrame {
         );
         JButton novoJogo = criarBotao("NOVO JOGO");
         JButton continuar = criarBotao("CONTINUAR");
-        JButton carregar = criarBotao("CARREGAR");
+        JButton carregar = criarBotao("PARTIDAS SALVAS");
         JButton configuracoes = criarBotao("CONFIGURAÇÕES");
         JButton sair = criarBotao("SAIR");
 
         continuar.setEnabled(saveManager.existeAlgumSave());
-        carregar.setEnabled(saveManager.existeAlgumSave());
 
         novoJogo.addActionListener(e -> iniciarNovoJogo());
         continuar.addActionListener(e -> continuarJogo());
@@ -162,15 +168,42 @@ public class moldura extends JFrame {
         JPanel conteudo = new JPanel();
         conteudo.setOpaque(false);
         conteudo.setLayout(new BoxLayout(conteudo, BoxLayout.Y_AXIS));
-        conteudo.add(criarTitulo("CARREGAR", 42));
+        conteudo.add(criarTitulo(escolhendoNovoJogo ? "NOVO JOGO" : "PARTIDAS SALVAS", 42));
+        conteudo.add(Box.createVerticalStrut(12));
+        conteudo.add(criarTextoCentralizado(
+                escolhendoNovoJogo ? "Escolha um slot para a nova partida."
+                        : "Carregue uma partida ou gerencie os três slots.", 18));
         conteudo.add(Box.createVerticalStrut(26));
 
-        for (int slot = 1; slot <= 3; slot++) {
-            JButton botaoSlot = criarBotao(saveManager.getResumoSlot(slot), 520);
-            botaoSlot.setEnabled(saveManager.existeSave(slot));
+        for (int slot = 1; slot <= SaveManager.TOTAL_SLOTS; slot++) {
             final int slotEscolhido = slot;
-            botaoSlot.addActionListener(e -> carregarSlot(slotEscolhido));
-            conteudo.add(botaoSlot);
+            boolean ocupado = saveManager.existeSave(slot);
+            JPanel linha = new JPanel(new BorderLayout(0, 8));
+            linha.setOpaque(false);
+            linha.setMaximumSize(new Dimension(650, 110));
+            linha.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+            JLabel resumo = new JLabel("<html>" + saveManager.getResumoSlot(slot) + "</html>");
+            resumo.setForeground(Color.WHITE);
+            resumo.setFont(new Font("SansSerif", Font.PLAIN, 16));
+            linha.add(resumo, BorderLayout.NORTH);
+
+            JPanel acoes = new JPanel();
+            acoes.setOpaque(false);
+            if (!escolhendoNovoJogo) {
+                JButton carregar = criarBotao("CARREGAR", 180);
+                carregar.setEnabled(saveManager.carregar(slot).isPresent());
+                carregar.addActionListener(e -> carregarSlot(slotEscolhido));
+                acoes.add(carregar);
+            }
+            JButton novo = criarBotao(ocupado ? "REINICIAR" : "NOVO JOGO", 180);
+            novo.addActionListener(e -> selecionarSlotNovoJogo(slotEscolhido));
+            acoes.add(novo);
+            JButton apagar = criarBotao("APAGAR", 150);
+            apagar.setEnabled(ocupado);
+            apagar.addActionListener(e -> apagarSlot(slotEscolhido));
+            acoes.add(apagar);
+            linha.add(acoes, BorderLayout.CENTER);
+            conteudo.add(linha);
             conteudo.add(Box.createVerticalStrut(12));
         }
 
@@ -270,6 +303,9 @@ public class moldura extends JFrame {
 
         JPanel rodape = new JPanel();
         rodape.setOpaque(false);
+        JButton voltar = criarBotao("VOLTAR");
+        voltar.addActionListener(e -> atualizarTelaSlots());
+        rodape.add(voltar);
         rodape.add(continuar);
         tela.add(rodape, BorderLayout.SOUTH);
 
@@ -278,21 +314,40 @@ public class moldura extends JFrame {
     }
 
     private void iniciarNovoJogo() {
-        if (saveManager.existeAlgumSave()) {
+        escolhendoNovoJogo = true;
+        atualizarTelaSlots();
+    }
+
+    private void selecionarSlotNovoJogo(int slot) {
+        if (saveManager.existeSave(slot)) {
             int escolha = JOptionPane.showConfirmDialog(
                     this,
-                    "Iniciar um novo jogo apagará os saves existentes.",
-                    "Novo jogo",
+                    "Substituir a partida do slot " + slot + " por um novo jogo?\n"
+                            + "Os outros slots serão preservados.",
+                    "Reiniciar slot " + slot,
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.WARNING_MESSAGE
             );
             if (escolha != JOptionPane.YES_OPTION) {
                 return;
             }
-            saveManager.apagarTodos();
         }
-
+        slotNovoJogo = slot;
         iniciarContexto();
+    }
+
+    private void apagarSlot(int slot) {
+        int escolha = JOptionPane.showConfirmDialog(this,
+                "Apagar somente a partida do slot " + slot + "?",
+                "Apagar slot " + slot, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (escolha != JOptionPane.YES_OPTION) {
+            return;
+        }
+        if (!saveManager.apagarSlot(slot)) {
+            JOptionPane.showMessageDialog(this, "Não foi possível apagar o slot " + slot + ".",
+                    "Falha ao apagar", JOptionPane.ERROR_MESSAGE);
+        }
+        atualizarTelaSlots();
     }
 
     private void continuarJogo() {
@@ -323,6 +378,11 @@ public class moldura extends JFrame {
     }
 
     private void mostrarTelaCarregar() {
+        escolhendoNovoJogo = false;
+        atualizarTelaSlots();
+    }
+
+    private void atualizarTelaSlots() {
         montarTelaCarregar(telaCarregar);
         navegacao.show(telas, TELA_CARREGAR);
     }
@@ -338,12 +398,17 @@ public class moldura extends JFrame {
     }
 
     private void iniciarJogo(GameState state) {
+        if (painelCentro != null) {
+            painelCentro.pausarJogo();
+        }
         if (telaJogo != null) {
             telas.remove(telaJogo);
         }
 
         Inventario inventario = new Inventario();
-        painelCentro = new panel("centro", inventario, this::mostrarTelaFinal, this::mostrarMenu);
+        int slot = state == null ? slotNovoJogo : state.slot;
+        painelCentro = new panel("centro", inventario, this::mostrarTelaFinal, this::mostrarMenu,
+                saveManager, slot);
         panel painelSul = new panel("sul", inventario);
         painelCentro.setPainelInventario(painelSul);
 
@@ -354,6 +419,12 @@ public class moldura extends JFrame {
 
         if (state != null) {
             painelCentro.aplicarGameState(state);
+        } else if (!painelCentro.salvarSlot(slot)) {
+            painelCentro.pausarJogo();
+            JOptionPane.showMessageDialog(this, "Não foi possível criar a partida no slot " + slot + ".",
+                    "Falha ao salvar", JOptionPane.ERROR_MESSAGE);
+            atualizarTelaSlots();
+            return;
         }
 
         navegacao.show(telas, TELA_JOGO);
