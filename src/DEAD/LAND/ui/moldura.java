@@ -412,9 +412,19 @@ public class moldura extends JFrame {
         panel painelSul = new panel("sul", inventario);
         painelCentro.setPainelInventario(painelSul);
 
-        telaJogo = new JPanel(new BorderLayout());
-        telaJogo.add(painelCentro, BorderLayout.CENTER);
-        telaJogo.add(painelSul, BorderLayout.SOUTH);
+        panel centro = painelCentro;
+        telaJogo = new JPanel(null) {
+            @Override public void doLayout() {
+                java.awt.Rectangle area = LayoutHUD.partida(getWidth(), getHeight());
+                int alturaJogo = (int) Math.round(area.height * 480.0 / 584.0);
+                centro.setBounds(area.x, area.y, area.width, alturaJogo);
+                painelSul.setBounds(area.x, area.y + alturaJogo, area.width, area.height - alturaJogo);
+            }
+        };
+        telaJogo.setBackground(Color.BLACK);
+        telaJogo.setPreferredSize(new Dimension(LayoutHUD.LARGURA, LayoutHUD.ALTURA_JOGO + LayoutHUD.ALTURA_RODAPE));
+        telaJogo.add(painelCentro);
+        telaJogo.add(painelSul);
         telas.add(telaJogo, TELA_JOGO);
 
         if (state != null) {

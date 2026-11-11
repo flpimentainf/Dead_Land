@@ -8,6 +8,7 @@ import javax.swing.SwingUtilities;
 public final class ValidacaoHUD {
     public static void main(String[] args) throws Exception {
         SwingUtilities.invokeAndWait(ValidacaoHUD::validarPrioridades);
+        SwingUtilities.invokeAndWait(ValidacaoHUD::validarHUDInferior);
         validarTextoEMissoes();
         System.out.println("Validacoes do HUD OK");
     }
@@ -76,5 +77,45 @@ public final class ValidacaoHUD {
             }
             exigir(paginas > 1 && longa.isExibindoMensagem(), "páginas não encerram o diálogo");
         } finally { g.dispose(); }
+    }
+
+    private static void validarHUDInferior() {
+        Inventario inventario = new Inventario();
+        inventario.adicionar(new DEAD.LAND.entity.item(DEAD.LAND.entity.item.SPRITE_ARCO, 0, 0, 0, -1, "arco"));
+        for (int i = 0; i < 30; i++) inventario.adicionar(new DEAD.LAND.entity.item(
+                DEAD.LAND.entity.item.SPRITE_POCAO_CURA, 0, 0, 0, -1, "item_" + i));
+        for (int largura : new int[]{320, 480, 768, 1280, 1920}) {
+            LayoutHUD.Inferior layout = LayoutHUD.inferior(largura, 104);
+            for (int i = 0; i < layout.capacidade(); i++) {
+                Rectangle slot = layout.slot(i);
+                exigir(!slot.intersects(layout.status()), "inventário não pode invadir barras");
+                exigir(new Rectangle(0, 0, largura, 104).contains(slot), "slots dentro do HUD");
+            }
+            java.util.Set<String> acessiveis = new java.util.HashSet<>();
+            for (int i = 0; i < inventario.getTotalPaginas(layout); i++) {
+                inventario.getItensPagina(layout).forEach(item -> acessiveis.add(item.getNome()));
+                inventario.mudarPagina(1, layout);
+            }
+            exigir(acessiveis.size() == inventario.getItensRapidos().size(), "todos os itens acessíveis pelas páginas");
+        }
+        for (Dimension resolucao : new Dimension[]{new Dimension(1280, 720), new Dimension(1366, 768), new Dimension(1920, 1080)}) {
+            Rectangle area = LayoutHUD.partida(resolucao.width, resolucao.height);
+            exigir(new Rectangle(0, 0, resolucao.width, resolucao.height).contains(area), "viewport cabe na resolução");
+            exigir(Math.abs(area.width / 768.0 - area.height / 584.0) < 0.003, "mesma escala nos dois eixos");
+        }
+        panel cena = new panel("centro", inventario);
+        panel hud = new panel("sul", inventario);
+        try {
+            cena.pausarJogo();
+            cena.getHistoria().restaurarEstadoPersistido("FLORESTA", "Explore.", java.util.Set.of(), false);
+            cena.setPainelInventario(hud);
+            hud.setSize(768, 104);
+            BufferedImage normal = new BufferedImage(768, 104, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g = normal.createGraphics(); hud.paint(g); g.dispose();
+            var tecla = new DEAD.LAND.input.escutadorTeclado(); tecla.abrirMenu = true; cena.atualizarMenuPausa(tecla);
+            BufferedImage pausado = new BufferedImage(768, 104, BufferedImage.TYPE_INT_RGB);
+            g = pausado.createGraphics(); hud.paint(g); g.dispose();
+            exigir(new Color(pausado.getRGB(195, 50)).getRed() < new Color(normal.getRGB(195, 50)).getRed(), "pausa escurece faixa inferior");
+        } finally { cena.pausarJogo(); }
     }
 }

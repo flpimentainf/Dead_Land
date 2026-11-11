@@ -77,38 +77,78 @@ public class Inventario {
         definirQuantidadeCura(curas);
     }
 
-    public void desenhar(Graphics2D g2, int largura, int altura) {
-        int y = (altura - TAMANHO_SLOT) / 2;
-        int indiceSlot = 0;
-        boolean mostrarFlechas = arcoEquipado();
+    private int paginaRapida;
 
-        // O slot da arma fica fixo à direita, independentemente da ordem de coleta.
-        for (item arma : this.itens) {
+    public List<item> getItensRapidos() {
+        List<item> rapidos = new ArrayList<>();
+        for (item i : itens) {
+            if (ehArma(i.getNome()) || "flecha".equals(i.getNome()) && !arcoEquipado()) continue;
+            rapidos.add(i);
+        }
+        if (arcoEquipado() && !temItem("flecha")) rapidos.add(iconeFlechas);
+        return rapidos;
+    }
+
+    public int getTotalPaginas(LayoutHUD.Inferior layout) {
+        int capacidade = Math.max(1, layout.capacidade() - (armaEquipada.isEmpty() ? 0 : 1));
+        return Math.max(1, (getItensRapidos().size() + capacidade - 1) / capacidade);
+    }
+
+    public int getPaginaRapida() { return paginaRapida; }
+    public List<item> getItensPagina(LayoutHUD.Inferior layout) {
+        List<item> rapidos = getItensRapidos();
+        int capacidade = Math.max(1, layout.capacidade() - (armaEquipada.isEmpty() ? 0 : 1));
+        paginaRapida = Math.min(paginaRapida, getTotalPaginas(layout) - 1);
+        int inicio = Math.min(rapidos.size(), paginaRapida * capacidade);
+        return List.copyOf(rapidos.subList(inicio, Math.min(rapidos.size(), inicio + capacidade)));
+    }
+    public void mudarPagina(int delta, LayoutHUD.Inferior layout) {
+        paginaRapida = Math.floorMod(paginaRapida + delta, getTotalPaginas(layout));
+    }
+
+    public void desenhar(Graphics2D g2, int largura, int altura) {
+        desenhar(g2, LayoutHUD.inferior(largura, altura));
+    }
+
+    public void desenhar(Graphics2D g2, LayoutHUD.Inferior layout) {
+        if (layout.capacidade() <= 0) return;
+        int indice = 0;
+        for (item arma : itens) {
             if (ehArma(arma.getNome()) && arma.getNome().equals(armaEquipada)) {
-                desenharItem(g2, arma, largura, y, indiceSlot++);
+                desenharItem(g2, arma, layout.slot(indice++));
                 break;
             }
         }
-
-        for (item itemColetado : this.itens) {
-            if (ehArma(itemColetado.getNome())) continue;
-            if ("flecha".equals(itemColetado.getNome()) && !mostrarFlechas) {
-                continue;
-            }
-            desenharItem(g2, itemColetado, largura, y, indiceSlot++);
+        int paginas = getTotalPaginas(layout);
+        for (item rapido : getItensPagina(layout)) {
+            if (indice >= layout.capacidade()) break;
+            desenharItem(g2, rapido, layout.slot(indice++));
         }
-        if (mostrarFlechas && !temItem("flecha")) {
-            desenharItem(g2, iconeFlechas, largura, y, indiceSlot);
+        if (paginas > 1) {
+            g2.setColor(new Color(220, 206, 164));
+            g2.setFont(new Font("SansSerif", Font.BOLD, 11));
+            java.awt.Rectangle anterior = layout.anterior(), proxima = layout.proxima();
+            g2.drawRect(anterior.x, anterior.y, anterior.width, anterior.height);
+            g2.drawRect(proxima.x, proxima.y, proxima.width, proxima.height);
+            g2.drawString("<", anterior.x + 8, anterior.y + 13);
+            g2.drawString(">", proxima.x + 8, proxima.y + 13);
+            String dica = (paginaRapida + 1) + "/" + paginas + " | roda do mouse: itens";
+            if (g2.getFontMetrics().stringWidth(dica) > layout.inventario().width - 60) dica = (paginaRapida + 1) + "/" + paginas;
+            int x = anterior.x + (proxima.x + proxima.width - anterior.x - g2.getFontMetrics().stringWidth(dica)) / 2;
+            g2.drawString(dica, x, anterior.y + 13);
         }
     }
 
-    private void desenharItem(Graphics2D g2, item itemColetado, int largura, int y, int indiceSlot) {
-        int x = largura - MARGEM - (indiceSlot + 1) * TAMANHO_SLOT - indiceSlot * ESPACO;
-        desenharSlot(g2, itemColetado, x, y);
-        desenharQuantidade(g2, itemColetado, x, y);
-        desenharDicaTecla(g2, itemColetado, x, y);
+    private void desenharItem(Graphics2D destino, item itemColetado, java.awt.Rectangle slot) {
+        Graphics2D g2 = (Graphics2D) destino.create();
+        try {
+            g2.translate(slot.x, slot.y);
+            g2.scale(slot.width / 64.0, slot.height / 64.0);
+            desenharSlot(g2, itemColetado, 0, 0);
+            desenharQuantidade(g2, itemColetado, 0, 0);
+            desenharDicaTecla(g2, itemColetado, 0, 0);
+        } finally { g2.dispose(); }
     }
-
    public boolean temArco() {
         return temItem("arco");
     }
@@ -258,7 +298,7 @@ public class Inventario {
         int tw = fm.stringWidth(tecla) + 8;
         int th = arma ? 18 : 14;
         int tx = arma ? x + TAMANHO_SLOT - tw - 3 : x + (TAMANHO_SLOT - tw) / 2;
-        int ty = arma ? y + 3 : y - th - 3;
+        int ty = y + 3;
 
         g2.setColor(new Color(0, 0, 0, 160));
         g2.fillRoundRect(tx, ty, tw, th, 5, 5);

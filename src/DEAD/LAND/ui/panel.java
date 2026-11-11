@@ -93,6 +93,8 @@ public class panel extends JPanel{
     private MemoryManager memoryManager;
     private Camera camera;
     private BufferedImage quadroLogico;
+    private BufferedImage quadroHUD;
+    private final ViewportJogo viewportHUD = new ViewportJogo(LayoutHUD.LARGURA, LayoutHUD.ALTURA_RODAPE);
     private SaveManager saveManager;
     private long inicioJogoMs;
     private long ultimoAutosaveMs;
@@ -191,9 +193,10 @@ public class panel extends JPanel{
                 break;
 
             case "sul":
-            	this.setPreferredSize(new Dimension(768, 125));
+            	this.setPreferredSize(new Dimension(LayoutHUD.LARGURA, LayoutHUD.ALTURA_RODAPE));
             	this.setBackground(new Color(38, 44, 58));
             	
+                configurarMouseHUD();
                 break;
 
             default:
@@ -216,12 +219,7 @@ public class panel extends JPanel{
                 break;
 
             case "sul":
-                g2.setColor(new Color(38, 44, 58));
-                g2.fillRect(0, 0, getWidth(), getHeight());
-                desenharStatus(g2);
-                if (this.inventario != null) {
-                    this.inventario.desenhar(g2, getWidth(), getHeight());
-                }
+                desenharHUD(g2);
                 break;
         }
     }
@@ -364,11 +362,53 @@ public class panel extends JPanel{
             return;
         }
 
-        int x = 20;
-        int y = (getHeight() - 64) / 2 + 14;
-        this.painelJogo.barradeVida.desenhar(g2, this.painelJogo.getJogador(), x, y);
-        EstiloHUD.desenharBarra(g2, "ESTAMINA", x, y + 32, 12,
+        Rectangle status = LayoutHUD.inferior(LayoutHUD.LARGURA, LayoutHUD.ALTURA_RODAPE).status();
+        int x = status.x, y = status.y + 10;
+        this.painelJogo.barradeVida.desenhar(g2, this.painelJogo.getJogador(), x, y, status.width);
+        EstiloHUD.desenharBarra(g2, "ESTAMINA", x, y + 32, status.width, 12,
                 this.painelJogo.getJogador().getProporcaoEstamina(), new Color(230, 175, 50));
+    }
+
+    private void configurarMouseHUD() {
+        addMouseWheelListener(e -> {
+            if (!hudInterativo()) return;
+            inventario.mudarPagina(e.getWheelRotation(), LayoutHUD.inferior(768, 104));
+            painelJogo.requestFocusInWindow();
+            repaint();
+        });
+        addMouseListener(new MouseAdapter() {
+            @Override public void mousePressed(MouseEvent e) {
+                if (!hudInterativo() || e.getButton() != MouseEvent.BUTTON1) return;
+                Point2D ponto = viewportHUD.paraLogico(e.getPoint(), getWidth(), getHeight());
+                LayoutHUD.Inferior layout = LayoutHUD.inferior(768, 104);
+                if (ponto != null && layout.anterior().contains(ponto)) inventario.mudarPagina(-1, layout);
+                if (ponto != null && layout.proxima().contains(ponto)) inventario.mudarPagina(1, layout);
+                painelJogo.requestFocusInWindow();
+                repaint();
+            }
+        });
+    }
+
+    private boolean hudInterativo() {
+        return painelJogo != null && inventario != null && LayoutHUD.mostrarAvisos(painelJogo.getEstadoHUD());
+    }
+
+    private void desenharHUD(Graphics2D tela) {
+        if (quadroHUD == null) quadroHUD = new BufferedImage(768, 104, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = quadroHUD.createGraphics();
+        try {
+            configurarRenderizacaoPixelArt(g);
+            g.setColor(new Color(21, 24, 32)); g.fillRect(0, 0, 768, 104);
+            desenharStatus(g);
+            if (inventario != null) inventario.desenhar(g, LayoutHUD.inferior(768, 104));
+            if (painelJogo != null && (painelJogo.menuPausaAberto || painelJogo.getEstadoHUD() == LayoutHUD.Estado.MORTE
+                    || painelJogo.getEstadoHUD() == LayoutHUD.Estado.ENCERRAMENTO)) {
+                g.setColor(new Color(0, 0, 0, 190)); g.fillRect(0, 0, 768, 104);
+            }
+        } finally { g.dispose(); }
+        tela.setColor(Color.BLACK); tela.fillRect(0, 0, getWidth(), getHeight());
+        Rectangle area = viewportHUD.getArea(getWidth(), getHeight());
+        tela.drawImage(quadroHUD, area.x, area.y, area.width, area.height, null);
     }
 
     private void desenharCentro(Graphics2D g2Tela) {
