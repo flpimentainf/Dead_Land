@@ -452,7 +452,8 @@ public class panel extends JPanel{
                 this.interfaceHistoria.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA, this.historia,
                         LayoutHUD.mostrarObjetivos(estadoHUD));
             }
-            if (LayoutHUD.mostrarAvisos(estadoHUD)) notificacoesObjetivos.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA);
+            if (LayoutHUD.mostrarAvisos(estadoHUD)) notificacoesObjetivos.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA,
+                    estadoHUD == LayoutHUD.Estado.CHEFE);
             if (deveDesenharBarraBoss() && (estadoHUD == LayoutHUD.Estado.CHEFE || estadoHUD == LayoutHUD.Estado.DIALOGO)) {
                 this.controladorInimigos.getChefe().desenharBarraBoss(g2, LARGURA_LOGICA);
             }
@@ -475,7 +476,11 @@ public class panel extends JPanel{
         if (this.historia != null && !deveDesenharBarraBoss()) {
             topo = 26 + InterfaceHistoria.alturaObjetivos(g2, historia);
         }
-        int rodape = notificacoesObjetivos.getAtual() != null || feedback != null && feedback.isMensagemVisivel() ? 150 : 8;
+        if (notificacoesObjetivos.getAtual() != null) {
+            Rectangle aviso = LayoutHUD.avisoMissao(LARGURA_LOGICA, deveDesenharBarraBoss());
+            topo = Math.max(topo, aviso.y + aviso.height + 8);
+        }
+        int rodape = feedback != null && feedback.isMensagemVisivel() ? 150 : 8;
         Rectangle limites = new Rectangle(this.camera.getXRender() + 8, this.camera.getYRender() + topo,
                 LARGURA_LOGICA - 16, ALTURA_LOGICA - topo - rodape);
         // A indicação acompanha a mesma prioridade da ação executada pela tecla E.

@@ -37,27 +37,37 @@ public final class NotificacoesObjetivos {
     public void limpar(SistemaHistoria historia) { fila.clear(); historia.limparAvisosObjetivos(); ultimo = relogio.getAsLong(); }
 
     public void desenhar(Graphics2D destino, int largura, int altura) {
+        desenhar(destino, largura, altura, false);
+    }
+
+    public void desenhar(Graphics2D destino, int largura, int altura, boolean chefe) {
         if (fila.isEmpty()) return;
         Graphics2D g = (Graphics2D) destino.create();
         try {
             float entrada = Math.min(1f, (DURACAO_MS - restante) / 150f);
             float saida = Math.min(1f, restante / 250f);
             g.setComposite(AlphaComposite.SrcOver.derive(Math.max(0f, Math.min(entrada, saida))));
-            int w = 320, x = largura - w - 20;
-            g.setFont(new Font("SansSerif", Font.PLAIN, 13));
-            java.util.List<String> linhas = TextoHUD.quebrar(fila.peekFirst().descricao(), g.getFontMetrics(), w - 24);
-            int quantidade = Math.min(3, linhas.size()), h = 46 + quantidade * 18, y = altura - h - 18;
-            g.setColor(EstiloHUD.FUNDO); g.fillRect(x, y, w, h);
-            g.setColor(EstiloHUD.DESTAQUE); g.drawRect(x, y, w, h);
-            g.setFont(EstiloHUD.TITULO);
-            g.drawString(fila.peekFirst().titulo(), x + 12, y + 20);
-            g.setFont(new Font("SansSerif", Font.PLAIN, 13)); g.setColor(Color.WHITE);
+            Rectangle area = LayoutHUD.avisoMissao(largura, chefe);
+            int w = area.width, x = area.x, y = area.y;
+            g.setFont(EstiloHUD.CORPO.deriveFont(11f));
+            java.util.List<String> linhas = TextoHUD.quebrar(fila.peekFirst().descricao(), g.getFontMetrics(), w - 46);
+            int quantidade = Math.min(2, linhas.size());
+            g.setColor(new Color(10, 12, 16, 245)); g.fillRect(x, y, w, area.height);
+            g.setColor(new Color(75, 75, 72)); g.drawRect(x, y, w - 1, area.height - 1);
+            g.setColor(new Color(145, 136, 110)); g.drawRect(x + 2, y + 2, w - 5, area.height - 5);
+            // Pequeno pergaminho em pixels, sem ampliar o card.
+            g.setColor(new Color(112, 86, 45)); g.fillRect(x + 9, y + 14, 20, 24);
+            g.setColor(EstiloHUD.DESTAQUE); g.fillRect(x + 11, y + 12, 16, 24);
+            g.setColor(new Color(75, 58, 37));
+            for (int i = 0; i < 3; i++) g.fillRect(x + 14, y + 18 + i * 5, 10, 1);
+            g.setFont(EstiloHUD.TITULO.deriveFont(10f)); g.setColor(EstiloHUD.DESTAQUE);
+            g.drawString(fila.peekFirst().titulo(), x + 36, y + 15);
+            g.setFont(EstiloHUD.CORPO.deriveFont(11f)); g.setColor(EstiloHUD.TEXTO);
             for (int i = 0; i < quantidade; i++) {
                 String linha = linhas.get(i);
-                if (i == quantidade - 1 && linhas.size() > quantidade) linha = TextoHUD.resumir(linha, g.getFontMetrics(), w - 24);
-                g.drawString(linha, x + 12, y + 40 + i * 18);
+                if (i == quantidade - 1 && linhas.size() > quantidade) linha = TextoHUD.resumir(linha, g.getFontMetrics(), w - 46);
+                g.drawString(linha, x + 36, y + 30 + i * 13);
             }
-            if (linhas.size() > quantidade) { g.setColor(Color.LIGHT_GRAY); g.drawString("… ESC > OBJETIVOS", x + 12, y + h - 6); }
         } finally { g.dispose(); }
     }
 }

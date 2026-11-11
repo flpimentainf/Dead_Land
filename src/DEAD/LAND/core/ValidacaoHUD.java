@@ -31,6 +31,9 @@ public final class ValidacaoHUD {
             exigir(LayoutHUD.estado(false, true, false, true, true) == LayoutHUD.Estado.MORTE, "morte tem prioridade");
             Rectangle boss = LayoutHUD.chefe(768);
             exigir(new Rectangle(0, 0, 768, 480).contains(boss), "barra do chefe dentro da tela");
+            Rectangle aviso = LayoutHUD.avisoMissao(768, false);
+            exigir(aviso.x == 532 && aviso.y == 12 && aviso.height == 52, "aviso compacto no canto superior direito");
+            exigir(!LayoutHUD.avisoMissao(768, true).intersects(boss), "aviso não invade barra do chefe");
         } finally { cena.pausarJogo(); }
     }
 

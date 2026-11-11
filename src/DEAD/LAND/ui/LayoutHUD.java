@@ -48,6 +48,10 @@ public final class LayoutHUD {
         return new Rectangle((largura - w) / 2, 12, w, 58);
     }
 
+    public static Rectangle avisoMissao(int largura, boolean chefe) {
+        return new Rectangle(largura - 224 - 12, chefe ? 80 : 12, 224, 52);
+    }
+
     public static boolean mostrarObjetivos(Estado estado) { return estado == Estado.EXPLORACAO; }
     public static boolean mostrarAvisos(Estado estado) { return estado == Estado.EXPLORACAO || estado == Estado.CHEFE; }
 }
