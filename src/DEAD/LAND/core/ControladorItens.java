@@ -110,6 +110,7 @@ public class ControladorItens {
                     );
                 }
                 processarColeta(cenaDoJogo, itemDoJogo);
+                cenaDoJogo.atualizarConquistas();
                 cenaDoJogo.atualizarInventario();
                 if (cenaDoJogo.getHistoria() != null) {
                     cenaDoJogo.getHistoria().eventoItemColetado(itemDoJogo.getNome());

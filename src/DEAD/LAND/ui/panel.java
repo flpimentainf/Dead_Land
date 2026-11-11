@@ -11,6 +11,7 @@ import DEAD.LAND.core.Camera;
 import DEAD.LAND.core.GameState;
 import DEAD.LAND.core.MemoryManager;
 import DEAD.LAND.core.SaveManager;
+import DEAD.LAND.core.SistemaConquistas;
 import DEAD.LAND.core.SistemaCheckpoint;
 import DEAD.LAND.core.SistemaFeedback;
 import DEAD.LAND.core.SistemaMorte;
@@ -91,6 +92,7 @@ public class panel extends JPanel{
     private SistemaMorte sistemaMorte;
     private SistemaFeedback feedback;
     private MemoryManager memoryManager;
+    private final SistemaConquistas conquistas = new SistemaConquistas();
     private Camera camera;
     private BufferedImage quadroLogico;
     private BufferedImage quadroHUD;
@@ -580,8 +582,12 @@ public class panel extends JPanel{
     }
     public void avancarPaginaDialogo() { if (interfaceHistoria != null) interfaceHistoria.avancarPagina(historia); }
     public void atualizarInterface() {
+        atualizarConquistas();
         if (historia != null) notificacoesObjetivos.atualizar(historia, LayoutHUD.mostrarAvisos(getEstadoHUD()));
     }
+
+    public SistemaConquistas getConquistas() { return conquistas; }
+    public void atualizarConquistas() { conquistas.atualizar(inventario, memoryManager, true); }
 
     public void sincronizarInterface() {
         notificacoesObjetivos.limpar(historia);
@@ -922,6 +928,7 @@ public class panel extends JPanel{
     public Camera getCamera() { return camera; }
 
     public GameState criarGameState(int slot) {
+        atualizarConquistas();
         GameState state = new GameState();
         state.slot = Math.max(1, Math.min(SaveManager.TOTAL_SLOTS, slot));
         state.cenarioIndex = this.cenario == null ? 0 : this.cenario.getCenarioAtualIndex();
@@ -942,6 +949,7 @@ public class panel extends JPanel{
         state.npcsConhecidos = historia == null ? new LinkedHashSet<String>() : historia.getNpcsConhecidos();
         state.eventosHistoria = historia == null ? new LinkedHashSet<String>() : historia.getEventosHistoria();
         state.memorias = memoryManager == null ? new LinkedHashSet<String>() : memoryManager.getIdsDescobertas();
+        state.conquistas = conquistas.getIds();
         return state;
     }
 
@@ -992,6 +1000,9 @@ public class panel extends JPanel{
                     state.bossDerrotado
             );
         }
+
+        conquistas.restaurar(state.conquistas);
+        conquistas.atualizar(inventario, memoryManager, false);
 
         if (this.sistemaCheckpoint != null) {
             this.sistemaCheckpoint.registrarCheckpointInicial(this);

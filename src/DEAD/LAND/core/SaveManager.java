@@ -62,6 +62,7 @@ public class SaveManager {
         props.setProperty("npcsConhecidos", juntar(state.npcsConhecidos));
         props.setProperty("eventosHistoria", juntar(state.eventosHistoria));
         props.setProperty("memorias", juntar(state.memorias));
+        props.setProperty("conquistas", juntar(state.conquistas));
 
         Path temporario = null;
         try {
@@ -121,6 +122,7 @@ public class SaveManager {
             state.npcsConhecidos = separar(props.getProperty("npcsConhecidos", ""));
             state.eventosHistoria = separar(props.getProperty("eventosHistoria", ""));
             state.memorias = separar(props.getProperty("memorias", ""));
+            state.conquistas = separar(props.getProperty("conquistas", ""));
             return Optional.of(state);
         } catch (Exception e) {
             return Optional.empty();

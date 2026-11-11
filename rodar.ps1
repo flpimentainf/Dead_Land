@@ -39,7 +39,7 @@ try {
     }
 
     if ($Validar -or $SomenteValidar) {
-        foreach ($validacao in @('ValidacaoTecnica', 'ValidacaoSlots', 'ValidacaoHUD')) {
+        foreach ($validacao in @('ValidacaoTecnica', 'ValidacaoSlots', 'ValidacaoHUD', 'ValidacaoConquistas')) {
             & $javaExecutable -cp $classesDirectory "DEAD.LAND.core.$validacao"
             if ($LASTEXITCODE -ne 0) {
                 throw "A validacao $validacao falhou. O jogo nao foi iniciado."

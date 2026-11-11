@@ -24,6 +24,7 @@ public class GameState {
     public Set<String> npcsConhecidos = new LinkedHashSet<String>();
     public Set<String> eventosHistoria = new LinkedHashSet<String>();
     public Set<String> memorias = new LinkedHashSet<String>();
+    public Set<String> conquistas = new LinkedHashSet<String>();
 
     public String getResumoProgresso() {
         return "Cenario " + cenarioIndex + " - " + estadoHistoria;
