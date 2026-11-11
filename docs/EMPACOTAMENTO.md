@@ -1,7 +1,7 @@
 # Executável Windows
 
 As distribuições ficam somente em `dist/vX.Y.Z/`, com `Dead_Land.exe` diretamente
-dentro de cada pasta. Hoje estão mantidas `dist/v1.1.0/` e `dist/v1.1.1/`.
+dentro de cada pasta. Hoje estão mantidas `dist/v1.1.1/` e `dist/v1.1.2/`.
 O Java está em `runtime/`, os recursos em `app/repos/` e os três slots em `save/`.
 Mantenha essas pastas junto do executável. Para transportar o jogo, copie a pasta
 da versão inteira. Não são gerados ZIPs.
@@ -23,7 +23,7 @@ O empacotador aplica estas regras:
 - Cada slot leva a cópia mais recente encontrada nas versões mantidas, mesmo que
   a última jogatina tenha acontecido na versão anterior.
 - Depois da publicação, permanecem somente as duas versões mais recentes,
-  ordenadas numericamente. Ao publicar `v1.2.0`, ficam `v1.1.1` e `v1.2.0`.
+  ordenadas numericamente. Ao publicar `v1.2.0`, ficam `v1.1.2` e `v1.2.0`.
 - Não são criadas pastas `Atualizado`, `Versao-X.Y.Z`, pastas extras `Dead_Land`
   dentro da pasta da versão, nem arquivos ZIP.
 

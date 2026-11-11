@@ -52,6 +52,10 @@ public final class LayoutHUD {
         return new Rectangle(largura - 224 - 12, chefe ? 80 : 12, 224, 52);
     }
 
+    public static Rectangle dialogo(int largura, int alturaMundo, int alturaCompacta, int extensao) {
+        return new Rectangle(32, alturaMundo - alturaCompacta - 20, largura - 64, alturaCompacta + extensao);
+    }
+
     public static boolean mostrarObjetivos(Estado estado) { return estado == Estado.EXPLORACAO; }
     public static boolean mostrarAvisos(Estado estado) { return estado == Estado.EXPLORACAO || estado == Estado.CHEFE; }
 }

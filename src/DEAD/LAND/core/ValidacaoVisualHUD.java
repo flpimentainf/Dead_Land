@@ -37,7 +37,7 @@ final class ValidacaoVisualHUD {
                 state.objetivoSecundario = "Encontre os fragmentos de memória e retorne ao Caçador para receber sua recompensa.";
                 cena.aplicarGameState(state);
                 capturarAviso(cena, saida);
-                for (String estado : new String[]{"exploracao", "castelo2", "chefe", "pausa", "objetivos", "dialogo", "inventario", "interacao", "morte"}) {
+                for (String estado : new String[]{"exploracao", "castelo2", "chefe", "pausa", "objetivos", "dialogo", "dialogo-npc", "inventario", "interacao", "morte"}) {
                     cena.aplicarGameState(state);
                     while (cena.isMenuPausaAberto()) alternarPausa(cena);
                     switch (estado) {
@@ -48,6 +48,7 @@ final class ValidacaoVisualHUD {
                         case "pausa" -> alternarPausa(cena);
                         case "objetivos" -> { alternarPausa(cena); clicar(cena, 384, 378); }
                         case "dialogo" -> cena.getHistoria().eventoDormir();
+                        case "dialogo-npc" -> cena.getHistoria().eventoFalarComNpc("mara", cena);
                         case "inventario" -> {
                             for (int i = 0; i < 30; i++) inventario.adicionar(new item(item.SPRITE_POCAO_CURA, 0, 0, 0, -1, "teste_" + i));
                         }
@@ -62,7 +63,7 @@ final class ValidacaoVisualHUD {
                     LayoutHUD.Estado esperado = switch (estado) {
                         case "chefe" -> LayoutHUD.Estado.CHEFE;
                         case "pausa", "objetivos" -> LayoutHUD.Estado.PAUSA;
-                        case "dialogo" -> LayoutHUD.Estado.DIALOGO;
+                        case "dialogo", "dialogo-npc" -> LayoutHUD.Estado.DIALOGO;
                         case "morte" -> LayoutHUD.Estado.MORTE;
                         default -> LayoutHUD.Estado.EXPLORACAO;
                     };
@@ -74,6 +75,13 @@ final class ValidacaoVisualHUD {
                         ValidacaoHUD.exigir(new Rectangle(0, 0, resolucao.width, resolucao.height).contains(rodape.getBounds()), "HUD cabe na janela");
                         BufferedImage imagem = new BufferedImage(resolucao.width, resolucao.height, BufferedImage.TYPE_INT_RGB);
                         Graphics2D g = imagem.createGraphics(); partida.paint(g); g.dispose();
+                        if (estado.startsWith("dialogo")) {
+                            Rectangle area = LayoutHUD.partida(resolucao.width, resolucao.height);
+                            int x = area.x + (int) Math.round(20 * area.width / 768.0);
+                            int y = area.y + (int) Math.round(520 * area.height / 584.0);
+                            ValidacaoHUD.exigir(imagem.getRGB(x, y) == new Color(21, 24, 32).getRGB(),
+                                    "dialogo deve cobrir barras e itens do rodape");
+                        }
                         ImageIO.write(imagem, "png", new File(saida, estado + "-" + resolucao.width + "x" + resolucao.height + ".png"));
                         if (estado.equals("chefe")) validarBarraChefe(cena);
                     }

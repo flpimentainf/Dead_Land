@@ -19,6 +19,10 @@ public class InterfaceHistoria {
     }
 
     public void desenhar(Graphics2D g2, int largura, int altura, SistemaHistoria historia, boolean objetivos) {
+        desenhar(g2, largura, altura, historia, objetivos, true);
+    }
+
+    public void desenhar(Graphics2D g2, int largura, int altura, SistemaHistoria historia, boolean objetivos, boolean dialogo) {
         if (historia == null) return;
         mensagemOrigem = List.copyOf(historia.getMensagem());
 
@@ -37,8 +41,14 @@ public class InterfaceHistoria {
         }
         painelEstavaVisivel = objetivos;
 
+        if (dialogo) desenharDialogo(g2, largura, altura, historia, 0);
+    }
+
+    public void desenharDialogo(Graphics2D g2, int largura, int alturaMundo, SistemaHistoria historia, int extensao) {
+        mensagemOrigem = List.copyOf(historia.getMensagem());
+
         if (historia.isExibindoEscolha()) {
-            desenharEscolha(g2, largura, altura, historia);
+            desenharEscolha(g2, largura, alturaMundo, historia, extensao);
             return;
         }
 
@@ -46,10 +56,10 @@ public class InterfaceHistoria {
             desenharCaixaTexto(
                     g2,
                     largura,
-                    altura,
+                    alturaMundo,
                     historia.getMensagem(),
                     "ENTER/E para continuar",
-                    historia.getNomeNpcFalando()
+                    historia.getNomeNpcFalando(), List.of(), extensao
             );
         }
     }
@@ -90,7 +100,7 @@ public class InterfaceHistoria {
         }
         g2.drawString(dica, 32, 18 + h - 8);
     }
-    private void desenharEscolha(Graphics2D g2, int largura, int altura, SistemaHistoria historia) {
+    private void desenharEscolha(Graphics2D g2, int largura, int altura, SistemaHistoria historia, int extensao) {
         List<String> linhas = new ArrayList<String>(historia.getMensagem());
         List<String> opcoes = List.of(
                 (historia.getOpcaoEscolhida() == 0 ? "> " : "  ") + historia.getOpcaoEscolha1(),
@@ -98,7 +108,7 @@ public class InterfaceHistoria {
         String rodape = historia.isEscolhaNpc()
                 ? "W/S escolhe | ENTER/E confirma"
                 : "W/S escolhe | ENTER/E confirma | ESC 3x: segredo";
-        desenharCaixaTexto(g2, largura, altura, linhas, rodape, historia.getNomeNpcFalando(), opcoes);
+        desenharCaixaTexto(g2, largura, altura, linhas, rodape, historia.getNomeNpcFalando(), opcoes, extensao);
     }
 
     private List<String> chaveDialogo = List.of();
@@ -124,12 +134,7 @@ public class InterfaceHistoria {
     }
 
     private void desenharCaixaTexto(Graphics2D g2, int largura, int altura,
-            List<String> linhas, String rodape, String nomeNpc) {
-        desenharCaixaTexto(g2, largura, altura, linhas, rodape, nomeNpc, List.of());
-    }
-
-    private void desenharCaixaTexto(Graphics2D g2, int largura, int altura,
-            List<String> linhas, String rodape, String nomeNpc, List<String> opcoes) {
+            List<String> linhas, String rodape, String nomeNpc, List<String> opcoes, int extensao) {
         int caixaX = 32, caixaLargura = largura - 64;
         int textoX = caixaX + (nomeNpc == null ? 16 : 78);
         g2.setFont(EstiloHUD.CORPO);
@@ -145,13 +150,16 @@ public class InterfaceHistoria {
             paginaDialogo = 0;
         }
         int passo = fm.getHeight() + 2;
-        int capacidade = Math.max(1, (140 - 36 - escolhas.size() * passo) / passo);
+        int capacidadeCompacta = Math.max(1, (140 - 36 - escolhas.size() * passo) / passo);
+        int alturaCompacta = Math.max(90, 36 + (Math.min(capacidadeCompacta, quebradas.size()) + escolhas.size()) * passo);
+        int capacidade = Math.max(1, (alturaCompacta + extensao - 36) / passo - escolhas.size());
         totalPaginas = Math.max(1, (quebradas.size() + capacidade - 1) / capacidade);
         paginaDialogo = Math.min(paginaDialogo, totalPaginas - 1);
         int inicio = paginaDialogo * capacidade;
         int quantidade = Math.min(capacidade, quebradas.size() - inicio);
-        int caixaAltura = Math.max(90, 36 + (quantidade + escolhas.size()) * passo);
-        int caixaY = altura - caixaAltura - 20;
+        java.awt.Rectangle caixa = LayoutHUD.dialogo(largura, altura, alturaCompacta, extensao);
+        int caixaAltura = caixa.height;
+        int caixaY = caixa.y;
         g2.setColor(new Color(12, 14, 20, 242));
         g2.fillRect(caixaX, caixaY, caixaLargura, caixaAltura);
         g2.setColor(new Color(200, 193, 170));

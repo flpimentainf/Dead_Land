@@ -450,7 +450,7 @@ public class panel extends JPanel{
             if (this.feedback != null && LayoutHUD.mostrarAvisos(estadoHUD)) this.feedback.desenharHud(g2, LARGURA_LOGICA, ALTURA_LOGICA);
             if (this.interfaceHistoria != null && estadoHUD != LayoutHUD.Estado.PAUSA && estadoHUD != LayoutHUD.Estado.MORTE) {
                 this.interfaceHistoria.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA, this.historia,
-                        LayoutHUD.mostrarObjetivos(estadoHUD));
+                        LayoutHUD.mostrarObjetivos(estadoHUD), !dialogoSobreHUD());
             }
             if (LayoutHUD.mostrarAvisos(estadoHUD)) notificacoesObjetivos.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA,
                     estadoHUD == LayoutHUD.Estado.CHEFE);
@@ -569,6 +569,15 @@ public class panel extends JPanel{
     }
 
     public boolean temProximaPaginaDialogo() { return interfaceHistoria != null && interfaceHistoria.temProximaPagina(historia); }
+    public boolean dialogoSobreHUD() {
+        return getParent() instanceof PainelPartida && historia != null
+                && (historia.isExibindoMensagem() || historia.isExibindoEscolha())
+                && !menuPausaAberto && jogador != null && jogador.estaVivo();
+    }
+
+    public void desenharDialogoSobreHUD(Graphics2D g) {
+        interfaceHistoria.desenharDialogo(g, LARGURA_LOGICA, ALTURA_LOGICA, historia, LayoutHUD.ALTURA_RODAPE);
+    }
     public void avancarPaginaDialogo() { if (interfaceHistoria != null) interfaceHistoria.avancarPagina(historia); }
     public void atualizarInterface() {
         if (historia != null) notificacoesObjetivos.atualizar(historia, LayoutHUD.mostrarAvisos(getEstadoHUD()));
@@ -1049,6 +1058,10 @@ public class panel extends JPanel{
     }
 
     public void atualizarInventario() {
+        if (getParent() instanceof PainelPartida partida) {
+            partida.repaint();
+            return;
+        }
         if (this.painelInventario != null) {
             this.painelInventario.repaint();
         }

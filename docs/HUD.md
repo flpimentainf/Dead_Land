@@ -36,6 +36,12 @@ Carregar uma partida ou restaurar um checkpoint descarta avisos anteriores.
 - **W/S** seleciona a resposta em qualquer página em que as escolhas estejam visíveis;
   avançar o texto mantém a seleção. Segurar **ENTER/E** não confirma duas vezes.
 
+Durante mensagens e escolhas, a caixa preserva o topo e a largura e se estende
+104 pixels lógicos para baixo, aproveitando o rodapé. Vida, estamina e inventário
+ficam ocultos durante a conversa e voltam automaticamente ao fechá-la. A câmera e
+a área ocupada pelo mundo permanecem iguais. A altura extra comporta mais linhas
+por página, mantendo W/S e ENTER/E.
+
 ## Validação
 
 Executar com JDK 21 ou superior:
@@ -61,8 +67,8 @@ abre o jogo. Os testes de slots usam diretórios temporários.
 - Feedback ao tentar usar uma poção inexistente sem alterar o inventário.
 
 A validação visual renderiza os componentes reais em **1280×720**, **1366×768** e
-**1920×1080**. São geradas 27 capturas em `build/hud/`: exploração, segunda área do
-castelo, chefe, pausa, missões, diálogo, inventário cheio, interação com a cama e morte
+**1920×1080**. São geradas 30 capturas em `build/hud/`: exploração, segunda área do
+castelo, chefe, pausa, missões, diálogo narrativo, conversa com NPC, inventário cheio, interação com a cama e morte
 em cada resolução, além de uma prévia do aviso compacto de missão.
 Essa pasta é ignorada pelo Git. Os cenários são preparados sem gravar no diretório
 de saves da partida.

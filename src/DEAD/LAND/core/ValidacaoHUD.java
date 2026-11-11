@@ -43,7 +43,7 @@ public final class ValidacaoHUD {
     }
 
     private static void validarTextoEMissoes() {
-        BufferedImage imagem = new BufferedImage(768, 480, BufferedImage.TYPE_INT_RGB);
+        BufferedImage imagem = new BufferedImage(768, 584, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = imagem.createGraphics();
         try {
             g.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -81,6 +81,20 @@ public final class ValidacaoHUD {
                 exigir(++paginas < 100, "paginação deve terminar");
             }
             exigir(paginas > 1 && longa.isExibindoMensagem(), "páginas não encerram o diálogo");
+            InterfaceHistoria estendida = new InterfaceHistoria();
+            estendida.desenharDialogo(g, 768, 480, longa, 104);
+            int paginasEstendidas = 1;
+            while (estendida.avancarPagina(longa)) {
+                estendida.desenharDialogo(g, 768, 480, longa, 104);
+                exigir(++paginasEstendidas < 100, "paginação estendida deve terminar");
+            }
+            exigir(paginasEstendidas < paginas, "espaco do HUD deve reduzir o numero de paginas");
+            Rectangle compacta = LayoutHUD.dialogo(768, 480, 140, 0);
+            Rectangle ampliada = LayoutHUD.dialogo(768, 480, 140, 104);
+            exigir(compacta.y == ampliada.y && compacta.x == ampliada.x && compacta.width == ampliada.width,
+                    "dialogo cresce para baixo sem mudar topo ou largura");
+            exigir(ampliada.height == compacta.height + 104 && ampliada.y + ampliada.height > 480,
+                    "dialogo deve aproveitar a faixa inferior");
         } finally { g.dispose(); }
     }
 
