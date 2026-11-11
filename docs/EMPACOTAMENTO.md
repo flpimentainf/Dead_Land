@@ -1,7 +1,7 @@
 # Executável Windows
 
 As distribuições ficam somente em `dist/vX.Y.Z/`, com `Dead_Land.exe` diretamente
-dentro de cada pasta. Hoje estão mantidas `dist/v1.1.1/` e `dist/v1.1.2/`.
+dentro de cada pasta. Hoje estão mantidas `dist/v1.1.2/` e `dist/v1.2.0/`.
 O Java está em `runtime/`, os recursos em `app/repos/` e os três slots em `save/`.
 Mantenha essas pastas junto do executável. Para transportar o jogo, copie a pasta
 da versão inteira. Não são gerados ZIPs.
@@ -12,18 +12,18 @@ Em Windows com JDK 21 ou superior, x64:
 
 ```powershell
 .\rodar.ps1 -SomenteValidar
-.\empacotar.ps1 -Versao 1.2.0
+.\empacotar.ps1 -Versao 1.3.0
 ```
 
 O empacotador aplica estas regras:
 
 - A versão é obrigatória e deve ser maior que a última publicada.
-- A pasta é criada automaticamente como `dist/v1.2.0/`.
+- A pasta é criada automaticamente como `dist/v1.3.0/`.
 - O pacote é montado em `build/` e só depois publicado em `dist/`.
 - Cada slot leva a cópia mais recente encontrada nas versões mantidas, mesmo que
   a última jogatina tenha acontecido na versão anterior.
 - Depois da publicação, permanecem somente as duas versões mais recentes,
-  ordenadas numericamente. Ao publicar `v1.2.0`, ficam `v1.1.2` e `v1.2.0`.
+  ordenadas numericamente. Ao publicar `v1.3.0`, ficam `v1.2.0` e `v1.3.0`.
 - Não são criadas pastas `Atualizado`, `Versao-X.Y.Z`, pastas extras `Dead_Land`
   dentro da pasta da versão, nem arquivos ZIP.
 
