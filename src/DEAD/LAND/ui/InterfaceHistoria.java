@@ -92,13 +92,13 @@ public class InterfaceHistoria {
     }
     private void desenharEscolha(Graphics2D g2, int largura, int altura, SistemaHistoria historia) {
         List<String> linhas = new ArrayList<String>(historia.getMensagem());
-        linhas.add("");
-        linhas.add((historia.getOpcaoEscolhida() == 0 ? "> " : "  ") + historia.getOpcaoEscolha1());
-        linhas.add((historia.getOpcaoEscolhida() == 1 ? "> " : "  ") + historia.getOpcaoEscolha2());
+        List<String> opcoes = List.of(
+                (historia.getOpcaoEscolhida() == 0 ? "> " : "  ") + historia.getOpcaoEscolha1(),
+                (historia.getOpcaoEscolhida() == 1 ? "> " : "  ") + historia.getOpcaoEscolha2());
         String rodape = historia.isEscolhaNpc()
                 ? "W/S escolhe | ENTER/E confirma"
                 : "W/S escolhe | ENTER/E confirma | ESC 3x: segredo";
-        desenharCaixaTexto(g2, largura, altura, linhas, rodape, historia.getNomeNpcFalando());
+        desenharCaixaTexto(g2, largura, altura, linhas, rodape, historia.getNomeNpcFalando(), opcoes);
     }
 
     private List<String> chaveDialogo = List.of();
@@ -125,38 +125,48 @@ public class InterfaceHistoria {
 
     private void desenharCaixaTexto(Graphics2D g2, int largura, int altura,
             List<String> linhas, String rodape, String nomeNpc) {
+        desenharCaixaTexto(g2, largura, altura, linhas, rodape, nomeNpc, List.of());
+    }
+
+    private void desenharCaixaTexto(Graphics2D g2, int largura, int altura,
+            List<String> linhas, String rodape, String nomeNpc, List<String> opcoes) {
         int caixaX = 32, caixaLargura = largura - 64;
-        int textoX = caixaX + (nomeNpc == null ? 20 : 98);
-        g2.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        int textoX = caixaX + (nomeNpc == null ? 16 : 78);
+        g2.setFont(EstiloHUD.CORPO);
         FontMetrics fm = g2.getFontMetrics();
+        int larguraTexto = caixaX + caixaLargura - textoX - 16;
         List<String> quebradas = new ArrayList<>();
-        for (String linha : linhas) quebradas.addAll(TextoHUD.quebrar(linha, fm, caixaX + caixaLargura - textoX - 20));
+        for (String linha : linhas) quebradas.addAll(TextoHUD.quebrar(linha, fm, larguraTexto));
+        List<String> escolhas = new ArrayList<>();
+        for (String opcao : opcoes) escolhas.addAll(TextoHUD.quebrar(opcao, fm, larguraTexto));
         List<String> chave = linhas.stream().map(l -> l.startsWith("> ") || l.startsWith("  ") ? l.substring(2) : l).toList();
         if (!chave.equals(chaveDialogo)) {
             chaveDialogo = chave;
             paginaDialogo = 0;
         }
         int passo = fm.getHeight() + 2;
-        int capacidade = Math.max(1, (altura - 170) / passo);
+        int capacidade = Math.max(1, (140 - 36 - escolhas.size() * passo) / passo);
         totalPaginas = Math.max(1, (quebradas.size() + capacidade - 1) / capacidade);
         paginaDialogo = Math.min(paginaDialogo, totalPaginas - 1);
         int inicio = paginaDialogo * capacidade;
         int quantidade = Math.min(capacidade, quebradas.size() - inicio);
-        int caixaAltura = Math.max(190, 82 + quantidade * passo);
+        int caixaAltura = Math.max(90, 36 + (quantidade + escolhas.size()) * passo);
         int caixaY = altura - caixaAltura - 20;
         g2.setColor(new Color(12, 14, 20, 242));
         g2.fillRect(caixaX, caixaY, caixaLargura, caixaAltura);
         g2.setColor(new Color(200, 193, 170));
         g2.drawRect(caixaX, caixaY, caixaLargura, caixaAltura);
-        if (nomeNpc != null) desenharRetratoNpc(g2, caixaX + 18, caixaY + 22, nomeNpc);
+        if (nomeNpc != null) desenharRetratoNpc(g2, caixaX + 16, caixaY + 16, nomeNpc);
         g2.setColor(Color.WHITE);
-        for (int i = 0; i < quantidade; i++) g2.drawString(quebradas.get(inicio + i), textoX, caixaY + 30 + i * passo);
-        g2.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        for (int i = 0; i < quantidade; i++) g2.drawString(quebradas.get(inicio + i), textoX, caixaY + 24 + i * passo);
+        g2.setColor(EstiloHUD.DESTAQUE);
+        for (int i = 0; i < escolhas.size(); i++) g2.drawString(escolhas.get(i), textoX, caixaY + 24 + (quantidade + i) * passo);
+        g2.setFont(EstiloHUD.DICA);
         g2.setColor(Color.LIGHT_GRAY);
         String dica = paginaDialogo + 1 < totalPaginas ? "ENTER/E: próxima página" : rodape;
         List<String> dicas = TextoHUD.quebrar(dica + (totalPaginas > 1 ? " | " + (paginaDialogo + 1) + "/" + totalPaginas : ""),
                 g2.getFontMetrics(), caixaLargura - 40);
-        for (int i = 0; i < dicas.size(); i++) g2.drawString(dicas.get(i), caixaX + 20, caixaY + caixaAltura - 28 + i * 15);
+        for (int i = 0; i < dicas.size(); i++) g2.drawString(dicas.get(i), caixaX + 16, caixaY + caixaAltura - 12 + i * 13);
     }
     private void desenharRetratoNpc(Graphics2D g2, int x, int y, String nomeNpc) {
         String arquivo = getArquivoRetrato(nomeNpc);
@@ -166,7 +176,7 @@ public class InterfaceHistoria {
 
         if (icone.getIconWidth() > 0) {
             Image retrato = icone.getImage();
-            g2.drawImage(retrato, x, y, 64, 64, null);
+            g2.drawImage(retrato, x, y, 48, 48, null);
             return;
         }
 
