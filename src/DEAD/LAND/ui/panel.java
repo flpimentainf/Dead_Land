@@ -53,7 +53,8 @@ public class panel extends JPanel{
             "SALVAR",
             "MEMORIAS",
             "CONFIGURACOES",
-            "MENU PRINCIPAL"
+            "MENU PRINCIPAL",
+            "OBJETIVOS"
     };
     private static final String[] OPCOES_CONFIGURACOES = {
             "MASTER",
@@ -66,6 +67,7 @@ public class panel extends JPanel{
     private enum TelaPausa {
         PRINCIPAL,
         MEMORIAS,
+        OBJETIVOS,
         CONFIGURACOES
     }
 
@@ -110,6 +112,7 @@ public class panel extends JPanel{
     private Point posicaoMouse;
     private final ControladorEspada controladorEspada = new ControladorEspada();
     private int volumeArrastando = -1;
+    private int rolagemObjetivos;
 
 
     public panel(String posicao, Inventario inventario) {
@@ -315,7 +318,7 @@ public class panel extends JPanel{
                 opcaoMenuPausa = indice;
                 executarOpcaoPausa();
             }
-        } else if (telaPausa == TelaPausa.MEMORIAS) {
+        } else if (telaPausa == TelaPausa.MEMORIAS || telaPausa == TelaPausa.OBJETIVOS) {
             if (LayoutMenuPausa.voltarMemorias().contains(ponto)) voltarOuFecharMenuPausa();
         } else {
             int indice = LayoutMenuPausa.indiceConfiguracao(ponto);
@@ -395,11 +398,15 @@ public class panel extends JPanel{
 
             g2.setTransform(transformacaoOriginal);
             desenharFlashDano(g2, LARGURA_LOGICA, ALTURA_LOGICA);
-            if (deveDesenharBarraBoss()) {
+            LayoutHUD.Estado estadoHUD = getEstadoHUD();
+            if (this.feedback != null && LayoutHUD.mostrarAvisos(estadoHUD)) this.feedback.desenharHud(g2, LARGURA_LOGICA, ALTURA_LOGICA);
+            if (this.interfaceHistoria != null && estadoHUD != LayoutHUD.Estado.PAUSA && estadoHUD != LayoutHUD.Estado.MORTE) {
+                this.interfaceHistoria.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA, this.historia,
+                        LayoutHUD.mostrarObjetivos(estadoHUD));
+            }
+            if (deveDesenharBarraBoss() && (estadoHUD == LayoutHUD.Estado.CHEFE || estadoHUD == LayoutHUD.Estado.DIALOGO)) {
                 this.controladorInimigos.getChefe().desenharBarraBoss(g2, LARGURA_LOGICA);
             }
-            if (this.feedback != null) this.feedback.desenharHud(g2, LARGURA_LOGICA, ALTURA_LOGICA);
-            if (this.interfaceHistoria != null) this.interfaceHistoria.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA, this.historia);
             if (this.sistemaMorte != null) this.sistemaMorte.desenhar(g2, LARGURA_LOGICA, ALTURA_LOGICA);
             if (this.menuPausaAberto) desenharMenuPausa(g2);
         } finally {
@@ -415,8 +422,8 @@ public class panel extends JPanel{
         if (this.historia != null && (this.historia.isExibindoMensagem()
                 || this.historia.isExibindoEscolha() || this.historia.isTelaEscura())) return;
 
-        int topo = 8;
-        if (this.historia != null) {
+        int topo = deveDesenharBarraBoss() ? LayoutHUD.chefe(LARGURA_LOGICA).y + LayoutHUD.chefe(LARGURA_LOGICA).height + 8 : 8;
+        if (this.historia != null && !deveDesenharBarraBoss()) {
             String secundario = this.historia.getObjetivoSecundario();
             topo = secundario != null && !secundario.isBlank() ? 82 : 60;
         }
@@ -500,6 +507,13 @@ public class panel extends JPanel{
                 && this.controladorInimigos.getChefe().estaVivo();
     }
 
+    public LayoutHUD.Estado getEstadoHUD() {
+        return LayoutHUD.estado(menuPausaAberto, jogador != null && jogador.estaMorto(),
+                historia != null && historia.historiaFinalizada(),
+                historia != null && (historia.isExibindoMensagem() || historia.isExibindoEscolha() || historia.isTelaEscura()),
+                deveDesenharBarraBoss());
+    }
+
     public boolean atualizarMenuPausa(escutadorTeclado teclado) {
         if (!"centro".equals(this.posicao) || teclado == null) {
             return false;
@@ -544,6 +558,12 @@ public class panel extends JPanel{
     }
 
     private void atualizarNavegacaoMenuPausa(escutadorTeclado teclado) {
+        if (this.telaPausa == TelaPausa.OBJETIVOS) {
+            if (teclado.movePraCima && !teclaCimaPausaPressionada) rolagemObjetivos = Math.max(0, rolagemObjetivos - 1);
+            if (teclado.movePraBaixo && !teclaBaixoPausaPressionada) rolagemObjetivos++;
+            if (teclado.confirmar && !teclaConfirmarPausaPressionada) voltarOuFecharMenuPausa();
+            return;
+        }
         if (this.telaPausa == TelaPausa.CONFIGURACOES) {
             atualizarConfiguracoes(teclado);
             return;
@@ -636,6 +656,10 @@ public class panel extends JPanel{
                     this.aoVoltarMenuPrincipal.run();
                 }
                 break;
+            case 5:
+                this.telaPausa = TelaPausa.OBJETIVOS;
+                this.rolagemObjetivos = 0;
+                break;
             default:
                 break;
         }
@@ -654,7 +678,9 @@ public class panel extends JPanel{
         g2.setColor(new Color(0, 0, 0, 190));
         g2.fillRect(0, 0, LARGURA_LOGICA, ALTURA_LOGICA);
 
-        if (this.telaPausa == TelaPausa.MEMORIAS) {
+        if (this.telaPausa == TelaPausa.OBJETIVOS) {
+            desenharTelaObjetivos(g2);
+        } else if (this.telaPausa == TelaPausa.MEMORIAS) {
             desenharTelaMemorias(g2);
         } else if (this.telaPausa == TelaPausa.CONFIGURACOES) {
             desenharTelaConfiguracoes(g2);
@@ -670,6 +696,29 @@ public class panel extends JPanel{
             String texto = i == 1 ? "SALVAR SLOT " + this.slotAtual : OPCOES_PAUSA[i];
             desenharOpcao(g2, texto, y + i * 44, i == this.opcaoMenuPausa);
         }
+    }
+
+    private void desenharTelaObjetivos(Graphics2D g2) {
+        desenharTextoCentralizado(g2, "OBJETIVOS", 58, 28, Font.BOLD, Color.WHITE);
+        g2.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        java.util.List<String> linhas = new java.util.ArrayList<>();
+        linhas.add("PRINCIPAL");
+        linhas.addAll(TextoHUD.quebrar(historia.getObjetivoAtual(), g2.getFontMetrics(), 560));
+        linhas.add("");
+        linhas.add("SECUNDÁRIA");
+        String secundario = historia.getObjetivoSecundario();
+        linhas.addAll(TextoHUD.quebrar(secundario.isBlank() ? "Nenhuma missão secundária ativa." : secundario,
+                g2.getFontMetrics(), 560));
+        int capacidade = 12;
+        rolagemObjetivos = Math.max(0, Math.min(rolagemObjetivos, linhas.size() - Math.min(capacidade, linhas.size())));
+        for (int i = 0; i < capacidade && i + rolagemObjetivos < linhas.size(); i++) {
+            g2.drawString(linhas.get(i + rolagemObjetivos), 104, 100 + i * 23);
+        }
+        desenharTextoCentralizado(g2, "W/S: rolar | ENTER/ESC: voltar", 401, 13, Font.PLAIN, Color.LIGHT_GRAY);
+        Rectangle botao = LayoutMenuPausa.voltarMemorias();
+        g2.setColor(new Color(70, 70, 80));
+        g2.fillRect(botao.x, botao.y, botao.width, botao.height);
+        desenharTextoCentralizado(g2, "VOLTAR", 446, 16, Font.BOLD, Color.WHITE);
     }
 
     private void desenharTelaMemorias(Graphics2D g2) {

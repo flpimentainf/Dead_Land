@@ -143,14 +143,15 @@ public class Boss extends Inimigo {
             return;
         }
 
-        int largura = Math.min(520, larguraTela - 120);
+        java.awt.Rectangle area = DEAD.LAND.ui.LayoutHUD.chefe(larguraTela);
+        int largura = area.width - 16;
         int altura = 18;
-        int x = (larguraTela - largura) / 2;
-        int y = 18;
+        int x = area.x + 8;
+        int y = area.y + 24;
         float prop = vida / (float) vidaMaxima;
 
         g2.setColor(new Color(0, 0, 0, 190));
-        g2.fillRoundRect(x - 8, y - 16, largura + 16, 44, 10, 10);
+        g2.fillRect(area.x, area.y, area.width, area.height);
         g2.setFont(new Font("Serif", Font.BOLD, 16));
         g2.setColor(new Color(240, 220, 190));
         g2.drawString("O ESQUECIDO", x, y - 3);

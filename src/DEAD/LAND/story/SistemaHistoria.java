@@ -158,7 +158,7 @@ public class SistemaHistoria {
         return exibindoMensagem || exibindoEscolha || historiaFinalizada();
     }
 
-    private boolean historiaFinalizada() {
+    public boolean historiaFinalizada() {
         return estado == Estado.FINAL_ACORDAR
                 || estado == Estado.FINAL_FICAR
                 || estado == Estado.FINAL_SECRETO;

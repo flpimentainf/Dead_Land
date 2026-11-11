@@ -13,13 +13,17 @@ import javax.swing.ImageIcon;
 
 public class InterfaceHistoria {
     public void desenhar(Graphics2D g2, int largura, int altura, SistemaHistoria historia) {
+        desenhar(g2, largura, altura, historia, true);
+    }
+
+    public void desenhar(Graphics2D g2, int largura, int altura, SistemaHistoria historia, boolean objetivos) {
         if (historia == null) return;
 
         if (historia.isTelaEscura()) {
             desenharEscurecimento(g2, largura, altura);
         }
 
-        desenharObjetivo(g2, largura, historia);
+        if (objetivos) desenharObjetivo(g2, largura, historia);
 
         if (historia.isExibindoEscolha()) {
             desenharEscolha(g2, largura, altura, historia);
