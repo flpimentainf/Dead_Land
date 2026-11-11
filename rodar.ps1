@@ -1,4 +1,4 @@
-param([switch]$Validar)
+param([switch]$Validar, [switch]$SomenteValidar)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -38,11 +38,14 @@ try {
         throw 'A compilacao falhou. O jogo nao foi iniciado.'
     }
 
-    if ($Validar) {
-        & $javaExecutable -cp $classesDirectory DEAD.LAND.core.ValidacaoTecnica
-        if ($LASTEXITCODE -ne 0) {
-            throw 'As validacoes tecnicas falharam. O jogo nao foi iniciado.'
+    if ($Validar -or $SomenteValidar) {
+        foreach ($validacao in @('ValidacaoTecnica', 'ValidacaoSlots', 'ValidacaoHUD')) {
+            & $javaExecutable -cp $classesDirectory "DEAD.LAND.core.$validacao"
+            if ($LASTEXITCODE -ne 0) {
+                throw "A validacao $validacao falhou. O jogo nao foi iniciado."
+            }
         }
+        if ($SomenteValidar) { return }
     }
 
     Write-Host 'Iniciando o jogo atualizado...'

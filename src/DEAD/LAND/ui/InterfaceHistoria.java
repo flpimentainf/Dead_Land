@@ -31,7 +31,7 @@ public class InterfaceHistoria {
             Graphics2D painel = (Graphics2D) g2.create();
             try {
                 float progresso = Math.min(1f, (System.nanoTime() - inicioPainelNs) / 150_000_000f);
-                painel.setComposite(java.awt.AlphaComposite.SrcOver.derive(0.35f + 0.65f * progresso));
+                painel.setComposite(java.awt.AlphaComposite.SrcOver.derive(0.85f + 0.15f * progresso));
                 desenharObjetivo(painel, largura, historia);
             } finally { painel.dispose(); }
         }
@@ -105,6 +105,13 @@ public class InterfaceHistoria {
     private int paginaDialogo;
     private int totalPaginas = 1;
     private List<String> mensagemOrigem = List.of();
+
+    public void resetarDialogo() {
+        chaveDialogo = List.of();
+        mensagemOrigem = List.of();
+        paginaDialogo = 0;
+        totalPaginas = 1;
+    }
 
     public boolean avancarPagina(SistemaHistoria historia) {
         if (!historia.getMensagem().equals(mensagemOrigem) || paginaDialogo + 1 >= totalPaginas) return false;

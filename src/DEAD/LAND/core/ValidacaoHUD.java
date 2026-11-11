@@ -10,6 +10,7 @@ public final class ValidacaoHUD {
         SwingUtilities.invokeAndWait(ValidacaoHUD::validarPrioridades);
         SwingUtilities.invokeAndWait(ValidacaoHUD::validarHUDInferior);
         validarTextoEMissoes();
+        SwingUtilities.invokeAndWait(ValidacaoVisualHUD::validar);
         System.out.println("Validacoes do HUD OK");
     }
 
@@ -123,6 +124,35 @@ public final class ValidacaoHUD {
             loop.actionPerformed(null);
             exigir("Sem poções de cura.".equals(cena.getFeedback().getMensagemCentro()), "H sem poção oferece feedback");
             exigir(inventario.getQuantidadeCura() == 0, "ação indisponível não altera inventário");
+            validarConsultaLonga(cena);
         } finally { cena.pausarJogo(); }
+    }
+
+    private static void validarConsultaLonga(panel cena) {
+        GameState state = cena.criarGameState(1);
+        state.objetivoHistoria = "Encontre a chave, explore a floresta e recupere suas lembranças. ".repeat(40);
+        state.objetivoSecundario = "Retorne ao Caçador após encontrar os fragmentos de memória. ".repeat(20);
+        cena.aplicarGameState(state);
+        cena.setSize(768, 480);
+        var tecla = new DEAD.LAND.input.escutadorTeclado();
+        tecla.abrirMenu = true; cena.atualizarMenuPausa(tecla);
+        tecla.abrirMenu = false; cena.atualizarMenuPausa(tecla);
+        cena.dispatchEvent(new java.awt.event.MouseEvent(cena, java.awt.event.MouseEvent.MOUSE_PRESSED,
+                System.currentTimeMillis(), 0, 384, 378, 1, false, java.awt.event.MouseEvent.BUTTON1));
+        BufferedImage inicio = pintar(cena);
+        cena.dispatchEvent(new java.awt.event.MouseWheelEvent(cena, java.awt.event.MouseEvent.MOUSE_WHEEL,
+                System.currentTimeMillis(), 0, 384, 240, 0, false, java.awt.event.MouseWheelEvent.WHEEL_UNIT_SCROLL, 3, 1000));
+        BufferedImage fim = pintar(cena);
+        int diferencas = 0;
+        for (int y = 85; y < 380; y++) for (int x = 100; x < 670; x++) {
+            if (inicio.getRGB(x, y) != fim.getRGB(x, y)) diferencas++;
+        }
+        exigir(diferencas > 100, "rolagem permite consultar fim de objetivos extensos");
+    }
+
+    private static BufferedImage pintar(panel cena) {
+        BufferedImage imagem = new BufferedImage(768, 480, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = imagem.createGraphics(); cena.paint(g); g.dispose();
+        return imagem;
     }
 }

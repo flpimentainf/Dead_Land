@@ -150,7 +150,7 @@ public class Boss extends Inimigo {
         int y = area.y + 24;
         float prop = vida / (float) vidaMaxima;
 
-        g2.setColor(new Color(0, 0, 0, 190));
+        g2.setColor(new Color(12, 14, 20));
         g2.fillRect(area.x, area.y, area.width, area.height);
         g2.setFont(DEAD.LAND.ui.EstiloHUD.TITULO.deriveFont(16f));
         g2.setColor(new Color(240, 220, 190));

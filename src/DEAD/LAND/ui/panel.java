@@ -475,8 +475,9 @@ public class panel extends JPanel{
         if (this.historia != null && !deveDesenharBarraBoss()) {
             topo = 26 + InterfaceHistoria.alturaObjetivos(g2, historia);
         }
+        int rodape = notificacoesObjetivos.getAtual() != null || feedback != null && feedback.isMensagemVisivel() ? 150 : 8;
         Rectangle limites = new Rectangle(this.camera.getXRender() + 8, this.camera.getYRender() + topo,
-                LARGURA_LOGICA - 16, ALTURA_LOGICA - topo - 8);
+                LARGURA_LOGICA - 16, ALTURA_LOGICA - topo - rodape);
         // A indicação acompanha a mesma prioridade da ação executada pela tecla E.
         boolean falando = this.controladorNPCs != null
                 && this.controladorNPCs.desenharIndicadorInteracao(g2, this, limites);
@@ -566,6 +567,11 @@ public class panel extends JPanel{
     public void avancarPaginaDialogo() { if (interfaceHistoria != null) interfaceHistoria.avancarPagina(historia); }
     public void atualizarInterface() {
         if (historia != null) notificacoesObjetivos.atualizar(historia, LayoutHUD.mostrarAvisos(getEstadoHUD()));
+    }
+
+    public void sincronizarInterface() {
+        notificacoesObjetivos.limpar(historia);
+        interfaceHistoria.resetarDialogo();
     }
 
     public boolean atualizarMenuPausa(escutadorTeclado teclado) {
@@ -979,7 +985,7 @@ public class panel extends JPanel{
 
         atualizarInventario();
         sincronizarCameraImediatamente();
-        notificacoesObjetivos.limpar(historia);
+        sincronizarInterface();
         requestFocusInWindow();
     }
 

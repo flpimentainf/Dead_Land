@@ -67,6 +67,7 @@ public class SistemaFeedback {
     }
 
     public String getMensagemCentro() { return mensagemCentro; }
+    public boolean isMensagemVisivel() { return framesMensagemCentro > 0 && !mensagemCentro.isBlank(); }
 
     public void desenharMundo(Graphics2D g2) {
         Composite composicaoOriginal = g2.getComposite();

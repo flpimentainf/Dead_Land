@@ -28,7 +28,11 @@ public class IconeInteracao {
             Rectangle caixa = new Rectangle(porta.x + (porta.width - TAMANHO) / 2,
                     porta.y + (porta.height - TAMANHO) / 2, TAMANHO, TAMANHO);
             // A porta ancora o E; o jogador pode passar atrás da indicação.
-            desenharBotao(g2, caixa, "E", new Color(120, 70, 20, 220));
+            if (limites.contains(caixa)) {
+                desenharBotao(g2, caixa, "E", new Color(120, 70, 20, 220));
+            } else {
+                desenharIndicador(g2, porta, limites, jogador, "E", new Color(120, 70, 20, 220));
+            }
         }
     }
 

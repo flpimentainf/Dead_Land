@@ -114,6 +114,7 @@ public class SistemaCheckpoint {
                     checkpointAtual.cenarioIndex,
                     bossDerrotado
             );
+            cenaDoJogo.sincronizarInterface();
         }
 
         if (cenaDoJogo.getHistoria() != null) {
