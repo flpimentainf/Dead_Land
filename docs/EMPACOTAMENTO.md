@@ -1,10 +1,15 @@
 # Executável Windows
 
 As distribuições ficam somente em `dist/vX.Y.Z/`, com `Dead_Land.exe` diretamente
-dentro de cada pasta. Hoje estão mantidas `dist/v1.1.2/` e `dist/v1.2.0/`.
+dentro de cada pasta. Hoje estão mantidas `dist/v1.2.0/` e `dist/v1.2.1/`.
 O Java está em `runtime/`, os recursos em `app/repos/` e os três slots em `save/`.
 Mantenha essas pastas junto do executável. Para transportar o jogo, copie a pasta
 da versão inteira. Não são gerados ZIPs.
+
+A v1.2.1 incorpora a floresta enviada em `MapaFloresta.java`, com 50 × 25 tiles,
+uma orbe e três poções. O nascimento após a queda continua em `(745, 200)` e o
+retorno após o final em `(745, 335)`. As trilhas foram adaptadas para permanecerem
+transitáveis, mantendo o visual de terra e as colisões dos demais cenários.
 
 ## Próximas atualizações
 
@@ -23,7 +28,7 @@ O empacotador aplica estas regras:
 - Cada slot leva a cópia mais recente encontrada nas versões mantidas, mesmo que
   a última jogatina tenha acontecido na versão anterior.
 - Depois da publicação, permanecem somente as duas versões mais recentes,
-  ordenadas numericamente. Ao publicar `v1.3.0`, ficam `v1.2.0` e `v1.3.0`.
+  ordenadas numericamente. Ao publicar `v1.3.0`, ficam `v1.2.1` e `v1.3.0`.
 - Não são criadas pastas `Atualizado`, `Versao-X.Y.Z`, pastas extras `Dead_Land`
   dentro da pasta da versão, nem arquivos ZIP.
 
