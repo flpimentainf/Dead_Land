@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 
 public final class ValidacaoHUD {
     public static void main(String[] args) throws Exception {
+        ValidacaoInteracao.validar();
         SwingUtilities.invokeAndWait(ValidacaoHUD::validarPrioridades);
         SwingUtilities.invokeAndWait(ValidacaoDialogos::validar);
         SwingUtilities.invokeAndWait(ValidacaoHUD::validarHUDInferior);

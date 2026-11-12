@@ -232,10 +232,9 @@ public class NPC extends Rectangle {
         }
     }
 
-    public void desenharIndicadorInteracao(Graphics2D g2, Rectangle limites, Rectangle jogador) {
-        Rectangle personagemENome = new Rectangle(x, y - 19, width, height + 19);
-        IconeInteracao.desenharIndicador(g2, personagemENome, limites, jogador,
-                "E  Falar", new Color(30, 30, 30, 190));
+    public void desenharIndicadorInteracao(Graphics2D g2, Rectangle limites, Rectangle jogador, Rectangle... obstaculos) {
+        IconeInteracao.desenharIndicador(g2, this, limites, jogador,
+                "E", new Color(30, 30, 30, 220), obstaculos);
     }
 
     private Image getSpriteAtual() {

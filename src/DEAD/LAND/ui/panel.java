@@ -493,21 +493,32 @@ public class panel extends JPanel{
         if (this.historia != null && (this.historia.isExibindoMensagem()
                 || this.historia.isExibindoEscolha() || this.historia.isTelaEscura())) return;
 
-        int topo = deveDesenharBarraBoss() ? LayoutHUD.chefe(LARGURA_LOGICA).y + LayoutHUD.chefe(LARGURA_LOGICA).height + 8 : 8;
+        java.util.List<Rectangle> paineis = new java.util.ArrayList<>();
+        if (deveDesenharBarraBoss()) paineis.add(LayoutHUD.chefe(LARGURA_LOGICA));
         if (this.historia != null && !deveDesenharBarraBoss()) {
-            topo = 26 + InterfaceHistoria.alturaObjetivos(g2, historia);
+            paineis.add(new Rectangle(20, 18, 280, InterfaceHistoria.alturaObjetivos(g2, historia)));
         }
         if (notificacoesObjetivos.getAtual() != null || notificacoesConquistas.visivel()) {
             Rectangle aviso = LayoutHUD.avisoMissao(LARGURA_LOGICA, deveDesenharBarraBoss());
-            topo = Math.max(topo, aviso.y + aviso.height + 8);
+            paineis.add(aviso);
         }
-        int rodape = feedback != null && feedback.isMensagemVisivel() ? 150 : 8;
-        Rectangle limites = new Rectangle(this.camera.getXRender() + 8, this.camera.getYRender() + topo,
-                LARGURA_LOGICA - 16, ALTURA_LOGICA - topo - rodape);
+        if (feedback != null && feedback.isMensagemVisivel()) paineis.add(new Rectangle(0, 330, 768, 150));
+        for (Rectangle area : paineis) area.translate(camera.getXRender(), camera.getYRender());
+        Rectangle[] obstaculos = paineis.toArray(Rectangle[]::new);
+        Rectangle limites = new Rectangle(this.camera.getXRender() + 8, this.camera.getYRender() + 8,
+                LARGURA_LOGICA - 16, ALTURA_LOGICA - 16);
         // A indicação acompanha a mesma prioridade da ação executada pela tecla E.
         boolean falando = this.controladorNPCs != null
-                && this.controladorNPCs.desenharIndicadorInteracao(g2, this, limites);
-        if (!falando) this.iconeInteracao.desenharArea(g2, this.cenario, getJogador(), limites);
+                && this.controladorNPCs.desenharIndicadorInteracao(g2, this, limites, obstaculos);
+        if (!falando) {
+            if (getInteracaoPerto() != null) {
+                this.iconeInteracao.desenharArea(g2, this.cenario, getJogador(), limites, obstaculos);
+            } else if (controladorItens != null) {
+                var item = controladorItens.getItemPerto(getJogador(), cenario.getCenarioAtualIndex());
+                if (item != null) IconeInteracao.desenharIndicador(g2, item, limites, getJogador(),
+                        "E  COLETAR", new Color(27, 49, 31, 230), obstaculos);
+            }
+        }
     }
 
     private BufferedImage getQuadroLogico() {

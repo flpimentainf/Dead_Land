@@ -10,9 +10,9 @@ import java.awt.Rectangle;
 
 public class IconeInteracao {
     private static final int TAMANHO = 24;
-    private static final int ESPACO = 8;
+    private static final int ESPACO = 4;
 
-    public void desenharArea(Graphics2D g2, tileMap cenario, player jogador, Rectangle limites) {
+    public void desenharArea(Graphics2D g2, tileMap cenario, player jogador, Rectangle limites, Rectangle... obstaculos) {
         jogador.atualizarAreaColisao();
         tileMap.InteracaoPerto interacao = cenario.getInteracaoPerto(jogador.AreaColisao);
 
@@ -22,25 +22,25 @@ public class IconeInteracao {
 
         if (interacao.tipo == tileMap.TIPO_CAMA) {
             desenharIndicador(g2, interacao.area, limites, jogador,
-                    "E  DORMIR", new Color(24, 24, 32, 220));
+                    "E  DORMIR", new Color(24, 24, 32, 220), obstaculos);
         } else if (interacao.tipo == tileMap.TIPO_PORTA) {
             Rectangle porta = interacao.area;
             Rectangle caixa = new Rectangle(porta.x + (porta.width - TAMANHO) / 2,
                     porta.y + (porta.height - TAMANHO) / 2, TAMANHO, TAMANHO);
             // A porta ancora o E; o jogador pode passar atrás da indicação.
-            if (limites.contains(caixa)) {
+            if (limites.contains(caixa) && livre(caixa, obstaculos)) {
                 desenharBotao(g2, caixa, "E", new Color(120, 70, 20, 220));
             } else {
-                desenharIndicador(g2, porta, limites, jogador, "E", new Color(120, 70, 20, 220));
+                desenharIndicador(g2, porta, limites, jogador, "E", new Color(120, 70, 20, 220), obstaculos);
             }
         }
     }
 
     public static void desenharIndicador(Graphics2D g2, Rectangle alvo, Rectangle limites,
-            Rectangle jogador, String texto, Color corFundo) {
+            Rectangle jogador, String texto, Color corFundo, Rectangle... obstaculos) {
         int largura = "E".equals(texto) ? TAMANHO : 96;
-        Rectangle caixa = posicionar(alvo, limites, jogador, largura);
-        desenharBotao(g2, caixa, texto, corFundo);
+        Rectangle caixa = posicionar(alvo, limites, jogador, largura, obstaculos);
+        if (caixa != null) desenharBotao(g2, caixa, texto, corFundo);
     }
 
     private static void desenharBotao(Graphics2D g2, Rectangle caixa, String texto, Color corFundo) {
@@ -61,22 +61,27 @@ public class IconeInteracao {
         } finally { g.dispose(); }
     }
 
-    private static Rectangle posicionar(Rectangle alvo, Rectangle limites, Rectangle jogador, int largura) {
+    public static Rectangle posicionar(Rectangle alvo, Rectangle limites, Rectangle jogador, int largura,
+            Rectangle... obstaculos) {
         int x = limitar(alvo.x + (alvo.width - largura) / 2, limites.x, limites.width - largura);
         int acima = alvo.y - TAMANHO - ESPACO;
-        // Prioriza o centro acima do alvo e mantém a caixa fora do personagem.
+        // Cada opção permanece a 4px do alvo. Nunca desloca a indicação até o HUD.
+        int lateralY = limitar(alvo.y + (alvo.height - TAMANHO) / 2, limites.y, limites.height - TAMANHO);
         Rectangle[] candidatos = {
+            new Rectangle(alvo.x + alvo.width + ESPACO, lateralY, largura, TAMANHO),
+            new Rectangle(alvo.x - largura - ESPACO, lateralY, largura, TAMANHO),
             new Rectangle(x, acima, largura, TAMANHO),
-            new Rectangle(x, Math.min(alvo.y, jogador.y) - TAMANHO - ESPACO, largura, TAMANHO),
-            new Rectangle(x, alvo.y + alvo.height + ESPACO, largura, TAMANHO),
-            new Rectangle(x, Math.max(alvo.y + alvo.height, jogador.y + jogador.height) + ESPACO, largura, TAMANHO),
-            new Rectangle(alvo.x - largura - ESPACO, alvo.y, largura, TAMANHO),
-            new Rectangle(alvo.x + alvo.width + ESPACO, alvo.y, largura, TAMANHO)
+            new Rectangle(x, alvo.y + alvo.height + ESPACO, largura, TAMANHO)
         };
         for (Rectangle candidato : candidatos) {
-            if (limites.contains(candidato) && !candidato.intersects(jogador)) return candidato;
+            if (limites.contains(candidato) && !candidato.intersects(jogador) && livre(candidato, obstaculos)) return candidato;
         }
-        return new Rectangle(x, limitar(acima, limites.y, limites.height - TAMANHO), largura, TAMANHO);
+        return null;
+    }
+
+    private static boolean livre(Rectangle area, Rectangle[] obstaculos) {
+        for (Rectangle obstaculo : obstaculos) if (obstaculo.intersects(area)) return false;
+        return true;
     }
 
     private static int limitar(int valor, int inicio, int espacoDisponivel) {

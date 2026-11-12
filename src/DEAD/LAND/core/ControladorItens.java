@@ -7,9 +7,6 @@ import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.ui.panel;
 import DEAD.LAND.world.tileMap;
 import DEAD.LAND.world.MapaFloresta;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,23 +59,15 @@ public class ControladorItens {
                     null
             );
 
-            int distancia = (int) Math.sqrt(
-                Math.pow(jogador.x - itemDoJogo.x, 2) + Math.pow(jogador.y - itemDoJogo.y, 2)
-            );
-
-            if (distancia < 80) {
-                int bx = itemDoJogo.x + itemDoJogo.width / 2 - 32;
-                int by = itemDoJogo.y - 22;
-                g2.setColor(new Color(30, 150, 30, 180));
-                g2.fillRoundRect(bx, by, 82, 18, 6, 6);
-                g2.setColor(Color.WHITE);
-                g2.drawRoundRect(bx, by, 82, 18, 6, 6);
-                g2.setFont(new Font("Arial", Font.BOLD, 11));
-                FontMetrics fm = g2.getFontMetrics();
-                String txt = "E - Coletar";
-                g2.drawString(txt, bx + (82 - fm.stringWidth(txt)) / 2, by + 13);
-            }
         }
+    }
+
+    public item getItemPerto(player jogador, int cenarioIndex) {
+        for (item coletavel : itens) {
+            if (!coletavel.foiColetado() && coletavel.getCenarioIndex() == cenarioIndex
+                    && coletavel.intersects(jogador)) return coletavel;
+        }
+        return null;
     }
 
     public void atualizar(panel cenaDoJogo, escutadorTeclado teclado) {

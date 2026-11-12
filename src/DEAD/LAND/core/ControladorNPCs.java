@@ -58,10 +58,10 @@ public class ControladorNPCs {
         }
     }
 
-    public boolean desenharIndicadorInteracao(Graphics2D g2, panel cenaDoJogo, Rectangle limites) {
+    public boolean desenharIndicadorInteracao(Graphics2D g2, panel cenaDoJogo, Rectangle limites, Rectangle... obstaculos) {
         NPC npc = getNpcPerto(cenaDoJogo);
         if (npc != null) {
-            npc.desenharIndicadorInteracao(g2, limites, cenaDoJogo.getJogador());
+            npc.desenharIndicadorInteracao(g2, limites, cenaDoJogo.getJogador(), obstaculos);
             return true;
         }
         return false;
