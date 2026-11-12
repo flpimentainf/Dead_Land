@@ -13,8 +13,12 @@ As construções são somente fachadas, sem interiores ou menus de loja nesta ve
 - `MapaVila.criarTerreno()`: grama e terra transitáveis, IDs 55 e 5.
 - `MapaVila.criarObjetos()`: construções (66), fonte (67), barricada (68) e árvores (69).
 - `CONSTRUCOES`: sete objetos, cada um com posição, dimensões, tipo e estilo.
-- `RenderizadorVila`: monta fachadas com paredes, janelas, portas, telhados,
-  chaminés, floreiras, toldo do armazém e emblema da guilda.
+- `RenderizadorVila`: compõe terreno, fachadas, fonte, árvores e placas.
+- `RenderizadorFachadas`: desenhos originais na grade de 3 pixels, com telhados
+  em dois planos, empenas, anexos, portas arqueadas, óculos, floreiras e toldos.
+  Os letreiros usam letras de 5 × 7 pixels para permanecerem legíveis.
+- `RenderizadorCaminhosVila`: curvas em degraus de 6 pixels e uma paleta curta,
+  com manchas de terra espaçadas. A forma dos percursos e as colisões são mantidas.
 - `RenderizadorArvores`: troncos, galhos e copas maiores que um tile, reutilizados
   na vila e nos antigos IDs de vegetação. Não modifica as colisões da floresta.
 

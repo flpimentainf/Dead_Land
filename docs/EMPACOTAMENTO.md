@@ -1,7 +1,7 @@
 # Executável Windows
 
 As distribuições ficam somente em `dist/vX.Y.Z/`, com `Dead_Land.exe` diretamente
-dentro de cada pasta. Hoje estão mantidas `dist/v1.2.2/` e `dist/v1.3.0/`.
+dentro de cada pasta. Os pacotes atual e anterior são `dist/v1.3.1/` e `dist/v1.3.0/`.
 O Java está em `runtime/`, os recursos em `app/repos/` e os três slots em `save/`.
 Mantenha essas pastas junto do executável. Para transportar o jogo, copie a pasta
 da versão inteira. Não são gerados ZIPs.
@@ -22,6 +22,10 @@ segura, registra checkpoint e adapta posições de saves antigos quando necessá
 As árvores foram redesenhadas e os indicadores de interação ficam junto dos alvos.
 Detalhes: [Mapa da vila](MAPA_VILA.md).
 
+A v1.3.1 redesenha as fachadas com volumes medievais variados e pixel art mais
+marcada: empenas, anexos laterais, portas e janelas arqueadas e letreiros pixelados.
+Os caminhos usam cores de terra mais simples e pequenos degraus nas curvas.
+
 ## Próximas atualizações
 
 Em Windows com JDK 21 ou superior, x64:
@@ -39,12 +43,25 @@ O empacotador aplica estas regras:
 - Cada slot leva a cópia mais recente encontrada nas versões mantidas, mesmo que
   a última jogatina tenha acontecido na versão anterior.
 - Depois da publicação, permanecem somente as duas versões mais recentes,
-  ordenadas numericamente. Ao publicar `v1.4.0`, ficam `v1.3.0` e `v1.4.0`.
+  ordenadas numericamente. Ao publicar `v1.4.0`, ficam `v1.3.1` e `v1.4.0`.
 - Não são criadas pastas `Atualizado`, `Versao-X.Y.Z`, pastas extras `Dead_Land`
   dentro da pasta da versão, nem arquivos ZIP.
 
 A limpeza verifica o diretório, os marcadores do jogo e a versão do executável
 antes de remover uma versão antiga. Versões já existentes não são sobrescritas.
+Arquivos em uso são verificados antes da exclusão para evitar uma limpeza parcial.
+Se uma versão antiga estiver aberta, salve e feche a partida para liberar a pasta.
+Caso o pacote novo já tenha sido publicado, a conclusão pode ser retomada sem
+recriá-lo, sincronizando novamente os slots antes da limpeza:
+
+```powershell
+Import-Module .\ferramentas\Distribuicao.psm1 -Force
+$raizDistribuicao = Join-Path $PWD 'dist'
+$versoesJogo = @(Get-VersoesJogo $raizDistribuicao)
+Copy-SavesRecentes -Origens @($versoesJogo | ForEach-Object { Join-Path $_.Pasta 'save' }) -Destino (Join-Path $versoesJogo[0].Pasta 'save')
+Remove-VersoesAntigasJogo $raizDistribuicao
+```
+
 Os saves usados ao executar os fontes continuam separados, em `save/` na raiz.
 Na primeira distribuição, essa pasta serve como origem quando ainda não existem
 versões anteriores.
