@@ -1,12 +1,10 @@
 package DEAD.LAND.world;
 
-import DEAD.LAND.core.ResourceManager;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 /** Fachadas montadas como objetos inteiros, sobre o terreno contínuo da vila. */
 public final class RenderizadorVila {
@@ -14,7 +12,6 @@ public final class RenderizadorVila {
     private final Map<MapaVila.Construcao, BufferedImage> fachadas = new HashMap<>();
     private final RenderizadorFachadas fachadasPixel = new RenderizadorFachadas();
     private final RenderizadorArvores arvores = new RenderizadorArvores();
-    private final Image terra = ResourceManager.getInstancia().carregarImagem("repos/tileset/terra.png");
 
     public void desenhar(Graphics2D g, int[][] objetos) {
         if (terreno == null) terreno = criarTerreno();
@@ -48,29 +45,7 @@ public final class RenderizadorVila {
             for (int l = 0; l < 25; l++) for (int c = 0; c < 50; c++) {
                 tiles.desenhar(g, 55, l, c, CenarioId.BOSQUE_ARI, false);
             }
-            Shape caminhos = MapaVila.caminhos();
-            g.setColor(new Color(56, 63, 37));
-            g.setStroke(new BasicStroke(12, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-            g.draw(caminhos);
-            g.setClip(caminhos);
-            for (int l = 0; l < 25; l++) for (int c = 0; c < 50; c++) {
-                g.drawImage(terra, c * 48, l * 48, 48, 48, null);
-            }
-            g.setColor(new Color(147, 113, 74, 105)); g.fillRect(0, 0, 2400, 1200);
-            Random rng = new Random(1841);
-            for (int i = 0; i < 10000; i++) {
-                int x = rng.nextInt(1200) * 2, y = rng.nextInt(600) * 2;
-                g.setColor(i % 3 == 0 ? new Color(194, 163, 111, 95) : new Color(65, 54, 40, 55));
-                g.fillRect(x, y, i % 5 == 0 ? 6 : 2, 2);
-            }
-            g.setClip(null);
-            // Pedras pequenas e tufos espaçados quebram o recorte perfeito das estradas.
-            for (int i = 0; i < 900; i++) {
-                int x = rng.nextInt(1200) * 2, y = rng.nextInt(600) * 2;
-                if (caminhos.contains(x, y) || !caminhos.intersects(x - 8, y - 8, 16, 16)) continue;
-                g.setColor(new Color(87, 104, 51)); g.fillRect(x, y, 4, 4);
-                g.setColor(new Color(45, 67, 34)); g.fillRect(x + 2, y - 2, 2, 4);
-            }
+            RenderizadorCaminhosVila.desenhar(g, MapaVila.caminhos());
             g.setColor(new Color(91, 100, 86));
             g.setStroke(new BasicStroke(22));
             g.draw(new Ellipse2D.Double(20.5 * 48, 10.5 * 48, 5 * 48, 5 * 48));
