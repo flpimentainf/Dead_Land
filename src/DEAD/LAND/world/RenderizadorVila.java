@@ -45,7 +45,7 @@ public final class RenderizadorVila {
             for (int l = 0; l < 25; l++) for (int c = 0; c < 50; c++) {
                 tiles.desenhar(g, 55, l, c, CenarioId.BOSQUE_ARI, false);
             }
-            RenderizadorCaminhosVila.desenhar(g, MapaVila.caminhos());
+            RenderizadorCaminhos.desenhar(g, MapaVila.caminhos());
             g.setColor(new Color(91, 100, 86));
             g.setStroke(new BasicStroke(22));
             g.draw(new Ellipse2D.Double(20.5 * 48, 10.5 * 48, 5 * 48, 5 * 48));

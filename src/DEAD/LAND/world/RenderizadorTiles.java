@@ -8,6 +8,8 @@ import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.Rectangle;
+import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +32,8 @@ public final class RenderizadorTiles {
     private static final int TAMANHO = tiles.LARGURA;
     private final Image[] materiais = new Image[Material.values().length];
     private final Map<Integer, BufferedImage> cache = new HashMap<>();
+    private record ChaveTrilha(int id, int variacao, int cantos) {}
+    private final Map<ChaveTrilha, BufferedImage> trilhas = new HashMap<>();
     private final RenderizadorTorre torre = new RenderizadorTorre();
     private final RenderizadorArvores arvores = new RenderizadorArvores();
     private int[][] mapaAtual;
@@ -43,6 +47,13 @@ public final class RenderizadorTiles {
 
     public boolean desenhar(Graphics2D g, int id, int linha, int coluna, CenarioId cenario, boolean objeto) {
         if (!temNovoVisual(id)) return false;
+        if (ehTrilha(id)) {
+            int variacao = Math.floorMod(coluna * 7 + linha * 3, 8);
+            int cantos = cantosTrilha(linha, coluna);
+            BufferedImage imagem = trilhas.computeIfAbsent(new ChaveTrilha(id, variacao, cantos), this::criarTrilha);
+            g.drawImage(imagem, coluna * TAMANHO, linha * TAMANHO, null);
+            return true;
+        }
         if (id == 56 || (id == 60 && cenario == CenarioId.TRILHA_LATERAL)) {
             if (!objeto) {
                 int variacao = Math.floorMod(coluna * 7 + linha * 3, 8);
@@ -101,18 +112,15 @@ public final class RenderizadorTiles {
             } else if (id == 39) {
                 textura(g, Material.MADEIRA_CLARA, variacao);
             } else if (id == 41) {
-                textura(g, piso(cenario), variacao);
-                if (cenario == CenarioId.TRILHA_LATERAL) detalhesVegetacao(g, variacao);
+                if (cenario == CenarioId.TRILHA_LATERAL) RenderizadorCaminhos.desenhar(g, new Rectangle(0, 0, 48, 48), 48, 48, variacao);
+                else textura(g, piso(cenario), variacao);
             } else if (id == 61) {
                 if (cenario == CenarioId.REGIAO_PRINCIPAL || cenario == CenarioId.AREA_MEMORIA) {
                     desenharTapete(g);
                     return tile;
                 }
-                Material material = switch (cenario) {
-                    case TRILHA_LATERAL -> Material.PISO_MUSGO;
-                    default -> piso(cenario);
-                };
-                textura(g, material, variacao);
+                if (cenario == CenarioId.TRILHA_LATERAL) RenderizadorCaminhos.desenhar(g, new Rectangle(0, 0, 48, 48), 48, 48, variacao);
+                else textura(g, piso(cenario), variacao);
             } else if (id == 54 || id == 55) {
                 textura(g, Material.GRAMA, variacao);
                 detalhesVegetacao(g, variacao);
@@ -222,19 +230,46 @@ public final class RenderizadorTiles {
         int direita = id == 3 || id == 6 || id == 59 ? 42 : 48;
         int cima = id >= 57 && id <= 59 ? 8 : 0;
         int baixo = id == 4 || id == 6 ? 42 : 48;
-        texturaRecortada(g, Material.TERRA, new java.awt.Rectangle(esquerda, cima, direita - esquerda, baixo - cima), variacao);
-        g.setColor(new Color(53, 80, 37));
-        if (esquerda > 0) {
-            g.fillRect(4, 4, 4, 8);
-            g.fillRect(6, 26, 4, 6);
-        }
-        if (direita < 48) {
-            g.fillRect(40, 12, 4, 6);
-            g.fillRect(38, 32, 6, 4);
-        }
-        if (cima > 0) {
-            for (int x = 4; x < 46; x += 10) g.fillRect(x, 6, 4, 4);
-        }
+        RenderizadorCaminhos.desenhar(g, new Rectangle(esquerda, cima, direita - esquerda, baixo - cima), 48, 48, variacao);
+    }
+
+    public static boolean ehTrilha(int id) { return (id >= 1 && id <= 10) || id == 53 || (id >= 57 && id <= 59); }
+
+    private boolean continuaTrilha(int l, int c) {
+        return mapaAtual == null || l < 0 || l >= mapaAtual.length || c < 0 || c >= mapaAtual[l].length || ehTrilha(mapaAtual[l][c]);
+    }
+
+    private int cantosTrilha(int l, int c) {
+        int cantos = 0;
+        boolean n = continuaTrilha(l - 1, c), s = continuaTrilha(l + 1, c);
+        boolean e = continuaTrilha(l, c - 1), d = continuaTrilha(l, c + 1);
+        if (!n && !e) cantos |= 1;
+        if (!n && !d) cantos |= 2;
+        if (!s && !e) cantos |= 4;
+        if (!s && !d) cantos |= 8;
+        return cantos;
+    }
+
+    private BufferedImage criarTrilha(ChaveTrilha chave) {
+        BufferedImage imagem = new BufferedImage(48, 48, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = imagem.createGraphics();
+        try {
+            textura(g, Material.GRAMA, chave.variacao());
+            int id = chave.id();
+            int x = id == 1 || id == 4 || id == 57 ? 6 : 0;
+            int fim = id == 3 || id == 6 || id == 59 ? 42 : 48;
+            int y = id >= 57 && id <= 59 ? 6 : 0;
+            int baixo = id == 4 || id == 6 ? 42 : 48;
+            Area forma = new Area(new Rectangle(x, y, fim - x, baixo - y));
+            for (int canto = 0; canto < 4; canto++) {
+                if ((chave.cantos() & (1 << canto)) == 0) continue;
+                int cx = canto % 2 == 0 ? 0 : 48, cy = canto < 2 ? 0 : 48;
+                int dx = cx == 0 ? 18 : -18, dy = cy == 0 ? 18 : -18;
+                forma.subtract(new Area(new Polygon(new int[]{cx, cx + dx, cx}, new int[]{cy, cy, cy + dy}, 3)));
+            }
+            RenderizadorCaminhos.desenhar(g, forma, 48, 48, chave.variacao());
+        } finally { g.dispose(); }
+        return imagem;
     }
 
     private void detalhesVegetacao(Graphics2D g, int variacao) {

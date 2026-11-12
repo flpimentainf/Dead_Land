@@ -29,6 +29,7 @@ public class ValidacaoTecnica {
         validarTilesDosCenarios();
         ValidacaoFloresta.validar();
         ValidacaoVila.validar();
+        ValidacaoCaminhos.validar();
         validarMateriaisCastelo();
         validarInventario();
         validarDano();
