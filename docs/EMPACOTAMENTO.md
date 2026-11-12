@@ -1,7 +1,7 @@
 # Executável Windows
 
 As distribuições ficam somente em `dist/vX.Y.Z/`, com `Dead_Land.exe` diretamente
-dentro de cada pasta. Hoje estão mantidas `dist/v1.2.1/` e `dist/v1.2.2/`.
+dentro de cada pasta. Hoje estão mantidas `dist/v1.2.2/` e `dist/v1.3.0/`.
 O Java está em `runtime/`, os recursos em `app/repos/` e os três slots em `save/`.
 Mantenha essas pastas junto do executável. Para transportar o jogo, copie a pasta
 da versão inteira. Não são gerados ZIPs.
@@ -15,24 +15,31 @@ A v1.2.2 acrescenta os 16 inimigos definidos no novo arquivo da floresta:
 seis esqueletos e dez slimes, com as posições, direções e raios de patrulha
 enviados. O terreno, os itens e os pontos de nascimento permanecem os mesmos.
 
+A v1.3.0 amplia a Vila de Ari para 50 × 25: casas variadas, armazém, guilda,
+fonte central, caminhos curvos e fachadas na camada de objetos. A saída leste
+mantém o caminho normal do castelo; a saída sudeste fica barricada. A vila é
+segura, registra checkpoint e adapta posições de saves antigos quando necessário.
+As árvores foram redesenhadas e os indicadores de interação ficam junto dos alvos.
+Detalhes: [Mapa da vila](MAPA_VILA.md).
+
 ## Próximas atualizações
 
 Em Windows com JDK 21 ou superior, x64:
 
 ```powershell
 .\rodar.ps1 -SomenteValidar
-.\empacotar.ps1 -Versao 1.3.0
+.\empacotar.ps1 -Versao 1.4.0
 ```
 
 O empacotador aplica estas regras:
 
 - A versão é obrigatória e deve ser maior que a última publicada.
-- A pasta é criada automaticamente como `dist/v1.3.0/`.
+- A pasta é criada automaticamente como `dist/v1.4.0/`.
 - O pacote é montado em `build/` e só depois publicado em `dist/`.
 - Cada slot leva a cópia mais recente encontrada nas versões mantidas, mesmo que
   a última jogatina tenha acontecido na versão anterior.
 - Depois da publicação, permanecem somente as duas versões mais recentes,
-  ordenadas numericamente. Ao publicar `v1.3.0`, ficam `v1.2.2` e `v1.3.0`.
+  ordenadas numericamente. Ao publicar `v1.4.0`, ficam `v1.3.0` e `v1.4.0`.
 - Não são criadas pastas `Atualizado`, `Versao-X.Y.Z`, pastas extras `Dead_Land`
   dentro da pasta da versão, nem arquivos ZIP.
 
