@@ -93,6 +93,10 @@ public class tiles {
         renderizador.desenharFundo(g, cenario, mapa);
     }
 
+    public void desenharAgua(Graphics2D g, int[][] mapa) {
+        renderizador.desenharAgua(g, mapa);
+    }
+
     private Image carregarImagem(String caminho) {
         return ResourceManager.getInstancia().carregarImagem(caminho);
     }

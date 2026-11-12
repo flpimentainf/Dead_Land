@@ -380,6 +380,7 @@ public class tileMap {
 		}
 		this.pecaDoCenario.desenharFundo(g, CenarioId.porIndice(cenarioAtualIndex), this.cenarioValido);
 		desenharCamada(g, this.cenarioValido, false);
+		this.pecaDoCenario.desenharAgua(g, this.cenarioValido);
 		desenharCamada(g, this.camadaObjetosValida, true);
 	}
 

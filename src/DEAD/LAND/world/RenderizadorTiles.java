@@ -34,6 +34,7 @@ public final class RenderizadorTiles {
     private final Map<Integer, BufferedImage> cache = new HashMap<>();
     private record ChaveTrilha(int id, int variacao, int cantos) {}
     private final Map<ChaveTrilha, BufferedImage> trilhas = new HashMap<>();
+    private final Map<int[][], BufferedImage> lagos = new HashMap<>();
     private final RenderizadorTorre torre = new RenderizadorTorre();
     private final RenderizadorArvores arvores = new RenderizadorArvores();
     private int[][] mapaAtual;
@@ -89,6 +90,12 @@ public final class RenderizadorTiles {
         if (cenario == CenarioId.ARENA_BOSS) torre.desenharFundo(g, mapa);
     }
 
+    public void desenharAgua(Graphics2D g, int[][] mapa) {
+        if (!lagos.containsKey(mapa)) lagos.put(mapa, RenderizadorAgua.criarCamada(mapa));
+        BufferedImage imagem = lagos.get(mapa);
+        if (imagem != null) g.drawImage(imagem, 0, 0, mapa[0].length * TAMANHO, mapa.length * TAMANHO, null);
+    }
+
     private BufferedImage criarTile(int id, CenarioId cenario, int variacao, boolean objeto) {
         BufferedImage tile = new BufferedImage(TAMANHO, TAMANHO, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = tile.createGraphics();
@@ -108,7 +115,7 @@ public final class RenderizadorTiles {
                     g.fillRect(x + 2, 16, 2, 6);
                 }
             } else if (id == 36) {
-                textura(g, Material.AGUA, variacao);
+                g.setColor(RenderizadorAgua.AGUA); g.fillRect(0, 0, TAMANHO, TAMANHO);
             } else if (id == 39) {
                 textura(g, Material.MADEIRA_CLARA, variacao);
             } else if (id == 41) {

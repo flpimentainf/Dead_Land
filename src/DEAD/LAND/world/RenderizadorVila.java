@@ -85,25 +85,7 @@ public final class RenderizadorVila {
         try {
             Shape agua = MapaVila.LAGUINHO.agua();
             Rectangle a = MapaVila.AREA_LAGO;
-            g.setStroke(new BasicStroke(24, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
-            g.setColor(new Color(78, 91, 47)); g.draw(agua);
-            g.setStroke(new BasicStroke(12, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
-            g.setColor(new Color(133, 128, 79)); g.draw(agua);
-            g.setColor(new Color(42, 96, 112)); g.fill(agua);
-            g.clip(agua);
-            g.setStroke(new BasicStroke(16, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
-            g.setColor(new Color(66, 127, 131)); g.draw(agua);
-            g.setColor(new Color(31, 80, 103));
-            Area fundo = new Area(agua);
-            fundo.subtract(new Area(new BasicStroke(54, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER).createStrokedShape(agua)));
-            g.fill(fundo);
-            for (int i = 0; i < 22; i++) {
-                int x = a.x + 18 + (i * 53 % (a.width - 36));
-                int y = a.y + 24 + (i * 37 % (a.height - 48));
-                g.setColor(i % 3 == 0 ? new Color(128, 174, 166) : new Color(80, 143, 147));
-                g.fillRect(x / 3 * 3, y / 3 * 3, i % 3 == 0 ? 18 : 9, 3);
-            }
-            g.setClip(null);
+            RenderizadorAgua.desenhar(g, agua, a);
             for (int[] pedra : new int[][]{{6, 51}, {45, 3}, {219, 180}, {63, 222}, {243, 90}}) {
                 int x = a.x + pedra[0], y = a.y + pedra[1];
                 g.setColor(new Color(54, 68, 58)); g.fillRect(x, y + 3, 21, 12);
