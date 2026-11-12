@@ -27,6 +27,22 @@ try {
     Exigir $recusou 'Nao deve apagar uma pasta sem os marcadores do jogo.'
     Exigir (Test-Path -LiteralPath (Join-Path $raizNumerica 'v1.10.0')) 'Validacao deve ocorrer antes de qualquer exclusao.'
 
+    $raizTrava = Join-Path $raizTeste 'arquivo-em-uso'
+    foreach ($numero in @('1.0.0', '1.1.0', '1.2.0', '1.3.0')) { Criar-VersaoTeste $raizTrava $numero | Out-Null }
+    $jarAberto = Join-Path $raizTrava 'v1.0.0\app\Dead_Land.jar'
+    Set-Content -LiteralPath $jarAberto -Value 'fixture jar'
+    $antes = @(Get-ChildItem -LiteralPath $raizTrava -Recurse -File | ForEach-Object FullName | Sort-Object)
+    $trava = [IO.File]::Open($jarAberto, [IO.FileMode]::Open, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+    try {
+        $recusou = $false
+        try { Remove-VersoesAntigasJogo $raizTrava } catch { $recusou = $_.Exception.Message -like '*em uso*' }
+        Exigir $recusou 'Uma versao aberta deve impedir a limpeza.'
+        $depois = @(Get-ChildItem -LiteralPath $raizTrava -Recurse -File | ForEach-Object FullName | Sort-Object)
+        Exigir (($antes -join '|') -eq ($depois -join '|')) 'Um arquivo bloqueado nao pode causar exclusao parcial de nenhuma versao.'
+    } finally { $trava.Dispose() }
+    Remove-VersoesAntigasJogo $raizTrava
+    Exigir (@(Get-VersoesJogo $raizTrava).Count -eq 2) 'Fechar o arquivo deve permitir concluir a limpeza.'
+
     $raizPacote = Join-Path $raizTeste 'pacotes'
     $antiga = Criar-VersaoTeste $raizPacote '1.0.0'
     $atual = Criar-VersaoTeste $raizPacote '1.1.0'
@@ -46,6 +62,8 @@ try {
     $versoes = @(Get-VersoesJogo $raizPacote)
     Exigir ($versoes.Count -eq 2 -and $versoes[0].Numero -eq [version]'1.2.0' -and $versoes[1].Numero -eq [version]'1.1.0') 'Deve manter somente v1.1.0 e v1.2.0.'
     Exigir ((Get-FileHash -LiteralPath (Join-Path $raizPacote 'v1.2.0\save\slot2.properties')).Hash -eq $hash) 'O slot mais recente da versao removida deve sobreviver.'
+    Copy-SavesRecentes -Origens @((Join-Path $raizPacote 'v1.2.0\save'), (Join-Path $atual 'save')) -Destino (Join-Path $raizPacote 'v1.2.0\save')
+    Exigir ((Get-FileHash -LiteralPath (Join-Path $raizPacote 'v1.2.0\save\slot2.properties')).Hash -eq $hash) 'Repetir a sincronizacao nao pode copiar um arquivo sobre si mesmo.'
     Exigir (@(Get-ChildItem -LiteralPath $raizPacote -File -Filter '*.zip').Count -eq 0) 'Nao deve gerar ZIP.'
     Write-Host 'Distribuicao OK: duas versoes, ordem numerica, saves preservados e nenhum ZIP.'
 } finally {

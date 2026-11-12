@@ -40,6 +40,7 @@ function Copy-SavesRecentes {
         if ($candidatos.Count) {
             New-Item -ItemType Directory -Path $Destino -Force | Out-Null
             $alvo = Join-Path $Destino "slot$slot.properties"
+            if ([IO.Path]::GetFullPath($alvo).Equals($candidatos[0].FullName, [StringComparison]::OrdinalIgnoreCase)) { continue }
             Copy-Item -LiteralPath $candidatos[0].FullName -Destination $alvo -Force
             if ((Get-FileHash -LiteralPath $alvo).Hash -ne (Get-FileHash -LiteralPath $candidatos[0].FullName).Hash) {
                 throw "Falha ao copiar o slot $slot."
@@ -53,7 +54,20 @@ function Remove-VersoesAntigasJogo {
     $versoes = @(Get-VersoesJogo -Raiz $Raiz)
     # Verifica todos os alvos antes de iniciar qualquer exclusao.
     foreach ($versao in $versoes) { Assert-PastaVersaoJogo -Raiz $Raiz -Pasta $versao.Pasta }
-    foreach ($versao in @($versoes | Select-Object -Skip 2)) {
+    $antigas = @($versoes | Select-Object -Skip 2)
+    # Detecta arquivos abertos antes de remover qualquer parte de um pacote.
+    foreach ($versao in $antigas) {
+        foreach ($arquivo in @(Get-ChildItem -LiteralPath $versao.Pasta -Recurse -File)) {
+            try {
+                $acesso = if ($arquivo.IsReadOnly) { [IO.FileAccess]::Read } else { [IO.FileAccess]::ReadWrite }
+                $fluxo = [IO.File]::Open($arquivo.FullName, [IO.FileMode]::Open, $acesso, [IO.FileShare]::None)
+                $fluxo.Dispose()
+            } catch {
+                throw "A versao v$($versao.Numero) possui um arquivo em uso ou indisponivel: $($arquivo.Name). Feche o jogo antes de limpar a versao antiga. Nenhuma pasta foi removida."
+            }
+        }
+    }
+    foreach ($versao in $antigas) {
         Assert-PastaVersaoJogo -Raiz $Raiz -Pasta $versao.Pasta
         Remove-Item -LiteralPath $versao.Pasta -Recurse -Force -ErrorAction Stop
     }
