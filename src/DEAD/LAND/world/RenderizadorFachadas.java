@@ -27,46 +27,27 @@ public final class RenderizadorFachadas {
             g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
             g.scale(1.0 / 3, 1.0 / 3); g.translate(12, 0);
             g.setColor(new Color(14, 24, 23, 95)); g.fillRect(12, h - 9, w - 12, 24);
+            for (var volume : GeometriaConstrucao.de(casa).volumes()) {
+                Paleta paleta = switch (volume.material()) {
+                    case OCRE -> OCRE; case BARRO -> BARRO; case ARDOSIA -> ARDOSIA; case MUSGO -> MUSGO;
+                };
+                if (volume.empena()) empena(g, volume, paleta);
+                else anexo(g, volume.x(), volume.y(), volume.largura(), volume.altura(), paleta, volume.vitrine());
+            }
             switch (casa.estilo()) {
-                case 0 -> {
-                    anexo(g, 176, 90, w - 176, h - 90, OCRE, false);
-                    empena(g, 0, 0, 210, h, 138, OCRE, 0);
-                    janela(g, 217, h - 79, 36, 45, false);
-                }
+                case 0 -> janela(g, 217, h - 79, 36, 45, false);
                 case 1 -> {
-                    anexo(g, 0, 90, 161, h - 90, BARRO, true);
-                    anexo(g, w - 160, 72, 160, h - 72, OCRE, true);
-                    empena(g, 126, 0, 228, h, 164, OCRE, 1);
-                    toldo(g, 15, h - 119, 123);
-                    toldo(g, w - 143, h - 125, 126);
+                    toldo(g, 15, h - 119, 123); toldo(g, w - 143, h - 125, 126);
                     letreiro(g, w / 2, h - 99, "ARMAZÉM");
                 }
                 case 2 -> {
-                    empena(g, 0, 78, 194, h - 78, 145, ARDOSIA, 2);
-                    empena(g, w - 194, 78, 194, h - 78, 145, ARDOSIA, 3);
-                    empena(g, 162, 0, 252, h, 219, OCRE, 4);
                     bandeira(g, 129, h - 151); bandeira(g, w - 156, h - 151);
-                    letreiro(g, w / 2, h - 130, "GUILDA DOS ERRANTES");
-                    escudo(g, w / 2, 183);
+                    letreiro(g, w / 2, h - 130, "GUILDA DOS ERRANTES"); escudo(g, w / 2, 183);
                 }
-                case 3 -> {
-                    anexo(g, 244, 108, w - 244, h - 108, BARRO, false);
-                    empena(g, 0, 0, 267, h, 189, BARRO, 5);
-                    janela(g, w - 128, h - 93, 57, 57, true);
-                }
-                case 4 -> {
-                    anexo(g, 0, 39, 135, h - 39, MUSGO, false);
-                    anexo(g, w - 132, 48, 132, h - 48, MUSGO, false);
-                    empena(g, 111, 0, 213, h, 108, OCRE, 6);
-                    janela(g, 30, h - 66, 39, 33, false);
-                    janela(g, w - 84, h - 66, 39, 33, true);
-                }
-                case 5 -> {
-                    anexo(g, 0, 87, 156, h - 87, OCRE, false);
-                    empena(g, 123, 0, w - 123, h, 166, BARRO, 7);
-                    janela(g, 36, h - 91, 51, 54, true);
-                }
-                default -> empena(g, 3, 0, w - 6, h, 108, MUSGO, 8);
+                case 3 -> janela(g, w - 128, h - 93, 57, 57, true);
+                case 4 -> { janela(g, 30, h - 66, 39, 33, false); janela(g, w - 84, h - 66, 39, 33, true); }
+                case 5 -> janela(g, 36, h - 91, 51, 54, true);
+                default -> { }
             }
             floreira(g, 15, h - 12, casa.estilo());
             floreira(g, w - 42, h - 12, casa.estilo() + 1);
@@ -74,7 +55,9 @@ public final class RenderizadorFachadas {
         return imagem;
     }
 
-    private void empena(Graphics2D g, int x, int y, int w, int h, int telhado, Paleta p, int estilo) {
+    private void empena(Graphics2D g, GeometriaConstrucao.Volume volume, Paleta p) {
+        int x = volume.x(), y = volume.y(), w = volume.largura(), h = volume.altura();
+        int telhado = volume.telhado(), estilo = volume.estilo();
         int base = y + h - 12, paredeY = y + telhado;
         parede(g, x + 9, paredeY - 9, w - 18, base - paredeY + 9, p, estilo);
         int cx = x + w / 2;
@@ -98,11 +81,9 @@ public final class RenderizadorFachadas {
         int raio = Math.min(20, Math.max(11, telhado / 10));
         if (estilo != 4) oculo(g, cx, y + telhado * 83 / 100, raio);
         int alturaParede = base - paredeY;
-        int portaH = estilo == 4 ? 111 : Math.min(87, alturaParede - 9);
-        int portaW = estilo == 4 ? 75 : Math.min(54, w / 5);
-        int portaX = cx - portaW / 2;
-        if (estilo == 5) portaX -= 24;
-        porta(g, portaX, base - portaH, portaW, portaH, estilo == 4);
+        Rectangle entrada = volume.porta();
+        int portaX = entrada.x, portaH = entrada.height;
+        porta(g, entrada.x, entrada.y, entrada.width, entrada.height, estilo == 4);
         int janelaH = Math.min(57, alturaParede - 33);
         if (janelaH >= 27) {
             if (estilo != 0 && estilo != 8) janela(g, x + 28, base - janelaH - 21, 36, janelaH, estilo % 2 == 0);

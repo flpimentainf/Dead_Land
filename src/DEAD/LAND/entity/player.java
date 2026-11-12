@@ -355,7 +355,7 @@ public class player extends Rectangle{
     }
 
     public void atualizarAreaColisao() {
-        this.AreaColisao.x = this.x + 3;
+        this.AreaColisao.x = this.x + 10;
         this.AreaColisao.y = this.y + this.height / 2;
         this.AreaColisao.width = this.width - 20;
         this.AreaColisao.height = this.height / 2;

@@ -125,9 +125,9 @@ public final class ControladorEspada {
         int passos = Math.max(1, (int) Math.ceil(Point2D.distance(x, y, fimX, fimY) / 3));
         for (int i = 0; i <= passos; i++) {
             double t = i / (double) passos;
-            int col = (int) Math.floor((x + (fimX - x) * t) / mapa.getTamanhoTile());
-            int lin = (int) Math.floor((y + (fimY - y) * t) / mapa.getTamanhoTile());
-            if (mapa.tileTemColisao(lin, col)) return false;
+            int px = (int) Math.floor(x + (fimX - x) * t);
+            int py = (int) Math.floor(y + (fimY - y) * t);
+            if (mapa.pontoTemColisao(px, py)) return false;
         }
         return true;
     }

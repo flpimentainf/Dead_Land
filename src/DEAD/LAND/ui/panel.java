@@ -453,11 +453,13 @@ public class panel extends JPanel{
             this.cenario.desenhar(g2);
             if (this.controladorNPCs != null) this.controladorNPCs.desenhar(g2, this);
             if (this.controladorInimigos != null) this.controladorInimigos.desenhar(g2, this.cenario.getCenarioAtualIndex());
-            if (this.inventario.espadaEquipada() && !getJogador().estaCaindo() && getJogador().estaVivo()) {
-                this.controladorEspada.desenharJogador(g2, getJogador());
-            } else {
-                getJogador().desenharPlayer(g2);
-            }
+            Graphics2D personagem = (Graphics2D) g2.create();
+            try {
+                cenario.aplicarOclusao(personagem, getJogador());
+                if (this.inventario.espadaEquipada() && !getJogador().estaCaindo() && getJogador().estaVivo()) {
+                    this.controladorEspada.desenharJogador(personagem, getJogador());
+                } else getJogador().desenharPlayer(personagem);
+            } finally { personagem.dispose(); }
             if (this.controladorFlechas != null) this.controladorFlechas.desenhar(g2);
             if (this.controladorItens != null) this.controladorItens.desenhar(g2, this);
             desenharIndicadorInteracao(g2);
@@ -1180,6 +1182,10 @@ public class panel extends JPanel{
         if (cenario.getCenarioAtualIndex() == 3
                 && !MapaVila.posicaoLivre(cenario, getJogador().AreaColisao)) {
             getJogador().posicionarEm(MapaVila.ENTRADA_X, MapaVila.ENTRADA_Y);
+        } else if (cenario.getCenarioAtualIndex() != 3 && cenario.areaTemColisao(getJogador().AreaColisao)
+                && !getJogador().estaCaindo()) {
+            Point deslocamento = cenario.deslocamentoLivreProximo(getJogador().AreaColisao);
+            if (deslocamento != null) getJogador().posicionarEm(x + deslocamento.x, y + deslocamento.y);
         }
     }
 

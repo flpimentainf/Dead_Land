@@ -32,15 +32,6 @@ public class verificadorDeColisao {
         Rectangle areaFutura = new Rectangle(areaColisao);
         areaFutura.translate(movimentoX, movimentoY);
 
-        int tamanhoTile = cenario.getTamanhoTile();
-        int colunaEsquerda = Math.floorDiv(areaFutura.x, tamanhoTile);
-        int colunaDireita = Math.floorDiv(areaFutura.x + areaFutura.width - 1, tamanhoTile);
-        int linhaSuperior = Math.floorDiv(areaFutura.y, tamanhoTile);
-        int linhaInferior = Math.floorDiv(areaFutura.y + areaFutura.height - 1, tamanhoTile);
-
-        return cenario.tileTemColisao(linhaSuperior, colunaEsquerda)
-                || cenario.tileTemColisao(linhaSuperior, colunaDireita)
-                || cenario.tileTemColisao(linhaInferior, colunaEsquerda)
-                || cenario.tileTemColisao(linhaInferior, colunaDireita);
+        return cenario.areaTemColisao(areaFutura);
     }
 }

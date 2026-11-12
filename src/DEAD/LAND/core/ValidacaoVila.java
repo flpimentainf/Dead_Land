@@ -5,6 +5,7 @@ import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.ui.Inventario;
 import DEAD.LAND.ui.panel;
 import DEAD.LAND.world.MapaVila;
+import DEAD.LAND.world.GeometriaConstrucao;
 import DEAD.LAND.world.tileMap;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -24,11 +25,11 @@ public final class ValidacaoVila {
         boolean[][] acessivel = explorar(mapa);
         exigir(acessivel[14][49] && acessivel[4][0], "entrada e saída do castelo devem estar conectadas");
         for (var casa : MapaVila.CONSTRUCOES) {
-            exigir(mapa.tileTemColisao(casa.linha(), casa.coluna()), "fachadas precisam bloquear passagem");
-            exigir(acessivel[casa.linha() + casa.altura()][casa.coluna() + casa.largura() / 2],
-                    "deve ser possível chegar à frente de " + casa.nome());
+            validarFachada(mapa, casa);
         }
-        exigir(mapa.tileTemColisao(12, 22), "fonte precisa ter colisão");
+        exigir(mapa.pontoTemColisao(23 * 48, 13 * 48), "água do lago precisa ter colisão");
+        exigir(!mapa.pontoTemColisao(MapaVila.AREA_LAGO.x, MapaVila.AREA_LAGO.y),
+                "margem seca fora da água não pode bloquear como um retângulo");
         exigir(acessivel[MapaVila.ARI_LINHA][MapaVila.ARI_COLUNA], "Ari precisa continuar acessível");
         item orbe = new ControladorItens().getItensPorNomes(Set.of("memoria_02")).getFirst();
         exigir(acessivel[orbe.y / 48][orbe.x / 48], "a segunda memória precisa continuar acessível");
@@ -37,6 +38,43 @@ public final class ValidacaoVila {
         exigir(new ControladorInimigos().getInimigos().stream().noneMatch(i -> i.getCenarioIndex() == 3),
                 "a primeira vila deve ser uma área segura sem inimigos");
         SwingUtilities.invokeAndWait(ValidacaoVila::validarPartida);
+    }
+
+    private static void validarFachada(tileMap mapa, MapaVila.Construcao casa) {
+        var geometria = GeometriaConstrucao.de(casa);
+        Rectangle origem = casa.area();
+        Rectangle livre = new Rectangle(origem.x + 12, origem.y + 6, 28, 24);
+        exigir(!mapa.areaTemColisao(livre), "canto vazio junto do telhado deve ficar livre: " + casa.nome());
+        verificadorDeColisao colisao = new verificadorDeColisao();
+        for (var volume : geometria.volumes()) {
+            Rectangle parede = volume.parede(); parede.translate(origem.x, origem.y);
+            exigir(mapa.pontoTemColisao((int) parede.getCenterX(), (int) parede.getCenterY()),
+                    "paredes precisam impedir passagem: " + casa.nome());
+            Rectangle frente = new Rectangle((int) parede.getCenterX() - 14, parede.y + parede.height + 2, 28, 24);
+            exigir(colisao.ocorreuColisao(frente, mapa, 0, -4), "andar contra a fachada deve parar na base desenhada");
+            Rectangle lateral = new Rectangle(parede.x - 30, (int) parede.getCenterY() - 12, 28, 24);
+            exigir(colisao.ocorreuColisao(lateral, mapa, 4, 0), "lateral da parede deve bloquear aproximação");
+        }
+        for (Point acesso : geometria.acessos()) {
+            exigir(MapaVila.caminhos().contains(acesso.x, acesso.y + 6),
+                    "rua precisa tocar a soleira de cada porta: " + casa.nome());
+            exigir(!mapa.areaTemColisao(new Rectangle(acesso.x - 14, acesso.y - 3, 28, 24)),
+                    "jogador precisa conseguir encostar na soleira: " + casa.nome());
+        }
+        // O teto visível pode cobrir o ator; os cantos transparentes não podem cobri-lo.
+        var imagem = new java.awt.image.BufferedImage(2400, 1200, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        var g = imagem.createGraphics();
+        var telhado = geometria.volumes().stream().filter(GeometriaConstrucao.Volume::empena).findFirst().orElseThrow();
+        Rectangle atras = new Rectangle(origem.x + telhado.x() + 18,
+                origem.y + telhado.y() + telhado.telhado() * 45 / 100 - 18, 48, 48);
+        try {
+            mapa.aplicarOclusao(g, atras); g.setColor(java.awt.Color.MAGENTA); g.fill(atras);
+        } finally { g.dispose(); }
+        int visiveis = 0;
+        for (int y = atras.y; y < atras.y + atras.height; y++) for (int x = atras.x; x < atras.x + atras.width; x++) {
+            if (imagem.getRGB(x, y) == java.awt.Color.MAGENTA.getRGB()) visiveis++;
+        }
+        exigir(visiveis > 0 && visiveis < 48 * 48, "oclusão deve acompanhar o telhado e suas transparências: " + casa.nome());
     }
 
     private static boolean[][] explorar(tileMap mapa) {
@@ -63,6 +101,18 @@ public final class ValidacaoVila {
         };
         try {
             cena.pausarJogo();
+            var casa = MapaVila.CONSTRUCOES.getFirst();
+            var volume = GeometriaConstrucao.de(casa).volumes().getLast();
+            Rectangle parede = volume.parede(); parede.translate(casa.area().x, casa.area().y);
+            cena.irParaCenario(3, casa.portaX() - 24, casa.area().y + 6);
+            int inicioY = cena.getJogador().y;
+            escutadorTeclado aproximar = new escutadorTeclado(); aproximar.movePraBaixo = true;
+            ControladorMovimento andar = new ControladorMovimento();
+            for (int i = 0; i < 80; i++) andar.atualizar(cena, aproximar);
+            exigir(cena.getJogador().y > inicioY && cena.getJogador().y + 48 <= parede.y,
+                    "deve andar pelo espaço do teto e parar somente ao chegar na parede");
+            exigir(cena.getJogador().AreaColisao.getCenterX() == cena.getJogador().getCenterX(),
+                    "colisor do jogador deve ficar centralizado no personagem");
             atravessar(cena, 2, 2376, 240, true, 3);
             exigir(cena.getJogador().y == MapaVila.ENTRADA_Y, "a entrada deve respeitar a altura da vila nova");
             atravessar(cena, 3, 2340, MapaVila.SAIDA_CASTELO_Y, true, 4);

@@ -10,6 +10,7 @@ import java.util.Map;
 public final class RenderizadorVila {
     private BufferedImage terreno;
     private final Map<MapaVila.Construcao, BufferedImage> fachadas = new HashMap<>();
+    private final Map<MapaVila.Construcao, Area> oclusoes = new HashMap<>();
     private final RenderizadorFachadas fachadasPixel = new RenderizadorFachadas();
     private final RenderizadorArvores arvores = new RenderizadorArvores();
 
@@ -17,12 +18,11 @@ public final class RenderizadorVila {
         if (terreno == null) terreno = criarTerreno();
         g.drawImage(terreno, 0, 0, 2400, 1200, null);
         for (MapaVila.Construcao casa : MapaVila.CONSTRUCOES) {
-            if (objetos[casa.linha()][casa.coluna()] != MapaVila.CONSTRUCAO) continue;
             BufferedImage imagem = fachadas.computeIfAbsent(casa, fachadasPixel::criar);
             Rectangle area = casa.area();
             g.drawImage(imagem, area.x - 12, area.y, area.width + 24, area.height + 24, null);
         }
-        desenharFonte(g);
+        desenharLago(g);
         for (int l = 0; l < objetos.length; l++) {
             for (int c = 0; c < objetos[l].length; c++) {
                 if (objetos[l][c] == MapaVila.ARVORE) {
@@ -46,48 +46,76 @@ public final class RenderizadorVila {
                 tiles.desenhar(g, 55, l, c, CenarioId.BOSQUE_ARI, false);
             }
             RenderizadorCaminhos.desenhar(g, MapaVila.caminhos());
-            g.setColor(new Color(91, 100, 86));
-            g.setStroke(new BasicStroke(22));
-            g.draw(new Ellipse2D.Double(20.5 * 48, 10.5 * 48, 5 * 48, 5 * 48));
-            g.setColor(new Color(164, 158, 128));
-            g.setStroke(new BasicStroke(16));
-            g.draw(new Ellipse2D.Double(20.5 * 48, 10.5 * 48, 5 * 48, 5 * 48));
-            g.setColor(new Color(93, 98, 82)); g.setStroke(new BasicStroke(2));
-            for (int i = 0; i < 28; i++) {
-                double angulo = i * Math.PI * 2 / 28;
-                g.drawLine((int) (23 * 48 + Math.cos(angulo) * 111), (int) (13 * 48 + Math.sin(angulo) * 111),
-                        (int) (23 * 48 + Math.cos(angulo) * 130), (int) (13 * 48 + Math.sin(angulo) * 130));
-            }
         } finally { g.dispose(); }
         return imagem;
     }
 
-    private void desenharFonte(Graphics2D destino) {
+    public void aplicarOclusao(Graphics2D g, Rectangle personagem) {
+        Area visivel = null;
+        for (var casa : MapaVila.CONSTRUCOES) {
+            Rectangle desenho = casa.area(); desenho.grow(12, 12);
+            if (personagem.y + personagem.height >= GeometriaConstrucao.de(casa).baseY() || !desenho.intersects(personagem)) continue;
+            if (visivel == null) visivel = new Area(g.getClip() == null ? new Rectangle(0, 0, 2400, 1200) : g.getClip());
+            visivel.subtract(oclusoes.computeIfAbsent(casa, this::criarOclusao));
+        }
+        if (visivel != null) g.clip(visivel);
+    }
+
+    private Area criarOclusao(MapaVila.Construcao casa) {
+        BufferedImage imagem = fachadas.computeIfAbsent(casa, fachadasPixel::criar);
+        Area opaca = new Area();
+        for (int y = 0; y < imagem.getHeight(); y++) {
+            int inicio = -1;
+            for (int x = 0; x <= imagem.getWidth(); x++) {
+                boolean dentro = x < imagem.getWidth() && (imagem.getRGB(x, y) >>> 24) >= 128;
+                if (dentro && inicio < 0) inicio = x;
+                if (!dentro && inicio >= 0) {
+                    opaca.add(new Area(new Rectangle(inicio, y, x - inicio, 1))); inicio = -1;
+                }
+            }
+        }
+        Rectangle a = casa.area();
+        AffineTransform transformacao = AffineTransform.getTranslateInstance(a.x - 12, a.y);
+        transformacao.scale(3, 3); opaca.transform(transformacao);
+        return opaca;
+    }
+
+    private void desenharLago(Graphics2D destino) {
         Graphics2D g = (Graphics2D) destino.create();
         try {
-            Rectangle a = MapaVila.AREA_FONTE;
-            g.translate(a.x, a.y);
-            g.setColor(new Color(14, 29, 27, 100)); g.fillOval(4, 79, 190, 116);
-            g.setColor(new Color(58, 69, 65)); g.fillOval(0, 62, 192, 122);
-            g.setColor(new Color(142, 147, 128)); g.fillOval(0, 50, 192, 120);
-            g.setColor(new Color(190, 187, 151)); g.fillOval(8, 53, 176, 107);
-            g.setColor(new Color(60, 82, 76)); g.fillOval(17, 62, 158, 89);
-            g.setColor(new Color(37, 105, 118)); g.fillOval(20, 67, 152, 78);
-            g.setColor(new Color(72, 141, 150)); g.drawOval(26, 73, 140, 65);
-            g.setColor(new Color(127, 173, 169)); g.drawArc(42, 81, 110, 43, 5, 150);
-            g.setColor(new Color(89, 105, 96)); g.fillRect(78, 51, 36, 72);
-            g.setColor(new Color(163, 169, 140)); g.fillRect(82, 46, 20, 73);
-            g.setColor(new Color(63, 79, 76)); g.fillOval(57, 27, 78, 43);
-            g.setColor(new Color(184, 188, 154)); g.fillOval(53, 19, 86, 40);
-            g.setColor(new Color(51, 118, 129)); g.fillOval(61, 23, 70, 29);
-            g.setColor(new Color(125, 198, 197));
-            g.fillRect(92, 4, 7, 34); g.fillRect(86, 10, 6, 6); g.fillRect(99, 12, 6, 6);
-            g.fillRect(61, 43, 5, 60); g.fillRect(126, 43, 5, 60);
-            g.setColor(new Color(185, 225, 208));
-            g.fillRect(93, 4, 3, 29); g.fillRect(62, 49, 2, 38); g.fillRect(127, 52, 2, 35);
-            for (int x : new int[]{55, 120}) { g.drawOval(x, 99, 23, 9); g.fillRect(x + 8, 97, 6, 2); }
-            g.setColor(new Color(81, 88, 77));
-            for (int x = 21; x < 182; x += 29) g.fillRect(x, 149 + Math.abs(x - 96) / 12, 2, 12);
+            Shape agua = MapaVila.LAGUINHO.agua();
+            Rectangle a = MapaVila.AREA_LAGO;
+            g.setStroke(new BasicStroke(24, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
+            g.setColor(new Color(78, 91, 47)); g.draw(agua);
+            g.setStroke(new BasicStroke(12, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
+            g.setColor(new Color(133, 128, 79)); g.draw(agua);
+            g.setColor(new Color(42, 96, 112)); g.fill(agua);
+            g.clip(agua);
+            g.setStroke(new BasicStroke(16, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
+            g.setColor(new Color(66, 127, 131)); g.draw(agua);
+            g.setColor(new Color(31, 80, 103));
+            Area fundo = new Area(agua);
+            fundo.subtract(new Area(new BasicStroke(54, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER).createStrokedShape(agua)));
+            g.fill(fundo);
+            for (int i = 0; i < 22; i++) {
+                int x = a.x + 18 + (i * 53 % (a.width - 36));
+                int y = a.y + 24 + (i * 37 % (a.height - 48));
+                g.setColor(i % 3 == 0 ? new Color(128, 174, 166) : new Color(80, 143, 147));
+                g.fillRect(x / 3 * 3, y / 3 * 3, i % 3 == 0 ? 18 : 9, 3);
+            }
+            g.setClip(null);
+            for (int[] pedra : new int[][]{{6, 51}, {45, 3}, {219, 180}, {63, 222}, {243, 90}}) {
+                int x = a.x + pedra[0], y = a.y + pedra[1];
+                g.setColor(new Color(54, 68, 58)); g.fillRect(x, y + 3, 21, 12);
+                g.setColor(new Color(132, 139, 116)); g.fillRect(x + 3, y, 15, 12);
+                g.setColor(new Color(175, 173, 137)); g.fillRect(x + 6, y, 9, 3);
+            }
+            for (int[] planta : new int[][]{{3, 117}, {186, 15}, {153, 228}}) {
+                int x = a.x + planta[0], y = a.y + planta[1];
+                g.setColor(new Color(45, 79, 38)); g.fillRect(x, y - 18, 3, 24); g.fillRect(x + 9, y - 27, 3, 33);
+                g.setColor(new Color(108, 125, 59)); g.fillRect(x + 3, y - 12, 3, 18);
+                g.setColor(new Color(100, 68, 35)); g.fillRect(x + 6, y - 33, 6, 12);
+            }
         } finally { g.dispose(); }
     }
 

@@ -143,7 +143,6 @@ public class ControladorFlechas {
 
     private void atualizarFlechas(panel cenaDoJogo) {
         tileMap cenario = cenaDoJogo.getCenario();
-        int tileSize = cenario.getTamanhoTile();
 
         for (Flecha f : flechas) {
             if (!f.isAtiva()) {
@@ -151,10 +150,8 @@ public class ControladorFlechas {
             }
 
             f.atualizar();
-            int col = Math.floorDiv(f.getPontaX(), tileSize);
-            int lin = Math.floorDiv(f.getPontaY(), tileSize);
-            if (cenario.tileTemColisao(lin, col)
-                    || cenario.tileTemColisao(Math.floorDiv(f.getCentroY(), tileSize), Math.floorDiv(f.getCentroX(), tileSize))) {
+            if (cenario.pontoTemColisao(f.getPontaX(), f.getPontaY())
+                    || cenario.pontoTemColisao(f.getCentroX(), f.getCentroY())) {
                 f.desativar();
                 cenaDoJogo.getFeedback().impactoParede(f.getCentroX(), f.getCentroY());
                 AudioManager.getInstancia().tocarEfeito("flecha_parede");

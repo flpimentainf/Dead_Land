@@ -33,7 +33,7 @@ public class tiles {
 
     private void configurarTilesSolidos() {
         this.tilesSolidos.add(MapaVila.CONSTRUCAO);
-        this.tilesSolidos.add(MapaVila.FONTE);
+        this.tilesSolidos.add(MapaVila.LAGO);
         this.tilesSolidos.add(MapaVila.BARRICADA);
         this.tilesSolidos.add(MapaVila.ARVORE);
         // Valores da matriz que devem bloquear o jogador.

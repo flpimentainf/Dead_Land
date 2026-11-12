@@ -49,11 +49,11 @@ public class ControladorNPCs {
         int cenarioAtual = cenaDoJogo.getCenario().getCenarioAtualIndex();
         for (NPC npc : npcs) {
             if (npc.getCenarioIndex() == cenarioAtual && npcEstaVisivel(npc, cenaDoJogo)) {
-                npc.desenhar(
-                        g2,
-                        getSimboloEstado(npc, cenaDoJogo),
-                        npcDeveBrilhar(npc, cenaDoJogo)
-                );
+                Graphics2D personagem = (Graphics2D) g2.create();
+                try {
+                    cenaDoJogo.getCenario().aplicarOclusao(personagem, npc);
+                    npc.desenhar(personagem, getSimboloEstado(npc, cenaDoJogo), npcDeveBrilhar(npc, cenaDoJogo));
+                } finally { personagem.dispose(); }
             }
         }
     }

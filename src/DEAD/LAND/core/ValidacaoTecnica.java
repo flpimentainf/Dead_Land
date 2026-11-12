@@ -30,6 +30,7 @@ public class ValidacaoTecnica {
         ValidacaoFloresta.validar();
         ValidacaoVila.validar();
         ValidacaoCaminhos.validar();
+        ValidacaoColisao.validar();
         validarMateriaisCastelo();
         validarInventario();
         validarDano();
@@ -96,7 +97,7 @@ public class ValidacaoTecnica {
                     "textura deve existir em 24x24: " + material.getCaminho());
         }
         // Assinaturas físicas dos mapas publicados, incluindo a floresta ampliada.
-        long[] colisoesOriginais = {3438794768L, 2915522381L, 3375136063L, 2932256928L,
+        long[] colisoesOriginais = {3438794768L, 2915522381L, 3375136063L, 3165380227L,
                 2415417690L, 2952865556L, 4056105978L, 688305776L, 3813518656L};
         tileMap mapa = new tileMap();
         for (CenarioId id : CenarioId.values()) {
@@ -298,7 +299,8 @@ public class ValidacaoTecnica {
 
         player pertoDaParede = new player(() -> 0);
         mapa.definirTile(4, 18, 60);
-        pertoDaParede.posicionarEm(830, 168);
+        pertoDaParede.posicionarEm(18 * 48 - pertoDaParede.width, 168);
+        exigir(!mapa.areaTemColisao(pertoDaParede.AreaColisao), "teste de dash deve começar fora da parede");
         exigir(pertoDaParede.iniciarDash(false, false, true, false), "dash deve iniciar perto da parede");
         pertoDaParede.atualizarDash(mapa, new verificadorDeColisao());
         exigir(pertoDaParede.AreaColisao.x + pertoDaParede.AreaColisao.width <= 18 * 48,

@@ -393,11 +393,59 @@ public class tileMap {
 		if (coluna >= this.cenarioValido[0].length) {
 			return this.ehUltimoCenario();
 		}
+		if (cenarioAtualIndex == CenarioId.BOSQUE_ARI.indice()) {
+			return areaTemColisao(new Rectangle(coluna * tiles.LARGURA, linha * tiles.ALTURA, tiles.LARGURA, tiles.ALTURA));
+		}
 		int tileBase = this.cenarioValido[linha][coluna];
 		int tileObjeto = this.camadaObjetosValida[linha][coluna];
 
 		return this.pecaDoCenario.isTileSolido(tileBase)
 				|| (tileObjeto != VAZIO && this.pecaDoCenario.isTileSolido(tileObjeto));
+	}
+
+	public boolean pontoTemColisao(int x, int y) { return areaTemColisao(new Rectangle(x, y, 1, 1)); }
+
+	public java.awt.Point deslocamentoLivreProximo(Rectangle origem) {
+		java.awt.Point melhor = null;
+		int distancia = Integer.MAX_VALUE;
+		for (int raio = 1; raio <= getTamanhoTile(); raio++) {
+			for (int dy = -raio; dy <= raio; dy++) for (int dx = -raio; dx <= raio; dx++) {
+				if (Math.abs(dx) != raio && Math.abs(dy) != raio) continue;
+				if (dx * dx + dy * dy >= distancia) continue;
+				Rectangle candidato = new Rectangle(origem); candidato.translate(dx, dy);
+				if (candidato.x < 0 || candidato.y < 0 || candidato.getMaxX() > getLarguraTotal() || candidato.getMaxY() > getAlturaTotal()) continue;
+				if (!areaTemColisao(candidato)) { melhor = new java.awt.Point(dx, dy); distancia = dx * dx + dy * dy; }
+			}
+			if (raio * raio >= distancia) break;
+		}
+		return melhor;
+	}
+
+	public boolean areaTemColisao(Rectangle area) {
+		boolean vila = cenarioAtualIndex == CenarioId.BOSQUE_ARI.indice();
+		if (vila) {
+			if (MapaVila.LAGUINHO.colide(area)) return true;
+			for (var casa : MapaVila.CONSTRUCOES) if (GeometriaConstrucao.de(casa).colide(area)) return true;
+		}
+		for (int l = Math.floorDiv(area.y, tiles.ALTURA); l <= Math.floorDiv(area.y + area.height - 1, tiles.ALTURA); l++) {
+			for (int c = Math.floorDiv(area.x, tiles.LARGURA); c <= Math.floorDiv(area.x + area.width - 1, tiles.LARGURA); c++) {
+				if (l < 0 || l >= cenarioValido.length) return true;
+				if (c < 0) { if (ehPrimeiroCenario()) return true; else continue; }
+				if (c >= cenarioValido[l].length) { if (ehUltimoCenario()) return true; else continue; }
+				int objeto = camadaObjetosValida[l][c];
+				if (pecaDoCenario.isTileSolido(cenarioValido[l][c])) return true;
+				if (vila && (objeto == MapaVila.CONSTRUCAO || objeto == MapaVila.LAGO)) continue;
+				if (objeto != VAZIO && pecaDoCenario.isTileSolido(objeto)) return true;
+			}
+		}
+		return false;
+	}
+
+	public void aplicarOclusao(Graphics2D g, Rectangle personagem) {
+		if (cenarioAtualIndex == CenarioId.BOSQUE_ARI.indice()) {
+			if (renderizadorVila == null) renderizadorVila = new RenderizadorVila();
+			renderizadorVila.aplicarOclusao(g, personagem);
+		}
 	}
 
 	public static class InteracaoPerto {

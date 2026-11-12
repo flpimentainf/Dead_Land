@@ -45,7 +45,6 @@ public class ControladorProjeteisInimigos {
     public void atualizar(panel cenaDoJogo) {
         tileMap cenario = cenaDoJogo.getCenario();
         player jogador = cenaDoJogo.getJogador();
-        int tileSize = cenario.getTamanhoTile();
 
         for (ProjetilInimigo projetil : projeteis) {
             if (!projetil.isAtivo()) {
@@ -53,9 +52,7 @@ public class ControladorProjeteisInimigos {
             }
 
             projetil.atualizar();
-            int col = projetil.getCentroX() / tileSize;
-            int lin = projetil.getCentroY() / tileSize;
-            if (cenario.tileTemColisao(lin, col)) {
+            if (cenario.pontoTemColisao(projetil.getCentroX(), projetil.getCentroY())) {
                 projetil.desativar();
                 if (cenaDoJogo.getFeedback() != null) {
                     cenaDoJogo.getFeedback().impactoParede(projetil.getCentroX(), projetil.getCentroY());
