@@ -64,6 +64,10 @@ public class ControladorInimigos {
 
     public void atualizar(panel cenaDoJogo, ControladorFlechas controladorFlechas) {
         int cenarioAtual = cenaDoJogo.getCenario().getCenarioAtualIndex();
+        if (cenarioAtual == 3) {
+            controladorProjeteis.limpar();
+            return;
+        }
         player jogador = cenaDoJogo.getJogador();
 
         for (Inimigo inimigo : inimigos) {
@@ -209,6 +213,7 @@ public class ControladorInimigos {
         }
 
         int cenarioAtual = cenaDoJogo.getCenario().getCenarioAtualIndex();
+        if (cenarioAtual == 3) return false;
         player jogador = cenaDoJogo.getJogador();
 
         for (Inimigo ini : inimigos) {

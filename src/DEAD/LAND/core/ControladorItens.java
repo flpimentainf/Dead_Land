@@ -35,7 +35,7 @@ public class ControladorItens {
         this.itens.add(new item(item.SPRITE_POCAO_CURA, 5, 480, 144,
                 "pocao_cura", Categoria.CONSUMIVEL, 1, true));
         this.itens.addAll(MapaFloresta.criarItens());
-        this.itens.add(new item(item.SPRITE_MEMORIA, 3, 210, 245,
+        this.itens.add(new item(item.SPRITE_MEMORIA, 3, 27 * 48, 15 * 48,
                 "memoria_02", Categoria.ITEM_HISTORIA, 1, false));
         this.itens.add(new item(item.SPRITE_MEMORIA, 5, 1080, 340,
                 "memoria_03", Categoria.ITEM_HISTORIA, 1, false));

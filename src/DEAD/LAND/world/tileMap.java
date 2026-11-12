@@ -19,6 +19,7 @@ public class tileMap {
 	private int [][][] todosOsCenarios;
 	private int [][][] todosOsObjetos;
 	private Cenario[] cenarios;
+	private RenderizadorVila renderizadorVila;
 
 	int [][] cenario1DoJogo = {
 		{ 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37},
@@ -48,18 +49,7 @@ public class tileMap {
 
 	int[][] cenario3DoJogo = MapaFloresta.criarMapaBase();
 
-	int [][] cenario4DoJogo = {
-		{55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55},
-		{55, 55, 11, 12, 14, 13, 55, 55, 11, 12, 14, 13, 55, 55, 11, 12, 14, 13, 55, 55, 11, 12, 14, 13, 55, 55, 11, 12, 14, 13, 55, 55},
-		{55, 55, 15, 16, 18, 17, 55, 55, 15, 16, 18, 17, 55, 55, 15, 16, 18, 17, 55, 55, 15, 16, 18, 17, 55, 55, 15, 16, 18, 17, 55, 55},
-		{55, 55, 19, 20, 27, 22, 55, 55, 19, 20, 27, 22, 55, 55, 19, 20, 27, 22, 55, 55, 19, 20, 27, 22, 55, 55, 19, 20, 27, 22, 55, 55},
-		{55, 55, 57, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58},
-		{55, 55,  4,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5},
-		{55, 55, 11, 14, 12, 13, 55, 55, 55, 55, 11, 14, 12, 13, 55, 55, 55, 55, 11, 14, 12, 13, 55, 55, 55, 55, 11, 14, 12, 13, 55, 55},
-		{55, 55, 15, 16, 16, 17, 55, 55, 55, 55, 15, 16, 16, 17, 55, 55, 55, 55, 15, 16, 16, 17, 55, 55, 55, 55, 15, 16, 16, 17, 55, 55},
-		{55, 55, 19, 20, 20, 22, 55, 55, 55, 55, 19, 20, 20, 22, 55, 55, 55, 55, 19, 20, 20, 22, 55, 55, 55, 55, 19, 20, 20, 22, 55, 55},
-		{55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55},
-	};
+	int[][] cenario4DoJogo = MapaVila.criarTerreno();
 
 	int [][] cenario5DoJogo = {
 		{55, 55, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 43, 44, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 55, 55, 55, 55},
@@ -130,18 +120,7 @@ public class tileMap {
 
 	int[][] cenario3Objetos = MapaFloresta.criarCamadaObjetos();
 	
-	int[][] cenario4Objetos = {
-		{56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56},
-		{56, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO,56},
-		{56, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO,56},
-		{VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO,VAZIO},
-		{VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO,VAZIO},
-		{VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO,VAZIO},
-		{VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO,VAZIO},
-		{56, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO,56},
-		{56, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO,56},
-		{56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56},
-	};
+	int[][] cenario4Objetos = MapaVila.criarObjetos();
 
 	int[][] cenario5Objetos = {
 		{56, 56, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, VAZIO, 56, 56, 56, 56},
@@ -219,7 +198,7 @@ public class tileMap {
 					this.todosOsCenarios[1], this.todosOsObjetos[1]),
 			new Cenario(CenarioId.FLORESTA, "Floresta", "queda_concluida", "floresta",
 					this.todosOsCenarios[2], this.todosOsObjetos[2]),
-			new Cenario(CenarioId.BOSQUE_ARI, "Bosque de Ari", "bosque_ari", "floresta",
+			new Cenario(CenarioId.BOSQUE_ARI, "Vila de Ari", "bosque_ari", "floresta",
 					this.todosOsCenarios[3], this.todosOsObjetos[3]),
 			new Cenario(CenarioId.RUINAS, "Ruinas", "ruinas", "floresta",
 					this.todosOsCenarios[4], this.todosOsObjetos[4]),
@@ -394,6 +373,11 @@ public class tileMap {
 	}
 
 	public void desenhar(Graphics2D g) {
+		if (cenarioAtualIndex == CenarioId.BOSQUE_ARI.indice()) {
+			if (renderizadorVila == null) renderizadorVila = new RenderizadorVila();
+			renderizadorVila.desenhar(g, camadaObjetosValida);
+			return;
+		}
 		this.pecaDoCenario.desenharFundo(g, CenarioId.porIndice(cenarioAtualIndex), this.cenarioValido);
 		desenharCamada(g, this.cenarioValido, false);
 		desenharCamada(g, this.camadaObjetosValida, true);

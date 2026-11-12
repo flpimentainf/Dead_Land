@@ -37,10 +37,14 @@ final class ValidacaoVisualHUD {
                 state.objetivoSecundario = "Encontre os fragmentos de memória e retorne ao Caçador para receber sua recompensa.";
                 cena.aplicarGameState(state);
                 capturarAviso(cena, saida);
-                for (String estado : new String[]{"exploracao", "castelo2", "chefe", "pausa", "objetivos", "dialogo", "dialogo-npc", "inventario", "interacao", "morte"}) {
+                for (String estado : new String[]{"exploracao", "vila", "vila-guilda", "vila-saida", "vila-barricada", "castelo2", "chefe", "pausa", "objetivos", "dialogo", "dialogo-npc", "inventario", "interacao", "morte"}) {
                     cena.aplicarGameState(state);
                     while (cena.isMenuPausaAberto()) alternarPausa(cena);
                     switch (estado) {
+                        case "vila" -> cena.irParaCenario(3, 900, 690);
+                        case "vila-guilda" -> cena.irParaCenario(3, 1900, 420);
+                        case "vila-saida" -> cena.irParaCenario(3, 2336, DEAD.LAND.world.MapaVila.SAIDA_CASTELO_Y);
+                        case "vila-barricada" -> cena.irParaCenario(3, 1750, 1056);
                         case "castelo2" -> cena.irParaCenario(6, 745, 335);
                         case "chefe" -> {
                             cena.irParaCenario(7, 745, 335);

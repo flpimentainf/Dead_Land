@@ -28,6 +28,7 @@ public class ValidacaoTecnica {
         validarCamaDoisTiles();
         validarTilesDosCenarios();
         ValidacaoFloresta.validar();
+        ValidacaoVila.validar();
         validarMateriaisCastelo();
         validarInventario();
         validarDano();
@@ -94,7 +95,7 @@ public class ValidacaoTecnica {
                     "textura deve existir em 24x24: " + material.getCaminho());
         }
         // Assinaturas físicas dos mapas publicados, incluindo a floresta ampliada.
-        long[] colisoesOriginais = {3438794768L, 2915522381L, 3375136063L, 3096947269L,
+        long[] colisoesOriginais = {3438794768L, 2915522381L, 3375136063L, 2932256928L,
                 2415417690L, 2952865556L, 4056105978L, 688305776L, 3813518656L};
         tileMap mapa = new tileMap();
         for (CenarioId id : CenarioId.values()) {

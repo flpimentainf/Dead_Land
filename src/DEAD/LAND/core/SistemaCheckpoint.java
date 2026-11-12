@@ -8,6 +8,7 @@ import java.util.Set;
 public class SistemaCheckpoint {
     private static final String CHECKPOINT_INICIAL = "inicio";
     private static final String CHECKPOINT_QUEDA = "queda_concluida";
+    private static final String CHECKPOINT_VILA = "bosque_ari";
     private static final String CHECKPOINT_REGIAO_PRINCIPAL = "regiao_principal";
     private static final String CHECKPOINT_CHAVE_PRATA = "chave_prata";
     private static final String CHECKPOINT_ANTES_BOSS = "antes_boss";
@@ -32,6 +33,10 @@ public class SistemaCheckpoint {
         if (cenarioAtual == 2 && cenaDoJogo.getHistoria() != null
                 && cenaDoJogo.getHistoria().getEstado() != SistemaHistoria.Estado.QUEDA) {
             tentarRegistrar(CHECKPOINT_QUEDA, cenaDoJogo);
+        }
+
+        if (cenarioAtual == 3) {
+            tentarRegistrar(CHECKPOINT_VILA, cenaDoJogo);
         }
 
         if (cenarioAtual == 5) {

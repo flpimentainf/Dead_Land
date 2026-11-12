@@ -4,6 +4,7 @@ import DEAD.LAND.entity.NPC;
 import DEAD.LAND.entity.player;
 import DEAD.LAND.ui.panel;
 import DEAD.LAND.world.tiles;
+import DEAD.LAND.world.MapaVila;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public class ControladorNPCs {
     private final verificadorDeColisao verificadorColisao = new verificadorDeColisao();
 
     public ControladorNPCs() {
-        adicionarNPC("ari", "Ari", 1, 3, 15, 5, true);
+        adicionarNPC("ari", "Ari", 1, 3, MapaVila.ARI_COLUNA, MapaVila.ARI_LINHA, true);
         adicionarNPC("mara", "Mara", 2, 5, 14, 7, true);
         adicionarNPC("guardiao_memoria", "Guardião", 3, 6, 4, 7, false);
         adicionarNPC("porteiro_morto", "Porteiro", 4, 7, 24, 6, false);

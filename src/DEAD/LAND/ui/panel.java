@@ -20,6 +20,7 @@ import DEAD.LAND.entity.player;
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.story.SistemaHistoria;
 import DEAD.LAND.world.CenarioId;
+import DEAD.LAND.world.MapaVila;
 import DEAD.LAND.world.tileMap;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -1000,7 +1001,7 @@ public class panel extends JPanel{
         this.controladorFlechas.limpar();
         this.inicioJogoMs = System.currentTimeMillis() - Math.max(0, state.tempoJogoMs);
         this.cenario.irParaCenario(state.cenarioIndex);
-        getJogador().posicionarEm(state.jogadorX, state.jogadorY);
+        posicionarJogador(state.jogadorX, state.jogadorY);
         getJogador().definirVida(Math.max(1, state.vida));
 
         if (this.memoryManager != null) {
@@ -1141,14 +1142,22 @@ public class panel extends JPanel{
     }
 
     public void irParaProximoCenario() {
+        int origem = cenario.getCenarioAtualIndex();
+        int y = getJogador().y;
         cenario.irParaProximoCenario();
-        posicionarJogador(50, getJogador().y);
+        if (origem == 2) y = MapaVila.ENTRADA_Y;
+        else if (origem == 3) y = 240;
+        posicionarJogador(50, y);
         sincronizarCameraImediatamente();
     }
 
     public void irParaCenarioAnterior() {
+        int origem = cenario.getCenarioAtualIndex();
+        int y = getJogador().y;
         cenario.irParaCenarioAnterior();
-        posicionarJogador(cenario.getLarguraTotal() - getJogador().width - 10, getJogador().y);
+        if (origem == 3) y = 240;
+        else if (origem == 4) y = MapaVila.SAIDA_CASTELO_Y;
+        posicionarJogador(cenario.getLarguraTotal() - getJogador().width - 10, y);
         sincronizarCameraImediatamente();
     }
 
@@ -1156,6 +1165,11 @@ public class panel extends JPanel{
         this.controladorEspada.cancelar();
         this.controladorFlechas.cancelarCarga();
         getJogador().posicionarEm(x, y);
+        // Saves e checkpoints anteriores podem apontar para uma fachada da vila nova.
+        if (cenario.getCenarioAtualIndex() == 3
+                && !MapaVila.posicaoLivre(cenario, getJogador().AreaColisao)) {
+            getJogador().posicionarEm(MapaVila.ENTRADA_X, MapaVila.ENTRADA_Y);
+        }
     }
 
     private void sincronizarCameraImediatamente() {
