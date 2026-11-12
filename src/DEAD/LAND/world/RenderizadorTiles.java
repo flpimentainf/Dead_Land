@@ -31,6 +31,7 @@ public final class RenderizadorTiles {
     private final Image[] materiais = new Image[Material.values().length];
     private final Map<Integer, BufferedImage> cache = new HashMap<>();
     private final RenderizadorTorre torre = new RenderizadorTorre();
+    private final RenderizadorArvores arvores = new RenderizadorArvores();
     private int[][] mapaAtual;
     private CenarioId cenarioAtual;
 
@@ -42,6 +43,16 @@ public final class RenderizadorTiles {
 
     public boolean desenhar(Graphics2D g, int id, int linha, int coluna, CenarioId cenario, boolean objeto) {
         if (!temNovoVisual(id)) return false;
+        if (id == 56 || (id == 60 && cenario == CenarioId.TRILHA_LATERAL)) {
+            if (!objeto) {
+                int variacao = Math.floorMod(coluna * 7 + linha * 3, 8);
+                BufferedImage grama = cache.computeIfAbsent(0x40000000 | variacao,
+                        k -> criarTile(55, cenario, variacao, false));
+                g.drawImage(grama, coluna * TAMANHO, linha * TAMANHO, null);
+            }
+            arvores.desenhar(g, coluna * TAMANHO, linha * TAMANHO, coluna * 7 + linha * 3, false);
+            return true;
+        }
         int idVisual = cenario == CenarioId.ARENA_BOSS ? torre.orientarParede(id, linha, coluna) : id;
         int variacao = Math.floorMod((coluna * 73856093) ^ (linha * 19349663), 8);
         int chave = (cenario.indice() << 16) | (idVisual << 4) | variacao | (objeto ? 1 << 24 : 0);
@@ -105,9 +116,6 @@ public final class RenderizadorTiles {
             } else if (id == 54 || id == 55) {
                 textura(g, Material.GRAMA, variacao);
                 detalhesVegetacao(g, variacao);
-            } else if (id == 56 || (id == 60 && cenario == CenarioId.TRILHA_LATERAL)) {
-                if (!objeto) textura(g, Material.GRAMA, variacao);
-                desenharArbusto(g, variacao);
             } else if (id <= 10 || id == 53 || (id >= 57 && id <= 59)) {
                 desenharTrilha(g, id, variacao);
             } else if (id >= 11 && id <= 18) {
@@ -241,23 +249,6 @@ public final class RenderizadorTiles {
             g.setColor(new Color(70, 78, 62));
             g.fillRect(28, 34, 10, 2);
         }
-    }
-
-    private void desenharArbusto(Graphics2D g, int variacao) {
-        g.setColor(new Color(8, 20, 15, 150));
-        g.fillRect(8, 38, 34, 8);
-        g.fillRect(14, 44, 22, 4);
-        g.setColor(new Color(58, 40, 28));
-        g.fillRect(20, 30, 8, 18);
-        Polygon folhas = new Polygon(new int[]{12, 36, 36, 42, 42, 46, 46, 42, 42, 34, 34, 14, 14, 6, 6, 2, 2, 8, 8, 12},
-                new int[]{2, 2, 6, 6, 12, 12, 32, 32, 38, 38, 42, 42, 38, 38, 32, 32, 14, 14, 6, 6}, 20);
-        texturaRecortada(g, Material.FOLHAGEM, folhas, variacao);
-        g.setColor(new Color(10, 32, 21, 180));
-        g.drawPolygon(folhas);
-        g.setColor(new Color(85, 122, 47));
-        g.fillRect(12, 10, 6, 2);
-        g.fillRect(10, 12, 4, 2);
-        g.fillRect(30, 20, 6, 2);
     }
 
     private void desenharTelhado(Graphics2D g, int id, int variacao) {
