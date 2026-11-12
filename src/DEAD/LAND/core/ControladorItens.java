@@ -6,6 +6,7 @@ import DEAD.LAND.entity.player;
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.ui.panel;
 import DEAD.LAND.world.tileMap;
+import DEAD.LAND.world.MapaFloresta;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -33,8 +34,7 @@ public class ControladorItens {
                 "espada", Categoria.ARMA, 1, false));
         this.itens.add(new item(item.SPRITE_POCAO_CURA, 5, 480, 144,
                 "pocao_cura", Categoria.CONSUMIVEL, 1, true));
-        this.itens.add(new item(item.SPRITE_MEMORIA, 2, 600, 240,
-                "memoria_01", Categoria.ITEM_HISTORIA, 1, false));
+        this.itens.addAll(MapaFloresta.criarItens());
         this.itens.add(new item(item.SPRITE_MEMORIA, 3, 210, 245,
                 "memoria_02", Categoria.ITEM_HISTORIA, 1, false));
         this.itens.add(new item(item.SPRITE_MEMORIA, 5, 1080, 340,

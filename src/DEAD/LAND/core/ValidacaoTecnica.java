@@ -27,6 +27,7 @@ public class ValidacaoTecnica {
         validarColisaoETransicao();
         validarCamaDoisTiles();
         validarTilesDosCenarios();
+        ValidacaoFloresta.validar();
         validarMateriaisCastelo();
         validarInventario();
         validarDano();
@@ -92,8 +93,8 @@ public class ValidacaoTecnica {
             exigir(imagem != null && imagem.getWidth() == 24 && imagem.getHeight() == 24,
                     "textura deve existir em 24x24: " + material.getCaminho());
         }
-        // Assinaturas físicas anteriores à troca do visual: nenhum caminho pode mudar.
-        long[] colisoesOriginais = {3438794768L, 2915522381L, 1126653853L, 3096947269L,
+        // Assinaturas físicas dos mapas publicados, incluindo a floresta ampliada.
+        long[] colisoesOriginais = {3438794768L, 2915522381L, 3375136063L, 3096947269L,
                 2415417690L, 2952865556L, 4056105978L, 688305776L, 3813518656L};
         tileMap mapa = new tileMap();
         for (CenarioId id : CenarioId.values()) {
@@ -108,7 +109,7 @@ public class ValidacaoTecnica {
                 }
             }
             exigir(assinatura.getValue() == colisoesOriginais[id.indice()],
-                    "troca visual deve preservar colisoes de " + id);
+                    "colisoes devem corresponder ao mapa publicado de " + id);
             var imagem = new java.awt.image.BufferedImage(mapa.getLarguraTotal(), mapa.getAlturaTotal(),
                     java.awt.image.BufferedImage.TYPE_INT_ARGB);
             var g = imagem.createGraphics();
@@ -419,7 +420,7 @@ public class ValidacaoTecnica {
         };
         try {
             cena.pausarJogo();
-            cena.irParaCenario(2, 600, 240);
+            cena.irParaCenario(2, 192, 144);
             cena.getHistoria().restaurarAposRespawn(null, inventario.getNomesItens(), 2, false);
             escutadorTeclado teclado = new escutadorTeclado();
             teclado.interagir = true;

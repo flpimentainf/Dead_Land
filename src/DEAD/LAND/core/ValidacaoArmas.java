@@ -42,13 +42,13 @@ final class ValidacaoArmas {
             cena.getSistemaCheckpoint().restaurar(cena);
             exigir(inventario.espadaEquipada(), "respawn deve preservar a arma selecionada");
 
-            cena.irParaCenario(2, 500, 200);
+            cena.irParaCenario(2, 740, 200);
             cena.getHistoria().restaurarAposRespawn(null, inventario.getNomesItens(), 2, false);
             teclado = new escutadorTeclado();
             long[] tempo = {0};
             ControladorEspada golpes = new ControladorEspada(() -> tempo[0]);
-            Point2D mira = new Point2D.Double(800, 230);
-            Inimigo perto = inimigo(562, 200, 2), longe = inimigo(700, 200, 2), atras = inimigo(450, 200, 2);
+            Point2D mira = new Point2D.Double(1040, 230);
+            Inimigo perto = inimigo(802, 200, 2), longe = inimigo(940, 200, 2), atras = inimigo(690, 200, 2);
             int vida = perto.getVida(), flechas = inventario.getQuantidadeFlechas();
             exigir(golpes.atacar(cena, mira), "espada equipada deve atacar com mira");
             exigir(!golpes.atacar(cena, mira), "preparacao nao pode ser reiniciada por spam de cliques");
@@ -66,12 +66,12 @@ final class ValidacaoArmas {
             exigir(!cena.getControladorFlechas().dispararMouse(cena, mira), "arco guardado nao pode disparar");
 
             golpes.cancelar();
-            cena.getCenario().definirTile(4, 11, 60);
+            cena.getCenario().definirTile(4, 16, 60);
             exigir(golpes.atacar(cena, mira), "novo golpe deve iniciar");
             tempo[0] += 180;
             golpes.atualizar(cena, teclado);
-            exigir(!golpes.tentarAtingir(cena, inimigo(562, 200, 2)), "golpe nao pode atravessar uma parede");
-            cena.getCenario().definirTile(4, 11, 55);
+            exigir(!golpes.tentarAtingir(cena, inimigo(802, 200, 2)), "golpe nao pode atravessar uma parede");
+            cena.getCenario().definirTile(4, 16, 2);
 
             for (double angulo : new double[]{0, Math.PI / 2, Math.PI, -Math.PI / 2}) {
                 golpes.cancelar();
