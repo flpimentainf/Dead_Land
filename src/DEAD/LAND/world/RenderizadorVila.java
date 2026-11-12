@@ -12,6 +12,7 @@ import java.util.Random;
 public final class RenderizadorVila {
     private BufferedImage terreno;
     private final Map<MapaVila.Construcao, BufferedImage> fachadas = new HashMap<>();
+    private final RenderizadorFachadas fachadasPixel = new RenderizadorFachadas();
     private final RenderizadorArvores arvores = new RenderizadorArvores();
     private final Image terra = ResourceManager.getInstancia().carregarImagem("repos/tileset/terra.png");
 
@@ -20,7 +21,7 @@ public final class RenderizadorVila {
         g.drawImage(terreno, 0, 0, 2400, 1200, null);
         for (MapaVila.Construcao casa : MapaVila.CONSTRUCOES) {
             if (objetos[casa.linha()][casa.coluna()] != MapaVila.CONSTRUCAO) continue;
-            BufferedImage imagem = fachadas.computeIfAbsent(casa, this::criarFachada);
+            BufferedImage imagem = fachadas.computeIfAbsent(casa, fachadasPixel::criar);
             Rectangle area = casa.area();
             g.drawImage(imagem, area.x - 12, area.y, area.width + 24, area.height + 24, null);
         }
@@ -84,166 +85,6 @@ public final class RenderizadorVila {
             }
         } finally { g.dispose(); }
         return imagem;
-    }
-
-    private BufferedImage criarFachada(MapaVila.Construcao casa) {
-        int w = casa.largura() * 48, h = casa.altura() * 48;
-        BufferedImage imagem = new BufferedImage((w + 24) / 2, (h + 24) / 2, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = imagem.createGraphics();
-        try {
-            g.scale(0.5, 0.5); g.translate(12, 0);
-            int estilo = casa.estilo();
-            boolean guilda = casa.tipo() == MapaVila.Tipo.GUILDA, loja = casa.tipo() == MapaVila.Tipo.LOJA;
-            int teto = guilda ? h * 54 / 100 : h * 48 / 100;
-            Color[] telhas = {new Color(125, 55, 42), new Color(104, 60, 44), new Color(56, 80, 86),
-                    new Color(73, 88, 66), new Color(115, 63, 48), new Color(68, 86, 103), new Color(101, 78, 47)};
-            g.setColor(new Color(8, 14, 14, 105)); g.fillRect(20, teto, w - 20, h - teto + 14);
-            g.fillRect(32, h + 14, w - 36, 6);
-            Color parede = estilo == 3 || guilda ? new Color(155, 148, 124) : new Color(192, 168, 127);
-            g.setColor(new Color(46, 43, 37)); g.fillRect(12, teto - 10, w - 24, h - teto + 10);
-            g.setColor(parede); g.fillRect(18, teto, w - 36, h - teto - 12);
-            if (estilo == 3 || guilda) {
-                for (int y = teto + 4; y < h - 10; y += 14) {
-                    g.setColor(new Color(103, 105, 90)); g.fillRect(18, y, w - 36, 2);
-                    for (int x = 18 + (y / 14 % 2) * 15; x < w - 18; x += 30) g.fillRect(x, y, 2, 14);
-                }
-            } else {
-                g.setColor(new Color(84, 61, 43));
-                for (int x = 20; x < w - 10; x += 64) g.fillRect(x, teto, 8, h - teto - 10);
-                g.fillRect(18, teto + 18, w - 36, 8);
-                g.fillRect(18, h - 22, w - 36, 8);
-            }
-            g.setColor(new Color(74, 79, 72)); g.fillRect(12, h - 12, w - 24, 12);
-            g.setColor(new Color(124, 125, 105)); g.fillRect(16, h - 12, w - 32, 3);
-            Polygon telhado = new Polygon(new int[]{0, w / 7, w - w / 7, w, w - 4, 4},
-                    new int[]{teto - 8, 4, 4, teto - 8, teto + 4, teto + 4}, 6);
-            telhado(g, telhado, telhas[estilo], w, teto);
-            if (guilda) {
-                int cx = w / 2;
-                g.setColor(new Color(50, 49, 43));
-                g.fillPolygon(new Polygon(new int[]{cx - 108, cx, cx + 108}, new int[]{teto + 18, 12, teto + 18}, 3));
-                g.setColor(new Color(178, 170, 138));
-                g.fillPolygon(new Polygon(new int[]{cx - 86, cx, cx + 86}, new int[]{teto + 8, 40, teto + 8}, 3));
-                g.setColor(new Color(74, 59, 43)); g.fillRect(cx - 4, 51, 8, teto - 44);
-                g.setColor(new Color(29, 46, 50));
-                g.fillPolygon(new Polygon(new int[]{cx - 27, cx + 27, cx + 24, cx, cx - 24},
-                        new int[]{teto - 89, teto - 89, teto - 47, teto - 27, teto - 47}, 5));
-                g.setColor(new Color(210, 173, 83)); g.setStroke(new BasicStroke(4));
-                g.drawLine(cx - 13, teto - 76, cx + 14, teto - 43);
-                g.drawLine(cx + 13, teto - 76, cx - 14, teto - 43);
-            } else if (estilo == 0 || estilo == 5) {
-                int dx = w * 2 / 3;
-                g.setColor(new Color(49, 45, 37));
-                g.fillPolygon(new Polygon(new int[]{dx - 32, dx, dx + 32}, new int[]{teto - 18, teto - 68, teto - 18}, 3));
-                g.setColor(parede); g.fillRect(dx - 24, teto - 26, 48, 34);
-                janela(g, dx - 12, teto - 22, 24, 26, false);
-            }
-            // Chaminé individual, com topo e argamassa legíveis.
-            int ch = w - 70;
-            g.setColor(new Color(63, 61, 53)); g.fillRect(ch, 4, 30, 48);
-            g.setColor(new Color(129, 119, 96)); g.fillRect(ch + 4, 4, 22, 44);
-            g.setColor(new Color(42, 42, 38)); g.fillRect(ch - 4, 0, 38, 8);
-            g.setColor(new Color(184, 172, 139)); g.fillRect(ch - 4, 0, 38, 3);
-            int portaW = guilda ? 72 : 40, portaH = Math.min(guilda ? 88 : 66, h - teto - 14);
-            porta(g, w / 2 - portaW / 2, h - portaH - 8, portaW, portaH, guilda);
-            int janelaY = teto + 34, janelaH = Math.min(44, h - janelaY - 30);
-            if (janelaH >= 20) {
-                janela(g, 42, janelaY, loja ? 96 : 44, janelaH, !guilda);
-                janela(g, w - (loja ? 138 : 86), janelaY, loja ? 96 : 44, janelaH, !guilda);
-            }
-            if (guilda) {
-                bandeira(g, 133, teto + 28); bandeira(g, w - 157, teto + 28);
-                letreiro(g, w / 2, teto + 21, "GUILDA DOS ERRANTES", 18);
-            } else if (loja) {
-                int ay = teto + 12;
-                for (int x = 24; x < w - 24; x += 24) {
-                    g.setColor((x / 24) % 2 == 0 ? new Color(146, 64, 47) : new Color(218, 199, 151));
-                    g.fillRect(x, ay, 24, 27); g.fillRect(x + 2, ay + 27, 20, 7);
-                }
-                letreiro(g, w / 2, teto - 7, "ARMAZÉM", 20);
-            }
-            vaso(g, 24, h - 15, estilo); vaso(g, w - 40, h - 15, estilo + 1);
-            if (guilda) { lanterna(g, w / 2 - 63, h - 82); lanterna(g, w / 2 + 56, h - 82); }
-        } finally { g.dispose(); }
-        return imagem;
-    }
-
-    private void telhado(Graphics2D g, Polygon forma, Color cor, int w, int h) {
-        g.setColor(new Color(38, 34, 29)); g.fillPolygon(forma);
-        Shape anterior = g.getClip(); g.clip(forma);
-        g.setColor(cor); g.fillRect(2, 8, w - 4, h - 10);
-        for (int y = 10; y < h; y += 12) {
-            g.setColor(cor.darker()); g.fillRect(0, y + 9, w, 3);
-            g.setColor(cor.brighter()); g.fillRect(0, y, w, 2);
-            for (int x = (y / 12 % 2) * 13; x < w; x += 26) {
-                g.setColor(cor.darker()); g.fillRect(x, y + 2, 2, 7);
-            }
-        }
-        g.setClip(anterior); g.setColor(new Color(40, 34, 29));
-        g.setStroke(new BasicStroke(5)); g.drawPolygon(forma);
-        g.setColor(new Color(176, 143, 97)); g.fillRect(w / 7, 6, w - 2 * (w / 7), 3);
-        g.setColor(new Color(58, 40, 29)); g.fillRect(4, h - 2, w - 8, 8);
-    }
-
-    private void janela(Graphics2D g, int x, int y, int w, int h, boolean persiana) {
-        g.setColor(new Color(60, 44, 32)); g.fillRect(x - 5, y - 5, w + 10, h + 10);
-        g.setColor(new Color(45, 66, 68)); g.fillRect(x, y, w, h);
-        g.setColor(new Color(186, 162, 102)); g.fillRect(x + 3, y + 3, w / 2 - 6, h - 6);
-        g.setColor(new Color(232, 207, 140)); g.fillRect(x + w / 2 + 2, y + 3, w / 2 - 5, h / 2 - 4);
-        g.setColor(new Color(80, 60, 39)); g.fillRect(x + w / 2 - 2, y, 4, h);
-        g.fillRect(x, y + h / 2 - 2, w, 4);
-        g.setColor(new Color(156, 137, 98)); g.fillRect(x - 7, y + h + 3, w + 14, 4);
-        if (persiana) {
-            g.setColor(new Color(62, 77, 62)); g.fillRect(x - 16, y - 2, 10, h + 4);
-            g.fillRect(x + w + 6, y - 2, 10, h + 4);
-            g.setColor(new Color(31, 48, 40));
-            for (int yy = y + 4; yy < y + h; yy += 7) {
-                g.fillRect(x - 16, yy, 10, 2); g.fillRect(x + w + 6, yy, 10, 2);
-            }
-        }
-    }
-
-    private void porta(Graphics2D g, int x, int y, int w, int h, boolean dupla) {
-        g.setColor(new Color(57, 51, 39)); g.fillRect(x - 8, y - 8, w + 16, h + 12);
-        g.setColor(new Color(136, 122, 93)); g.fillRect(x - 5, y - 5, w + 10, h + 5);
-        g.setColor(new Color(75, 50, 32)); g.fillRect(x, y, w, h);
-        for (int xx = x + 4; xx < x + w; xx += 9) {
-            g.setColor(new Color(111, 76, 42)); g.fillRect(xx, y + 3, 3, h - 5);
-        }
-        g.setColor(new Color(31, 35, 32)); g.fillRect(x + 2, y + 13, w - 4, 5);
-        g.fillRect(x + 2, y + h - 19, w - 4, 5);
-        if (dupla) g.fillRect(x + w / 2 - 1, y, 3, h);
-        g.setColor(new Color(212, 170, 77)); g.fillRect(x + w - 10, y + h / 2, 4, 7);
-        g.setColor(new Color(159, 154, 130)); g.fillRect(x - 9, y + h + 1, w + 18, 5);
-        g.setColor(new Color(91, 97, 86)); g.fillRect(x - 12, y + h + 6, w + 24, 6);
-    }
-
-    private void bandeira(Graphics2D g, int x, int y) {
-        g.setColor(new Color(43, 48, 45)); g.fillRect(x - 4, y - 4, 38, 6);
-        g.setColor(new Color(42, 80, 84)); g.fillRect(x, y, 30, 65);
-        g.fillPolygon(new Polygon(new int[]{x, x + 15, x + 30}, new int[]{y + 65, y + 78, y + 65}, 3));
-        g.setColor(new Color(205, 164, 78)); g.fillRect(x + 13, y + 12, 4, 37); g.fillRect(x + 6, y + 29, 18, 4);
-    }
-
-    private void vaso(Graphics2D g, int x, int y, int estilo) {
-        g.setColor(new Color(111, 67, 41)); g.fillRect(x + 2, y - 5, 18, 15);
-        g.setColor(new Color(167, 105, 65)); g.fillRect(x, y - 7, 22, 5);
-        g.setColor(new Color(42, 79, 39)); g.fillRect(x - 2, y - 16, 24, 10);
-        g.setColor(estilo % 2 == 0 ? new Color(176, 114, 108) : new Color(199, 172, 92));
-        g.fillRect(x + 3, y - 18, 5, 5); g.fillRect(x + 14, y - 14, 4, 4);
-    }
-
-    private void lanterna(Graphics2D g, int x, int y) {
-        g.setColor(new Color(39, 43, 37)); g.fillRect(x, y - 6, 12, 25);
-        g.setColor(new Color(226, 190, 106)); g.fillRect(x + 3, y, 6, 13);
-    }
-
-    private void letreiro(Graphics2D g, int centro, int y, String texto, int tamanho) {
-        g.setFont(new Font("Monospaced", Font.BOLD, tamanho));
-        int w = g.getFontMetrics().stringWidth(texto) + 22;
-        g.setColor(new Color(41, 37, 29)); g.fillRect(centro - w / 2 - 3, y - tamanho - 4, w + 6, tamanho + 14);
-        g.setColor(new Color(104, 72, 41)); g.fillRect(centro - w / 2, y - tamanho - 1, w, tamanho + 8);
-        g.setColor(new Color(225, 204, 151)); g.drawString(texto, centro - (w - 22) / 2, y + 1);
     }
 
     private void desenharFonte(Graphics2D destino) {
