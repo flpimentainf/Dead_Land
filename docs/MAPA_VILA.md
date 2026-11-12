@@ -23,6 +23,9 @@ As construções são somente fachadas, sem interiores ou menus de loja nesta ve
   desenho. Os acessos são ligados automaticamente às soleiras, inclusive nas
   entradas laterais da guilda. Telhados e cantos transparentes não bloqueiam passos.
 - `GeometriaLago`: a mesma margem pixelada define a água visível e a área que bloqueia.
+- `RenderizadorAgua`: compartilha as faixas de grama, terra e água rasa entre o
+  lago da vila e os lagos do caminho do castelo. A camada se une entre os tiles
+  e preserva as muralhas e o espaço das passagens.
 - `RenderizadorArvores`: troncos, galhos e copas maiores que um tile, reutilizados
   na vila e nos antigos IDs de vegetação. Não modifica as colisões da floresta.
 
