@@ -1,7 +1,7 @@
 # Executável Windows
 
 As distribuições ficam somente em `dist/vX.Y.Z/`, com `Dead_Land.exe` diretamente
-dentro de cada pasta. Os pacotes atual e anterior são `dist/v1.3.1/` e `dist/v1.3.0/`.
+dentro de cada pasta. Os pacotes atual e anterior são `dist/v1.3.2/` e `dist/v1.3.1/`.
 O Java está em `runtime/`, os recursos em `app/repos/` e os três slots em `save/`.
 Mantenha essas pastas junto do executável. Para transportar o jogo, copie a pasta
 da versão inteira. Não são gerados ZIPs.
@@ -26,6 +26,11 @@ A v1.3.1 redesenha as fachadas com volumes medievais variados e pixel art mais
 marcada: empenas, anexos laterais, portas e janelas arqueadas e letreiros pixelados.
 Os caminhos usam cores de terra mais simples e pequenos degraus nas curvas.
 
+A v1.3.2 aplica esse estilo às trilhas de todos os cenários e liga os acessos às
+portas realmente desenhadas. As colisões da vila seguem as paredes de cada volume;
+telhados e cantos vazios permitem passagem, com sobreposição visual correta.
+A fonte central foi substituída por um lago de margem irregular e colisão da água.
+
 ## Próximas atualizações
 
 Em Windows com JDK 21 ou superior, x64:
@@ -43,7 +48,7 @@ O empacotador aplica estas regras:
 - Cada slot leva a cópia mais recente encontrada nas versões mantidas, mesmo que
   a última jogatina tenha acontecido na versão anterior.
 - Depois da publicação, permanecem somente as duas versões mais recentes,
-  ordenadas numericamente. Ao publicar `v1.4.0`, ficam `v1.3.1` e `v1.4.0`.
+  ordenadas numericamente. Ao publicar `v1.4.0`, ficam `v1.3.2` e `v1.4.0`.
 - Não são criadas pastas `Atualizado`, `Versao-X.Y.Z`, pastas extras `Dead_Land`
   dentro da pasta da versão, nem arquivos ZIP.
 
