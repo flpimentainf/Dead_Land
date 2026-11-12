@@ -2,6 +2,10 @@ package DEAD.LAND.world;
 
 import DEAD.LAND.entity.item;
 import DEAD.LAND.entity.item.Categoria;
+import DEAD.LAND.core.SpawnInimigo;
+import DEAD.LAND.entity.TipoInimigo;
+import DEAD.LAND.entity.Inimigo;
+import DEAD.LAND.entity.Boss;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,5 +104,38 @@ public final class MapaFloresta {
         itens.add(new item("repos/itens/pocao_cura.png", 2, 2112, 1008, "pocao_cura", Categoria.CONSUMIVEL, 1, true));
         itens.add(new item("repos/itens/pocao_cura.png", 2, 2208, 960, "pocao_cura", Categoria.CONSUMIVEL, 1, true));
         return itens;
+    }
+
+    public static List<SpawnInimigo> criarSpawns() {
+        List<SpawnInimigo> spawns = new ArrayList<>();
+        spawns.add(new SpawnInimigo(TipoInimigo.SKELETON, 2, 96, 288, "esquerda", 90));
+        spawns.add(new SpawnInimigo(TipoInimigo.SKELETON, 2, 192, 336, "esquerda", 90));
+        spawns.add(new SpawnInimigo(TipoInimigo.SKELETON, 2, 288, 288, "esquerda", 90));
+        spawns.add(new SpawnInimigo(TipoInimigo.SLIME, 2, 144, 240, "esquerda", 80));
+        spawns.add(new SpawnInimigo(TipoInimigo.SLIME, 2, 240, 240, "esquerda", 80));
+        spawns.add(new SpawnInimigo(TipoInimigo.SLIME, 2, 48, 336, "esquerda", 80));
+        spawns.add(new SpawnInimigo(TipoInimigo.SLIME, 2, 96, 384, "esquerda", 80));
+        spawns.add(new SpawnInimigo(TipoInimigo.SLIME, 2, 192, 432, "esquerda", 80));
+        spawns.add(new SpawnInimigo(TipoInimigo.SLIME, 2, 1872, 864, "esquerda", 80));
+        spawns.add(new SpawnInimigo(TipoInimigo.SLIME, 2, 2064, 864, "esquerda", 80));
+        spawns.add(new SpawnInimigo(TipoInimigo.SLIME, 2, 1968, 720, "esquerda", 80));
+        spawns.add(new SpawnInimigo(TipoInimigo.SLIME, 2, 1920, 768, "esquerda", 80));
+        spawns.add(new SpawnInimigo(TipoInimigo.SLIME, 2, 2160, 816, "esquerda", 80));
+        spawns.add(new SpawnInimigo(TipoInimigo.SKELETON, 2, 1824, 720, "esquerda", 90));
+        spawns.add(new SpawnInimigo(TipoInimigo.SKELETON, 2, 1728, 624, "esquerda", 90));
+        spawns.add(new SpawnInimigo(TipoInimigo.SKELETON, 2, 1872, 624, "esquerda", 90));
+        return spawns;
+    }
+
+    public static List<Inimigo> criarInimigos() {
+        List<Inimigo> inimigos = new ArrayList<>();
+        for (SpawnInimigo spawn : criarSpawns()) {
+            Inimigo inimigo = spawn.getTipo() == TipoInimigo.BOSS
+                    ? new Boss(spawn.getX(), spawn.getY())
+                    : new Inimigo(spawn.getX(), spawn.getY(), spawn.getTipo(), spawn.getDirecaoInicial(), spawn.getRaioPatrulha());
+            inimigo.setCenarioIndex(spawn.getCenarioIndex());
+            inimigos.add(inimigo);
+        }
+        return inimigos;
     }
 }

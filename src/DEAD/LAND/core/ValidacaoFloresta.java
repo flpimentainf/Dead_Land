@@ -2,10 +2,12 @@ package DEAD.LAND.core;
 
 import DEAD.LAND.entity.item;
 import DEAD.LAND.entity.player;
+import DEAD.LAND.entity.TipoInimigo;
 import DEAD.LAND.input.escutadorTeclado;
 import DEAD.LAND.ui.Inventario;
 import DEAD.LAND.ui.panel;
 import DEAD.LAND.world.tileMap;
+import DEAD.LAND.world.MapaFloresta;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayDeque;
@@ -45,6 +47,7 @@ public final class ValidacaoFloresta {
             } else pocoes++;
         }
         exigir(orbes == 1 && pocoes == 3, "o mapa deve conter uma orbe e três poções");
+        validarInimigos(mapa, acessivel);
 
         // Cada partida precisa de suas próprias camadas editáveis.
         mapa.getCenarioAtual().getMapaBase()[4][15] = 0;
@@ -53,6 +56,40 @@ public final class ValidacaoFloresta {
         outraPartida.irParaCenario(2);
         exigir(!outraPartida.tileTemColisao(4, 15), "uma partida não pode modificar outra floresta");
         SwingUtilities.invokeAndWait(ValidacaoFloresta::validarQuedaESaida);
+    }
+
+    private static void validarInimigos(tileMap mapa, boolean[][] acessivel) {
+        ControladorInimigos controlador = new ControladorInimigos();
+        var inimigos = controlador.getInimigos().stream()
+                .filter(inimigo -> inimigo.getCenarioIndex() == 2).toList();
+        exigir(inimigos.size() == 16, "a floresta deve carregar os 16 inimigos enviados");
+        exigir(inimigos.stream().filter(i -> i.getTipo() == TipoInimigo.SKELETON).count() == 6
+                        && inimigos.stream().filter(i -> i.getTipo() == TipoInimigo.SLIME).count() == 10,
+                "a floresta deve conter seis esqueletos e dez slimes");
+        for (SpawnInimigo spawn : MapaFloresta.criarSpawns()) {
+            var inimigo = inimigos.stream().filter(i -> i.x == spawn.getX()
+                    && i.y == spawn.getY() && i.getTipo() == spawn.getTipo()).findFirst().orElseThrow();
+            exigir(areaLivre(mapa, inimigo.getAreaDano()),
+                    "inimigo deve nascer fora dos obstáculos em " + inimigo.x + "," + inimigo.y);
+            exigir(acessivel[inimigo.y / 48][inimigo.x / 48],
+                    "a posição de cada inimigo deve ser acessível ao jogador");
+            exigir(!inimigo.intersects(new Rectangle(745, 200, 48, 48))
+                            && !inimigo.intersects(new Rectangle(745, 335, 48, 48)),
+                    "inimigos não devem ocupar os pontos de nascimento existentes");
+            inimigo.marcarDerrotado();
+            inimigo.translate(12, 12);
+        }
+        controlador.resetarCenario(2, false);
+        for (SpawnInimigo spawn : MapaFloresta.criarSpawns()) {
+            exigir(inimigos.stream().anyMatch(i -> i.x == spawn.getX() && i.y == spawn.getY()
+                            && i.estaVivo() && i.getVida() == i.getVidaMaxima()),
+                    "retorno ao checkpoint deve restaurar cada inimigo na posição enviada");
+        }
+        exigir(controlador.getInimigos().size() == 25
+                        && controlador.getInimigos().stream().filter(i -> i.getCenarioIndex() == 5).count() == 3
+                        && controlador.getInimigos().stream().filter(i -> i.getCenarioIndex() == 6).count() == 5
+                        && controlador.getChefe().getCenarioIndex() == 7,
+                "a importação deve preservar os inimigos dos outros cenários e o chefe");
     }
 
     private static boolean[][] explorar(tileMap mapa, int linha, int coluna) {

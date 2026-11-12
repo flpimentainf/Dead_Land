@@ -7,6 +7,7 @@ import DEAD.LAND.entity.TipoInimigo;
 import DEAD.LAND.entity.player;
 import DEAD.LAND.ui.panel;
 import DEAD.LAND.world.tiles;
+import DEAD.LAND.world.MapaFloresta;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class ControladorInimigos {
 
     private void carregarSpawns() {
         List<SpawnInimigo> spawns = new ArrayList<SpawnInimigo>();
+        spawns.addAll(MapaFloresta.criarSpawns());
         spawns.add(new SpawnInimigo(TipoInimigo.SKELETON, 5, 22 * tiles.LARGURA, 3 * tiles.ALTURA, "esquerda", 90));
         spawns.add(new SpawnInimigo(TipoInimigo.SLIME, 5, 25 * tiles.LARGURA, 4 * tiles.ALTURA, "esquerda", 80));
         spawns.add(new SpawnInimigo(TipoInimigo.RANGED, 5, 29 * tiles.LARGURA, 2 * tiles.ALTURA, "esquerda", 70));
@@ -185,6 +187,10 @@ public class ControladorInimigos {
 
     public Boss getChefe() {
         return chefe;
+    }
+
+    public List<Inimigo> getInimigos() {
+        return List.copyOf(inimigos);
     }
 
     public void definirBossDerrotado(boolean derrotado) {
